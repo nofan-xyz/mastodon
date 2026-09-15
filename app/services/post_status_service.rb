@@ -20,6 +20,15 @@ class PostStatusService < BaseService
     end
   end
 
+  class IdempotencyError < StandardError
+    attr_reader :status
+
+    def initialize(status)
+      super()
+      @status = status
+    end
+  end
+
   # Post a text status update, fetch and notify remote users mentioned
   # @param [Account] account Account from which to post
   # @param [Hash] options
@@ -48,7 +57,7 @@ class PostStatusService < BaseService
     @quoted_status = @options[:quoted_status]
     preprocess_attributes!
 
-    duplicate_status = with_idempotency do
+    with_idempotency do
       validate_media!
 
       if scheduled?
@@ -58,15 +67,13 @@ class PostStatusService < BaseService
       end
     end
 
-    return duplicate_status if duplicate_status
-
     unless scheduled?
       postprocess_status!
       bump_potential_friendship!
     end
 
     @status
-  rescue Antispam::SilentlyDrop => e
+  rescue Antispam::SilentlyDrop, IdempotencyError => e
     e.status
   end
 
@@ -237,20 +244,15 @@ class PostStatusService < BaseService
   end
 
   def with_idempotency
-    unless idempotency_given?
-      yield
-      return
-    end
+    return yield unless idempotency_given?
 
     with_redis_lock("idempotency:lock:status:#{@account.id}:#{@options[:idempotency]}") do
-      return idempotency_duplicate if idempotency_duplicate?
+      raise IdempotencyError, idempotency_duplicate if idempotency_duplicate?
 
       yield
 
       redis.setex(idempotency_key, 3_600, @status.id)
     end
-
-    nil
   end
 
   def scheduled_in_the_past?
