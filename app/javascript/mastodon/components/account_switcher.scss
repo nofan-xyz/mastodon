@@ -1,0 +1,162 @@
+.account-switcher {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+
+  summary,
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: start;
+
+    &:hover,
+    &:focus-visible {
+      background: var(
+        --color-bg-overlay-highlight,
+        color-mix(in srgb, var(--color-text-primary) 5%, transparent)
+      );
+    }
+  }
+
+  summary {
+    list-style: none;
+    padding: 0;
+
+    .display-name {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.65;
+    }
+  }
+
+  img {
+    border-radius: 4px;
+  }
+
+  p {
+    padding: 10px;
+  }
+
+  &__name {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong,
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    z-index: 10;
+    inset-inline: 0;
+    min-width: 220px;
+    max-width: calc(100vw - 32px);
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 4px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px #0003;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+
+    &:hover,
+    &:focus-within {
+      background: var(
+        --color-bg-overlay-highlight,
+        color-mix(in srgb, var(--color-text-primary) 5%, transparent)
+      );
+
+      .account-switcher__remove {
+        opacity: 1;
+      }
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: transparent;
+    }
+  }
+
+  button.account-switcher__select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  button.account-switcher__remove {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+    opacity: 0;
+
+    @media (hover: none) {
+      opacity: 1;
+    }
+  }
+
+  &__remove-icon {
+    display: block;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  &__changed {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+
+    [role='alertdialog'] {
+      max-width: 420px;
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 20px;
+    }
+  }
+}

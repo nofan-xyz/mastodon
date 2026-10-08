@@ -4,6 +4,14 @@
 - content_for :header_tags do
   = render partial: 'shared/og'
 
+- saved_accounts = BrowserAccountSessions.new(cookies).sessions.select { |activation| activation.user.active_for_authentication? && activation.user.functional? }
+- if saved_accounts.any?
+  .simple_form
+    %h2= t('account_switcher.saved_accounts')
+    .actions
+      - saved_accounts.each do |activation|
+        = button_to t('account_switcher.continue_as', username: activation.user.account.username), auth_accounts_switch_path, params: { account_id: activation.user.account.id }, class: 'button', method: :post
+
 - unless omniauth_only?
   = simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
     %h1.title= t('auth.sign_in.title', domain: site_hostname)

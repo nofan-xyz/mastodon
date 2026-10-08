@@ -1,0 +1,4 @@
+zh-CN:
+  account_switcher:
+    continue_as: '返回 @%{username}'
+    saved_accounts: 已登录的账号

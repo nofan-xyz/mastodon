@@ -1,0 +1,4 @@
+en:
+  account_switcher:
+    continue_as: 'Continue as @%{username}'
+    saved_accounts: Saved accounts

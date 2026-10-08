@@ -12,6 +12,8 @@ Warden::Manager.after_set_user except: :fetch do |user, warden|
     httponly: true,
     same_site: :lax,
   }
+
+  BrowserAccountSessions.new(warden.cookies).remember(user.session_activations.find_by(session_id: session_id))
 end
 
 Warden::Manager.after_fetch do |user, warden|
@@ -33,7 +35,10 @@ Warden::Manager.after_fetch do |user, warden|
 end
 
 Warden::Manager.before_logout do |_, warden|
-  SessionActivation.deactivate warden.cookies.signed['_session_id']
+  unless warden.request.env['mastodon.preserve_account_session']
+    BrowserAccountSessions.new(warden.cookies).forget(warden.cookies.signed['_session_id'])
+    SessionActivation.deactivate warden.cookies.signed['_session_id']
+  end
   warden.cookies.delete('_session_id')
 end
 
