@@ -74,6 +74,10 @@ Rails.application.routes.draw do
     resource :unsubscribe, only: [:show, :create], controller: :unsubscriptions
 
     namespace :auth do
+      get 'accounts', to: 'accounts#index'
+      post 'accounts/add', to: 'accounts#add'
+      post 'accounts/switch', to: 'accounts#switch'
+      delete 'accounts/:account_id', to: 'accounts#destroy', as: :saved_account
       resource :acceptance, only: [:create]
       resource :setup, only: [:show, :update], controller: :setup
       resource :challenge, only: [:create]

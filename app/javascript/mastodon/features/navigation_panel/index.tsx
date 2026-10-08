@@ -31,7 +31,7 @@ import StarIcon from '@/material-icons/400-24px/star.svg?react';
 import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { openNavigation, closeNavigation } from 'mastodon/actions/navigation';
-import { Account } from 'mastodon/components/account';
+import { AccountSwitcher } from 'mastodon/components/account_switcher';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { WordmarkLogo } from 'mastodon/components/logo';
 import { Search } from 'mastodon/features/compose/components/search';
@@ -198,7 +198,7 @@ const ProfileCard: React.FC = () => {
 
   return (
     <div className='navigation-bar'>
-      <Account id={me} minimal size={36} />
+      <AccountSwitcher size={36} />
     </div>
   );
 };
