@@ -103,7 +103,11 @@ export const HoverCardController: React.FC = () => {
           target.removeAttribute('title');
 
           setEnterTimeout(() => {
-            open(target);
+            // The anchor may have been disabled while waiting (e.g. when
+            // opening the account switcher), or removed from the page.
+            if (target.isConnected && isHoverCardAnchor(target)) {
+              open(target);
+            }
           }, enterDelay);
         }
 
