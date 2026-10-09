@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+
 import {
   render,
   screen,
@@ -50,6 +52,41 @@ describe('AccountSwitcher', () => {
     });
     mocks.post.mockReset().mockRejectedValue(new Error('Request failed'));
     mocks.delete.mockReset().mockResolvedValue({});
+  });
+
+  it('opens the profile without opening the switcher and supports hovering when closed', async () => {
+    const Location = () => <output>{useLocation().pathname}</output>;
+    render(
+      <>
+        <AccountSwitcher />
+        <Location />
+      </>,
+    );
+    const profile = screen.getByRole('link', { name: /Alice/ });
+    const toggle = screen.getByRole('button', { name: 'Switch account' });
+    expect(profile.getAttribute('href')).toBe('/@alice');
+    expect(profile.getAttribute('data-hover-card-account')).toBe('1');
+    fireEvent.click(profile);
+    expect(screen.getByText('/@alice')).toBeTruthy();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('button', { name: /Bob/ })).toBeNull();
+    await waitFor(() => {
+      expect(mocks.get).toHaveBeenCalled();
+    });
+  });
+
+  it('disables profile hover while the switcher is open and restores it on outside dismissal', async () => {
+    render(<AccountSwitcher />);
+    const profile = screen.getByRole('link', { name: /Alice/ });
+    const toggle = screen.getByRole('button', { name: 'Switch account' });
+    fireEvent.click(toggle);
+    await screen.findByRole('button', { name: /Bob/ });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(profile.hasAttribute('data-hover-card-account')).toBe(false);
+    fireEvent.pointerDown(document.body);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(profile.getAttribute('data-hover-card-account')).toBe('1');
+    expect(screen.queryByRole('button', { name: /Bob/ })).toBeNull();
   });
 
   afterEach(() => {
@@ -110,13 +147,13 @@ describe('AccountSwitcher', () => {
     expect(mocks.post).not.toHaveBeenCalled();
   });
 
-  it('closes the list with Escape and returns focus to the summary', async () => {
+  it('closes the list with Escape and returns focus to the toggle', async () => {
     render(<AccountSwitcher />);
     const summary = screen.getByLabelText('Switch account');
     fireEvent.click(summary);
     const target = await screen.findByRole('button', { name: /Bob/ });
     fireEvent.keyDown(target, { key: 'Escape' });
-    expect(summary.closest('details')?.open).toBe(false);
+    expect(summary.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(summary);
   });
 

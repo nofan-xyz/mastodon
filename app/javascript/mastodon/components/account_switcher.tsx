@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { defineMessages, useIntl } from 'react-intl';
+
+import { Link } from 'react-router-dom';
 
 import { List as ImmutableList } from 'immutable';
 
@@ -69,7 +71,10 @@ const changeKey = 'mastodon:account-changed';
 export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
   const intl = useIntl();
   const account = useAccount(me);
-  const details = useRef<HTMLDetailsElement>(null);
+  const container = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
+  const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState<SavedAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -107,8 +112,11 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
       if (event.key === changeKey) refresh();
     };
     const handlePointerDown = (event: PointerEvent) => {
-      if (details.current && !details.current.contains(event.target as Node)) {
-        details.current.open = false;
+      if (
+        container.current &&
+        !container.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
       }
     };
     refresh();
@@ -174,7 +182,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
           data: { current_account_id: me },
         });
         setAccounts((saved) => saved.filter((item) => item.id !== id));
-        details.current?.querySelector('summary')?.focus();
+        toggle.current?.focus();
         try {
           localStorage.setItem(changeKey, 'removed');
           localStorage.removeItem(changeKey);
@@ -199,13 +207,17 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
-      if (event.key === 'Escape' && details.current) {
-        details.current.open = false;
-        details.current.querySelector('summary')?.focus();
+      if (event.key === 'Escape') {
+        setOpen(false);
+        toggle.current?.focus();
       }
     },
     [],
   );
+
+  const handleToggle = useCallback(() => {
+    setOpen((value) => !value);
+  }, []);
 
   if (!account) return null;
 
@@ -214,85 +226,104 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
   }
 
   return (
-    <details
+    <div
       className='account-switcher account account--minimal account--without-border'
-      ref={details}
+      ref={container}
     >
-      <summary
-        className='account__display-name'
-        aria-label={intl.formatMessage(messages.switch)}
-        onKeyDown={handleKeyDown}
-      >
-        <Avatar account={account} size={size} />
-        <span className='display-name'>
-          <strong className='display-name__html'>
-            {account.display_name || account.username}
-          </strong>
-          <span className='display-name__account'>@{account.acct}</span>
-        </span>
-        <span aria-hidden>▾</span>
-      </summary>
-      <div className='account-switcher__menu' aria-busy={busy}>
-        {loading && <p role='status'>{intl.formatMessage(messages.loading)}</p>}
-        {accounts.map((saved) => (
-          <div className='account-switcher__row' key={saved.id}>
-            <button
-              className='account-switcher__select'
-              data-account-id={saved.id}
-              type='button'
-              disabled={busy || saved.id === me}
-              onClick={handleSwitch}
-              onKeyDown={handleKeyDown}
-            >
-              <img src={saved.avatar} width={28} height={28} alt='' />
-              <span className='account-switcher__name'>
-                <strong>{saved.display_name}</strong>
-                <span>@{saved.username}</span>
-              </span>
-              {saved.id === me && (
-                <span aria-label={intl.formatMessage(messages.current)}>✓</span>
-              )}
-            </button>
-            {saved.id !== me && (
-              <button
-                className='account-switcher__remove'
-                data-account-id={saved.id}
-                type='button'
-                disabled={busy}
-                aria-label={intl.formatMessage(messages.remove, {
-                  username: saved.username,
-                })}
-                title={intl.formatMessage(messages.remove, {
-                  username: saved.username,
-                })}
-                onClick={handleRemove}
-                onKeyDown={handleKeyDown}
-              >
-                <CloseIcon
-                  className='account-switcher__remove-icon'
-                  aria-hidden
-                />
-              </button>
-            )}
-          </div>
-        ))}
+      <div className='account-switcher__header'>
+        <Link
+          className='account__display-name account-switcher__profile focusable'
+          to={`/@${account.acct}`}
+          data-hover-card-account={open ? undefined : account.id}
+        >
+          <Avatar account={account} size={size} />
+          <span className='display-name'>
+            <strong className='display-name__html'>
+              {account.display_name || account.username}
+            </strong>
+            <span className='display-name__account'>@{account.acct}</span>
+          </span>
+        </Link>
         <button
+          className='account-switcher__toggle'
           type='button'
-          disabled={busy || loading}
-          onClick={handleAdd}
+          ref={toggle}
+          aria-label={intl.formatMessage(messages.switch)}
+          aria-expanded={open}
+          aria-controls={menuId}
+          onClick={handleToggle}
           onKeyDown={handleKeyDown}
         >
-          {intl.formatMessage(messages.add)}
+          <span aria-hidden>▾</span>
         </button>
-        {error && (
-          <p role='alert'>
-            {intl.formatMessage(
-              error === 'remove' ? messages.removeError : messages.error,
-            )}
-          </p>
-        )}
       </div>
-    </details>
+      {open && (
+        <div id={menuId} className='account-switcher__menu' aria-busy={busy}>
+          {loading && (
+            <p role='status'>{intl.formatMessage(messages.loading)}</p>
+          )}
+          {accounts.map((saved) => (
+            <div className='account-switcher__row' key={saved.id}>
+              <button
+                className='account-switcher__select'
+                data-account-id={saved.id}
+                type='button'
+                disabled={busy || saved.id === me}
+                onClick={handleSwitch}
+                onKeyDown={handleKeyDown}
+              >
+                <img src={saved.avatar} width={28} height={28} alt='' />
+                <span className='account-switcher__name'>
+                  <strong>{saved.display_name}</strong>
+                  <span>@{saved.username}</span>
+                </span>
+                {saved.id === me && (
+                  <span aria-label={intl.formatMessage(messages.current)}>
+                    ✓
+                  </span>
+                )}
+              </button>
+              {saved.id !== me && (
+                <button
+                  className='account-switcher__remove'
+                  data-account-id={saved.id}
+                  type='button'
+                  disabled={busy}
+                  aria-label={intl.formatMessage(messages.remove, {
+                    username: saved.username,
+                  })}
+                  title={intl.formatMessage(messages.remove, {
+                    username: saved.username,
+                  })}
+                  onClick={handleRemove}
+                  onKeyDown={handleKeyDown}
+                >
+                  <CloseIcon
+                    className='account-switcher__remove-icon'
+                    aria-hidden
+                  />
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type='button'
+            disabled={busy || loading}
+            onClick={handleAdd}
+            onKeyDown={handleKeyDown}
+          >
+            {intl.formatMessage(messages.add)}
+          </button>
+          {error && (
+            <p role='alert'>
+              {intl.formatMessage(
+                error === 'remove' ? messages.removeError : messages.error,
+              )}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
