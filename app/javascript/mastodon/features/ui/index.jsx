@@ -25,6 +25,7 @@ import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 import { accountSwitchNavigation } from 'mastodon/utils/account_switch';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
+import { OnThisDayController } from '@/mastodon/features/on_this_day/controller';
 
 import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
@@ -665,6 +666,7 @@ class UI extends PureComponent {
           {!minimalShell && <NavigationBar />}
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
+          {this.props.identity.signedIn && <OnThisDayController />}
           {!disableHoverCards && <HoverCardController />}
           <HashtagMenuController />
           <LoadingBarContainer className='loading-bar' />

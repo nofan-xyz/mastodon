@@ -110,10 +110,10 @@ class InitialStateSerializer < ActiveModel::Serializer
 
   def on_this_day
     return unless object.current_account
-    return unless object.current_account.user.setting_on_this_day_enabled
 
-    on_this_day = OnThisDay.new(object.current_account)
-    { state: on_this_day.state, date: OnThisDay.today_cst.to_s }
+    date = OnThisDay.today_cst
+    state = object.current_account.user.setting_on_this_day_enabled ? OnThisDay.new(object.current_account, date).state : 'disabled'
+    { state: state, date: date.to_s }
   end
 
   def default_meta_store

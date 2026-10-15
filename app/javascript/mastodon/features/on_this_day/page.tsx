@@ -14,7 +14,6 @@ import { ColumnHeader } from '@/mastodon/components/column_header';
 import { Icon } from '@/mastodon/components/icon';
 import { StatusQuoteManager } from '@/mastodon/components/status_quoted';
 import {
-  checkOnThisDay,
   fetchOnThisDayData,
   fetchOnThisDayState,
 } from '@/mastodon/reducers/slices/on_this_day';
@@ -31,31 +30,12 @@ export const OnThisDayPage: FC = () => {
   const dispatch = useAppDispatch();
   const { state, date, data, error } = useAppSelector((s) => s.onThisDay);
 
-  // Always check state on mount (handles direct URL access)
-  useEffect(() => {
-    dispatch(checkOnThisDay());
-  }, [dispatch]);
-
   // Fetch full data when state becomes ready
   useEffect(() => {
-    if (!data && state === 'ready') {
+    if (!data && !error && state === 'ready') {
       void dispatch(fetchOnThisDayData());
     }
-  }, [dispatch, data, state]);
-
-  // While the record is being generated in the background (state is
-  // 'pending'), poll until it resolves to 'ready' or 'empty'
-  useEffect(() => {
-    if (state !== 'pending') return;
-
-    const timer = setTimeout(() => {
-      void dispatch(fetchOnThisDayState());
-    }, 3_000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [dispatch, state]);
+  }, [dispatch, data, state, error]);
 
   const years = useMemo(() => {
     if (!data?.years) return [];
@@ -87,7 +67,14 @@ export const OnThisDayPage: FC = () => {
   const showDisabled = state === 'disabled' && !data && !error;
 
   const handleRetry = useCallback(() => {
-    void dispatch(fetchOnThisDayData());
+    void dispatch(fetchOnThisDayState()).then((action) => {
+      if (
+        fetchOnThisDayState.fulfilled.match(action) &&
+        action.payload.state === 'ready'
+      ) {
+        void dispatch(fetchOnThisDayData());
+      }
+    });
   }, [dispatch]);
 
   const handleEnable = useCallback(() => {

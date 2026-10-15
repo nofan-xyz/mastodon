@@ -39,6 +39,34 @@ RSpec.describe OnThisDay do
   end
 
   describe '#generate' do
+    it 'precomputes tomorrow at 23:30 and becomes ready exactly at Beijing midnight' do
+      target_date = Date.new(2026, 10, 16)
+      travel_to Time.utc(2026, 10, 15, 15, 30) do
+        account.update!(created_at: Time.utc(2020, 1, 1))
+        past_status = Fabricate(:status, account: account, created_at: Time.utc(2025, 10, 15, 16))
+        Fabricate(:status, account: account, created_at: Time.utc(2025, 10, 15, 15, 59, 59))
+
+        described_class.new(account, target_date).generate
+
+        expect(described_class.new(account).state).to eq 'pending'
+        expect(OnThisDayRecord.find_by(account: account, date: target_date).status_ids).to eq [past_status.id.to_s]
+      end
+
+      travel_to Time.utc(2026, 10, 15, 16) do
+        expect(described_class.new(account).state).to eq 'ready'
+      end
+    end
+
+    it 'groups New Year memories using their Beijing year' do
+      travel_to Time.utc(2026, 12, 31, 15, 30) do
+        account.update!(created_at: Time.utc(2020, 1, 1))
+        past_status = Fabricate(:status, account: account, created_at: Time.utc(2025, 12, 31, 16, 30))
+        described_class.new(account, Date.new(2027, 1, 1)).generate
+
+        expect(OnThisDayRecord.find_by(account: account).data).to eq('years' => { '2026' => [past_status.id.to_s] })
+      end
+    end
+
     it 'is a no-op when a record already exists for today' do
       Fabricate(:on_this_day_record, account: account)
 

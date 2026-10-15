@@ -1,26 +1,18 @@
-import { useEffect } from 'react';
-
 import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Icon } from '@/mastodon/components/icon';
-import { checkOnThisDay } from '@/mastodon/reducers/slices/on_this_day';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppSelector } from '@/mastodon/store';
 import HistoryIcon from '@/material-icons/400-24px/history.svg?react';
 
 export const OnThisDayNavItem: React.FC = () => {
-  const dispatch = useAppDispatch();
   const { state } = useAppSelector((state) => state.onThisDay);
   const location = useLocation();
   const active = location.pathname.startsWith('/on_this_day');
 
-  useEffect(() => {
-    dispatch(checkOnThisDay());
-  }, [dispatch]);
-
-  if (!state || state === 'pending' || state === 'disabled') {
+  if (!state || state === 'disabled') {
     return null;
   }
 

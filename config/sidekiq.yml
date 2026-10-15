@@ -76,8 +76,13 @@
       interval: 1 hour
       class: Scheduler::CollectionItemCleanupScheduler
       queue: scheduler
+    on_this_day_precompute_scheduler:
+      cron: '0 23 * * * Asia/Shanghai'
+      class: Scheduler::OnThisDayScheduler
+      args: [1]
+      queue: scheduler
     on_this_day_scheduler:
-      cron: '5 16 * * *'
+      cron: '5 0 * * * Asia/Shanghai'
       class: Scheduler::OnThisDayScheduler
       queue: scheduler
     repair_remote_collections_scheduler:

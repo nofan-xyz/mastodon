@@ -9,7 +9,8 @@
 - 侧边导航入口 + 独立页面（`/on_this_day`），回顾往年同一天发布的嘟文。
 - 默认开启，用户可在偏好设置中关闭；关闭时 `GET /api/v1/on_this_day/state` 返回 `{ state: 'disabled' }` 而非 403。
 - 收录公开 / 不列 / 仅关注者嘟文，排除私信；尊重当前屏蔽与隐藏关系；不含转发，回复仅含自我回复。
-- 记录按 UTC+8（Asia/Shanghai）日期划分，每日 00:05 由 `Scheduler::OnThisDayScheduler` 批量生成；用户访问时尚未生成则入队 `GenerateOnThisDayWorker` 异步生成，前端在 `pending` 状态每 3 秒轮询。
+- 记录按 UTC+8（Asia/Shanghai）日期划分；每日 23:00 启动次日预生成，将账号任务分散到 23:00–23:50。00:05 补齐当天缺失记录，访问时仍支持按需生成；任务携带固定日期并去重。
+- 功能开启时导航在生成期间保持显示；全局统一轮询并在北京时间跨日、返回标签页时刷新，清除昨日数据和过期响应。展示预生成结果时重新过滤已删除或不再符合条件的嘟文。实现与验收说明见 `docs/ON_THIS_DAY.md`。
 - 测试：`spec/lib/on_this_day_spec.rb`、`spec/requests/api/v1/on_this_day_spec.rb`。
 - 相关代码：`app/lib/on_this_day.rb`、`app/models/on_this_day_record.rb`、`app/controllers/api/v1/on_this_day_controller.rb`、`app/javascript/mastodon/features/on_this_day/`。
 
