@@ -104,7 +104,7 @@ class OnThisDay
   # Build the data JSONB hash from queried statuses.
   # Groups status IDs by year, oldest year first in the hash.
   def build_data(statuses)
-    grouped = statuses.group_by { |s| s.created_at.year }
+    grouped = statuses.group_by { |s| s.created_at.in_time_zone(CST_ZONE).year }
       .transform_values { |list| list.map { |status| status.id.to_s } }
 
     { 'years' => grouped }

@@ -1,25 +1,18 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import type { FC } from 'react';
 
 import { useHistory } from 'react-router';
 
 import { useDismissible } from '@/mastodon/hooks/useDismissible';
-import { checkOnThisDay } from '@/mastodon/reducers/slices/on_this_day';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppSelector } from '@/mastodon/store';
 
 import { OnThisDayAnnouncement } from './announcement';
 
 export const OnThisDayTimeline: FC = () => {
   const { state, date } = useAppSelector((state) => state.onThisDay);
 
-  const dispatch = useAppDispatch();
   const history = useHistory();
   const { wasDismissed, dismiss } = useDismissible('on_this_day_intro');
-
-  // Check state on mount
-  useEffect(() => {
-    dispatch(checkOnThisDay());
-  }, [dispatch]);
 
   const handleShow = useCallback(() => {
     dismiss();

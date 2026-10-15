@@ -12,6 +12,7 @@ export interface ApiOnThisDayStateResponse {
 export const apiGetOnThisDayState = async () => {
   const response = await api().get<ApiOnThisDayStateResponse>(
     '/api/v1/on_this_day/state',
+    { timeout: 15_000 },
   );
   return response.data;
 };
@@ -24,4 +25,6 @@ export interface ApiOnThisDayResponse {
 }
 
 export const apiGetOnThisDay = () =>
-  apiRequestGet<ApiOnThisDayResponse>('v1/on_this_day');
+  apiRequestGet<ApiOnThisDayResponse>('v1/on_this_day', undefined, {
+    timeout: 30_000,
+  });

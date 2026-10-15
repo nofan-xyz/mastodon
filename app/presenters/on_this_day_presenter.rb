@@ -14,7 +14,7 @@ class OnThisDayPresenter
   end
 
   def data
-    record.data
+    { 'years' => statuses.group_by { |status| status.created_at.in_time_zone(OnThisDay::CST_ZONE).year.to_s }.transform_values { |items| items.map { |status| status.id.to_s } } }
   end
 
   def accounts
@@ -22,7 +22,13 @@ class OnThisDayPresenter
   end
 
   def statuses
-    @statuses ||= Status.where(id: record.status_ids)
+    @statuses ||= record.account.statuses
+      .where(id: record.status_ids, visibility: %i(public unlisted private))
+      .without_reblogs
+      .without_replies
+      .kept
+      .not_excluded_by_account(record.account)
+      .not_domain_blocked_by_account(record.account)
       .with_includes
       .order(created_at: :asc)
   end

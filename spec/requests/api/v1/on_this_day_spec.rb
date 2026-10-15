@@ -47,7 +47,7 @@ RSpec.describe 'OnThisDay' do
           .to not_change(OnThisDayRecord, :count)
 
         expect(GenerateOnThisDayWorker)
-          .to have_enqueued_sidekiq_job(user.account_id)
+          .to have_enqueued_sidekiq_job(user.account_id, OnThisDay.today_cst.iso8601)
         expect(response).to have_http_status(200)
         expect(response.parsed_body)
           .to include(state: 'pending', date: OnThisDay.today_cst.to_s)
@@ -112,10 +112,11 @@ RSpec.describe 'OnThisDay' do
         Fabricate(:on_this_day_record, account: user.account)
       end
 
-      it 'returns http not found' do
+      it 'returns an empty result' do
         get '/api/v1/on_this_day', headers: headers
 
-        expect(response).to have_http_status(404)
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body).to include(data: { years: {} }, statuses: [])
       end
     end
 
@@ -130,6 +131,32 @@ RSpec.describe 'OnThisDay' do
         expect(response.parsed_body[:date]).to eq OnThisDay.today_cst.to_s
         expect(response.parsed_body[:statuses].pluck(:id)).to eq [status.id.to_s]
         expect(response.parsed_body[:accounts].pluck(:id)).to eq [user.account.id.to_s]
+      end
+
+      it 'filters posts deleted or made direct after precomputation out of both IDs and statuses' do
+        visible = Fabricate(:status, account: user.account)
+        deleted = Fabricate(:status, account: user.account)
+        direct = Fabricate(:status, account: user.account)
+        foreign = Fabricate(:status)
+        Fabricate(:on_this_day_record, account: user.account, data: { 'years' => { '2025' => [visible, deleted, direct, foreign].map { |status| status.id.to_s } } })
+        deleted.discard
+        direct.update!(visibility: :direct)
+
+        get '/api/v1/on_this_day', headers: headers
+
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body[:statuses].pluck(:id)).to eq [visible.id.to_s]
+        expect(response.parsed_body[:data][:years].values.flatten).to eq [visible.id.to_s]
+      end
+    end
+
+    it 'does not expose a precomputed record before its Beijing date' do
+      travel_to Time.utc(2026, 10, 15, 15, 30) do
+        Fabricate(:on_this_day_record, account: user.account, date: Date.new(2026, 10, 16))
+
+        get '/api/v1/on_this_day', headers: headers
+
+        expect(response).to have_http_status(404)
       end
     end
   end
