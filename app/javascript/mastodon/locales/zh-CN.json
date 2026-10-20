@@ -1252,6 +1252,7 @@
   "on_this_day.page.enable": "在偏好设置中开启",
   "on_this_day.page.error": "没能翻出这一天的回忆，再试一次？",
   "on_this_day.page.heading": "那年今日",
+  "on_this_day.page.pending": "回忆还在整理中，完成后会自动显示。你也可以稍后重试。",
   "on_this_day.page.retry": "重试",
   "on_this_day.page.summary": "这一天，你在 <brand>nofan</brand> 留下了 {count} 条回忆",
   "on_this_day.page.title": "那年今日",

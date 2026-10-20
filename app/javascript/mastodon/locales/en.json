@@ -1250,6 +1250,7 @@
   "on_this_day.page.enable": "Enable in preferences",
   "on_this_day.page.error": "Couldn't find this day's memories. Try again?",
   "on_this_day.page.heading": "On This Day",
+  "on_this_day.page.pending": "Your memories are still being prepared. They'll appear automatically when ready. You can also try again in a moment.",
   "on_this_day.page.retry": "Retry",
   "on_this_day.page.summary": "On this day, you left {count, plural, one {# memory} other {# memories}} on <brand>Mastodon</brand>",
   "on_this_day.page.title": "On This Day",

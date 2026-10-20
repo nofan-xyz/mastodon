@@ -95,9 +95,30 @@ Tangerine 的五款配色从 `2.6.5` 更新至上游 `3.0.0-beta.1`，固定提�
 
 Stylelint、oxfmt、`git diff --check` 和全部皮肤的生产构建通过；当前 manifest 引用的五款 Tangerine CSS 均包含 `v3.0.0-beta.1` 及上游新设计变量，不含旧 `v2.6.5` 标记。
 
+### 那年今日待生成与空页面
+
+2026-10-21 本地复现：Alice 的状态接口持续返回 `pending`，今天的记录不存在，生成任务停留在独立 Redis 的 `default` 队列，预览 Sidekiq 进程数为 0；Bob 的历史记录在读取时过滤为空，页面立即显示空提示。前者是后台进程缺失，不能按空数据处理，也与 Tangerine 样式无关。
+
+详情页等待生成超过 10 秒后改为明确的等待提示和重试按钮，保留自动轮询；新业务日期重新计时。已有空记录和过滤后的空数据均显示空页面，请求失败显示错误。新增页面测试结合原控制器/状态测试共 15 项，覆盖轮询不重置提示、自动转为空页、重试、删除后为空、跨日及请求错误恢复。
+
+预览环境启动前审计队列：没有远程账号或 webhook，默认队列中只有本地生成、时间线分发和偏好更新等任务。恢复独立 Sidekiq 后，真实 Alice 页面无需刷新便由 `pending` 自动转为 `empty`，生成空记录；浏览器同时检查桌面/手机等待、重试和空页面。预览 Streaming 4105 也已恢复，避免独立实时服务缺失造成连接报错。
+
 ### 独立环境与迁移演练
 
-本地应用使用 `mastodon_5_adaptation` / `mastodon_5_adaptation_test`，独立 Redis 端口 6385。网页 3105、Vite 3136、Streaming 4105；未启动 Sidekiq，开发邮件使用本地/test delivery。测试 ES 前缀为 `nofan5_adaptation_test`，不使用既有本地索引前缀。
+本地应用使用 `mastodon_5_adaptation` / `mastodon_5_adaptation_test`，独立 Redis 端口 6385。网页 3105、Vite 3136、Streaming 4105；预览 Sidekiq 仅消费 `default` 队列，并发 2，禁用周期调度，不消费联邦及邮件队列，开发邮件使用本地/test delivery。测试 ES 前缀为 `nofan5_adaptation_test`，不使用既有本地索引前缀。
+
+预览专用配置 `tmp/sidekiq-preview.yml`（本地文件，不提交）为：
+
+```yaml
+---
+:concurrency: 2
+:queues:
+  - default
+:scheduler:
+  :enabled: false
+```
+
+在此工作区使用 `RAILS_ENV=development PORT=3105 bundle exec sidekiq -C tmp/sidekiq-preview.yml` 启动，确认日志连接 `redis://127.0.0.1:6385/1`。此配置供本地按需生成使用；生产继续使用完整队列及预生成时间表。独立 Streaming 需要显式读取 `.env.development.local` 并覆盖 `PORT=4105`，以使用同一测试数据库和 Redis。
 
 Vite 端口通过 `.env.development.local` 中的 `VITE_DEV_SERVER_PORT=3136` 同时传给前端服务、HMR 和 Rails 代理。4.7 环境保留 3036，端口占用时直接停止启动，避免多个工作区混用资源。修改后须重启 Rails 和 Vite，见 DEVELOPMENT.md。
 
