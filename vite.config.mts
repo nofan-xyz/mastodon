@@ -13,6 +13,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import {
   PluginOption,
   defineConfig,
+  loadEnv,
   UserConfigFnPromise,
   UserConfig,
 } from 'vite';
@@ -41,6 +42,19 @@ const removePropTypesPreset = defineRolldownBabelPreset({
 
 export const config: UserConfigFnPromise = async ({ mode, command }) => {
   const isProdBuild = mode === 'production' && command === 'build';
+  const devServerPort = Number(
+    loadEnv(mode, __dirname, 'VITE_').VITE_DEV_SERVER_PORT ?? '3036',
+  );
+
+  if (
+    !Number.isInteger(devServerPort) ||
+    devServerPort < 1 ||
+    devServerPort > 65535
+  ) {
+    throw new Error(
+      'VITE_DEV_SERVER_PORT must be an integer between 1 and 65535',
+    );
+  }
 
   let outDirName = 'packs-dev';
   if (mode === 'test' || mode === 'production') {
@@ -122,9 +136,10 @@ export const config: UserConfigFnPromise = async ({ mode, command }) => {
         protocol: 'ws',
         // The client can't connect through the main Rails app proxy since it doesn't support
         // WebSockets. It needs to connect directly to Vite's server, that's why we set the port again
-        clientPort: 3036,
+        clientPort: devServerPort,
       },
-      port: 3036,
+      port: devServerPort,
+      strictPort: true,
     },
     build: {
       commonjsOptions: { transformMixedEsModules: true },

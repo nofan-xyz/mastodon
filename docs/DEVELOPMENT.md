@@ -95,6 +95,24 @@ development environment configured with the software needed for this project.
 - Check out the [Mastodon docs] for tips on working with emails in development (you'll need this when creating new user accounts) as well as a list of useful commands for testing and updating your dev instance.
 - You can optionally populate your database with sample data by running `bin/rails dev:populate_sample_data`. This will create a `@showcase_account` account with various types of contents.
 
+## Running multiple checkouts
+
+Each Rails app must use the Vite server from the same checkout. Set a different
+`VITE_DEV_SERVER_PORT` in the second checkout's `.env.development.local`, for example:
+
+```dotenv
+VITE_DEV_SERVER_PORT=3136
+```
+
+This sets the Vite HTTP port, browser WebSocket port, and Rails asset proxy port
+together. Restart both Rails and Vite after changing it. The default is `3036`.
+Vite stops if the configured port is occupied, so it cannot silently move to a
+different port while Rails keeps using another checkout's assets. Avoid using
+`vite --port` alone, which does not update the Rails proxy configuration.
+
+The Rails, streaming, database, and Redis settings also need to be isolated when
+running independent development environments.
+
 [codespace]: https://codespaces.new/mastodon/mastodon?quickstart=1&devcontainer_path=.devcontainer%2Fcodespaces%2Fdevcontainer.json
 [CONTRIBUTING]: ../CONTRIBUTING.md
 [Dev Container extension]: https://containers.dev/supporting#dev-containers

@@ -59,9 +59,17 @@
 - 新发帖框实际发布 Markdown，确认请求 `content_type` 和服务端生成的 `<strong>` 内容；真实添加第二个本地账号并切回。
 - 这里的兼容指原有主题配色/偏好和核心入口在 5.0 界面可用；5.0 更换了 DOM，外观不可能逐像素等同 4.7。
 
+2026-10-20 UI 复核发现：饭否经典、太空饭否、Graphite 和朱印使用独立配色入口，未包含官方入口新增的结构变量，导致帖子内边距归零、头像列失效、圆角及按钮间距丢失。补入共享的间距、圆角、边框、字号、行高和链接变量，继续使用各皮肤自己的配色。另修复本地 4.7/5.0 Vite 端口冲突造成的资源混用。
+
+- 6 个 Mastodon skin × 深浅模式 × 桌面/手机宽度，共 24 个页面通过。新增检查实际计算样式：16px 帖子内边距、48px 头像列、基础变量和视口内布局；原 4.7 环境也完成 24 个页面回归。
+- 六款主题另完成 2560px 宽桌面、新发帖窗口和触屏手机账号菜单检查：菜单在视口内、发帖输入区可用、账号切换按钮至少 44×44px，无运行时异常。
+- 生产前端构建通过，检查生成的六款主题 CSS 均包含上述结构变量。Vite 代理/配置相关 RSpec 11 项通过；实际验证占用端口会拒绝启动、无效端口会报错，两个 Rails 入口分别加载本工作区的资源。
+
 ### 独立环境与迁移演练
 
-本地应用使用 `mastodon_5_adaptation` / `mastodon_5_adaptation_test`，独立 Redis 端口 6385。网页 3105、Vite 3036、Streaming 4105；未启动 Sidekiq，开发邮件使用本地/test delivery。测试 ES 前缀为 `nofan5_adaptation_test`，不使用既有本地索引前缀。
+本地应用使用 `mastodon_5_adaptation` / `mastodon_5_adaptation_test`，独立 Redis 端口 6385。网页 3105、Vite 3136、Streaming 4105；未启动 Sidekiq，开发邮件使用本地/test delivery。测试 ES 前缀为 `nofan5_adaptation_test`，不使用既有本地索引前缀。
+
+Vite 端口通过 `.env.development.local` 中的 `VITE_DEV_SERVER_PORT=3136` 同时传给前端服务、HMR 和 Rails 代理。4.7 环境保留 3036，端口占用时直接停止启动，避免多个工作区混用资源。修改后须重启 Rails 和 Vite，见 DEVELOPMENT.md。
 
 迁移演练在 PostgreSQL **14.24** 上执行，另用 `mastodon_5_rehearsal` 与 `mastodon_5_restore`：
 
