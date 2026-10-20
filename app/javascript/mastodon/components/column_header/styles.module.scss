@@ -1,23 +1,13 @@
 @use '@/styles/mastodon/mixins';
-@use '@/styles/mastodon/variables';
 
 .root {
   position: sticky;
-  top: 0;
+  top: var(--column-panel-offset, 0);
   z-index: 10;
-  padding-top: var(--space-1);
   color: var(--color-text-primary);
-  background: var(--color-bg-desktop);
-
-  html[data-density='compact'] & {
-    padding-top: 0;
-    background: var(--color-bg-primary);
-  }
-
-  @media (width <= variables.$mobile-menu-breakpoint) {
-    padding-top: 0;
-    background: var(--color-bg-primary);
-  }
+  background: var(--color-bg-primary);
+  border-radius: var(--column-panel-radius, 8px) var(--column-panel-radius, 8px)
+    0 0;
 
   // Scroll fade that overlays the scrollable content below
   &::after {
@@ -62,18 +52,9 @@
   min-height: 48px;
   text-align: center;
   cursor: pointer;
-  border-radius: var(--radius-6) var(--radius-6) 0 0;
+  border-radius: var(--column-panel-radius, 8px) var(--column-panel-radius, 8px)
+    0 0;
   background: var(--color-bg-primary);
-
-  html[data-density='compact'] & {
-    border-radius: 0;
-    background: transparent;
-  }
-
-  @media (width <= variables.$mobile-menu-breakpoint) {
-    border-radius: 0;
-    background: transparent;
-  }
 
   // html[data-color-scheme='dark'] & {
   //   border: var(--border-default);

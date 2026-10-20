@@ -95,6 +95,9 @@
   max-width: calc(100vw - var(--space-8));
   padding-inline-start: var(--pull-tolerance);
   touch-action: pan-y;
-  background: var(--color-bg-primary);
+  background: var(--color-bg-navigation, var(--color-bg-primary));
+  border-start-end-radius: var(--column-panel-radius, 8px);
+  border-end-end-radius: var(--column-panel-radius, 8px);
+  overflow: clip;
   box-shadow: var(--dropdown-shadow);
 }

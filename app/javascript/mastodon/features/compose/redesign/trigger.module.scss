@@ -45,6 +45,7 @@
     top: auto;
     display: grid;
     grid-template-columns: var(--columns-area-grid-columns);
+    column-gap: var(--columns-area-grid-gap, 0);
     bottom: 0;
     pointer-events: none;
   }

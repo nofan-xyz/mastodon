@@ -17,10 +17,20 @@
 
   scroll-padding-block: var(--header-height) var(--footer-height);
 
-  --navigation-background-color: var(--color-bg-desktop);
+  --navigation-background-color: var(
+    --color-bg-navigation,
+    var(--color-bg-primary)
+  );
+
+  background: var(--navigation-background-color);
+  border-radius: var(--column-panel-radius, 8px);
 
   &[data-mode='slide-out'] {
-    --navigation-background-color: var(--color-bg-primary);
+    // The drawer owns the outer corners and clips the scrolling surface.
+    border-radius: 0;
+
+    // Constrain browser panning on the scroll container, before the drag wrapper.
+    touch-action: pan-y;
   }
 }
 

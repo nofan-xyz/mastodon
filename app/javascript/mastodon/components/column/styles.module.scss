@@ -22,5 +22,7 @@
       400px
     );
     background: var(--color-bg-primary);
+    border-radius: var(--column-panel-radius, 8px);
+    overflow: clip;
   }
 }

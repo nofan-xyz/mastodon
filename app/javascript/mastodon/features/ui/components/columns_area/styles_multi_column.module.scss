@@ -1,6 +1,8 @@
 @use '@/styles/mastodon/variables' as *;
 
 .root {
+  --column-panel-radius: 8px;
+  --column-panel-offset: 0px;
   --multi-column-navigation-width: 320px;
   --multi-column-gap: var(--space-1);
 
@@ -10,11 +12,13 @@
   --columns-area-grid-gap: var(--multi-column-gap);
 
   position: relative;
+  box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
   justify-content: flex-start;
   gap: var(--multi-column-gap);
   padding-inline-end: var(--multi-column-gap);
+  padding-block: 16px;
   overflow-x: auto;
   scroll-padding-inline-start: var(--multi-column-navigation-width);
 
@@ -35,7 +39,7 @@
   z-index: 100;
   min-width: var(--multi-column-navigation-width);
   padding-bottom: env(safe-area-inset-bottom);
-  background: var(--color-bg-desktop);
+  border-radius: var(--column-panel-radius);
 
   @media (max-width: ($mobile-menu-breakpoint - 1)) {
     display: none;

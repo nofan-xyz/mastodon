@@ -1,6 +1,9 @@
 @use '@/styles/mastodon/variables' as *;
 
 .root {
+  --column-panel-radius: 8px;
+  --column-panel-offset: 8px;
+  --columns-area-grid-gap: 12px;
   --main-column-max-width: 600px;
   --navigation-width: 320px;
   --search-column-width: 320px;
@@ -16,11 +19,16 @@
   height: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: var(--column-panel-offset) 8px
+    calc(var(--column-panel-offset) + env(safe-area-inset-bottom));
 
   @media (min-width: $mobile-menu-breakpoint) {
+    --column-panel-offset: 16px;
+
     display: grid;
     grid-template-columns: var(--columns-area-grid-columns);
+    column-gap: var(--columns-area-grid-gap);
+    padding-inline: 0;
   }
 }
 
@@ -46,11 +54,12 @@
 .navigationWrapper,
 .discoveryWrapper {
   position: sticky;
-  top: 0;
+  top: var(--column-panel-offset);
   z-index: 1;
   box-sizing: border-box;
   width: 100%;
-  height: 100dvh;
+  height: calc(100dvh - var(--column-panel-offset) * 2);
+  border-radius: var(--column-panel-radius);
 }
 
 .navigationWrapper {
@@ -74,6 +83,7 @@
 .discoveryWrapper {
   max-width: var(--search-column-width);
   padding: var(--space-5) var(--space-4) var(--space-6);
+  background: var(--color-bg-primary);
 
   @media (width <= $no-gap-breakpoint) {
     display: none;
@@ -91,6 +101,10 @@
   container: column / inline-size;
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
+  border-radius: var(--column-panel-radius);
+
+  // Unlike overflow:hidden, clip preserves document scrolling and sticky headers.
+  overflow: clip;
 
   :global(.scrollable) {
     contain: content;
