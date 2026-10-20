@@ -133,13 +133,13 @@ class UserSettings
   # flavour/skin selector as a `flavour/skin` string. Persisted as the
   # two underlying keys so they stay independently readable.
   def flavour_and_skin
-    "#{self['flavour']}/#{self['skin']}"
+    "#{self['flavour']}/#{Themes.instance.canonical_skin(self['flavour'], self['skin'])}"
   end
 
   def flavour_and_skin=(value)
     flavour, skin = value.to_s.split('/', 2)
     self['flavour'] = flavour.presence
-    self['skin'] = skin.presence
+    self['skin'] = Themes.instance.canonical_skin(flavour, skin.presence)
   end
 
   def as_json

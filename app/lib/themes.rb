@@ -82,6 +82,11 @@ class Themes
     primary && skins.delete(primary) ? [primary, *skins] : skins
   end
 
+  # Keep saved preferences readable after merging the two Fanfou skins.
+  def canonical_skin(flavour, skin)
+    flavour == 'mastodon-ui' && skin == 'space_fanfou' ? 'fanfou_classic' : skin
+  end
+
   def all_skins
     @flavours.values.flat_map { |data| data['skins'] }.uniq.sort
   end

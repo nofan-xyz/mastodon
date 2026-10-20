@@ -27,6 +27,14 @@ RSpec.describe ThemeHelper do
           )
       end
     end
+
+    context 'when using the retired Space Fanfou skin' do
+      let(:theme) { ['mastodon-ui', 'space_fanfou'] }
+
+      it 'returns the merged Fanfou Classic stylesheet' do
+        expect(html_links.last['href']).to match(%r{/assets/skins/mastodon-ui/fanfou_classic-[\w-]+\.css})
+      end
+    end
   end
 
   describe 'theme_color_tags' do
@@ -123,6 +131,12 @@ RSpec.describe ThemeHelper do
         it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
       end
 
+      context 'when the site default still uses Space Fanfou' do
+        before { Setting.skin = 'space_fanfou' }
+
+        it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
+      end
+
       context 'when skin is changed to an unknown value' do
         before { Setting.skin = 'fakethemename' }
 
@@ -149,6 +163,12 @@ RSpec.describe ThemeHelper do
         before { current_user.settings.update(flavour: 'mastodon-ui', skin: 'graphite', noindex: false) }
 
         it { is_expected.to eq(['mastodon-ui', 'graphite']) }
+      end
+
+      context 'when user previously selected Space Fanfou' do
+        before { current_user.settings.update(flavour: 'mastodon-ui', skin: 'space_fanfou') }
+
+        it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
       end
 
       context 'when user set an unknown skin' do

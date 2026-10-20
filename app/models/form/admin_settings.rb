@@ -151,13 +151,13 @@ class Form::AdminSettings
   # never reaches a `settings` row. The reader goes through the KEYS
   # accessors so a re-rendered form reflects submitted values.
   def flavour_and_skin
-    "#{flavour}/#{skin}"
+    "#{flavour}/#{Themes.instance.canonical_skin(flavour, skin)}"
   end
 
   def flavour_and_skin=(value)
     flavour, skin = value.to_s.split('/', 2)
     @flavour = flavour.presence
-    @skin = skin.presence
+    @skin = Themes.instance.canonical_skin(flavour, skin.presence)
   end
 
   def authorized_fetch

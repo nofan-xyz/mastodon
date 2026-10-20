@@ -114,9 +114,22 @@ RSpec.describe UserSettings do
 
       expect(subject.flavour_and_skin).to eq 'bird-ui/mastodon-bird-ui-auto'
     end
+
+    it 'selects Fanfou Classic for a stored Space Fanfou preference' do
+      subject['flavour'] = 'mastodon-ui'
+      subject['skin'] = 'space_fanfou'
+
+      expect(subject.flavour_and_skin).to eq 'mastodon-ui/fanfou_classic'
+    end
   end
 
   describe '#flavour_and_skin=' do
+    it 'saves an old Space Fanfou form submission under the merged skin' do
+      subject.flavour_and_skin = 'mastodon-ui/space_fanfou'
+
+      expect(subject['skin']).to eq 'fanfou_classic'
+    end
+
     it 'splits the pair onto the flavour and skin keys' do
       subject.flavour_and_skin = 'bird-ui/mastodon-bird-ui-auto'
 

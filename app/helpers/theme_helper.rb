@@ -27,6 +27,7 @@ module ThemeHelper
 
   def theme_style_tags(flavour_and_skin)
     flavour, skin = flavour_and_skin
+    skin = Themes.instance.canonical_skin(flavour, skin)
 
     vite_stylesheet_tag "skins/#{flavour}/#{skin}", type: :virtual, media: 'all', crossorigin: 'anonymous'
   end
@@ -73,7 +74,9 @@ module ThemeHelper
 
   def current_skin
     skins = Themes.instance.skins_for(current_flavour)
-    [current_user&.setting_skin, Setting.skin, 'default'].find { |skin| skins.include?(skin) }
+    [current_user&.setting_skin, Setting.skin, 'default']
+      .map { |skin| Themes.instance.canonical_skin(current_flavour, skin) }
+      .find { |skin| skins.include?(skin) }
   end
 
   def current_theme
