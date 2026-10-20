@@ -276,8 +276,6 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
         reference={toggleElement}
         placement='top-end'
         strategy='fixed'
-        minWidth={260}
-        maxWidth='min(320px, calc(100vw - 32px))'
         id={menuId}
         className='account-switcher__menu'
         aria-busy={busy}

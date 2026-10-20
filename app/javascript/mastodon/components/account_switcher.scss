@@ -88,6 +88,7 @@
 
   &__menu {
     z-index: 300;
+    width: 320px;
     min-width: 220px;
     max-width: min(320px, calc(100vw - 32px));
     max-height: 60vh;
