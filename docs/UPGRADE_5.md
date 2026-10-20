@@ -83,6 +83,18 @@
 
 验证：12 个 skin × 深浅模式 × 桌面/手机共 48 个面板场景，另检查全部 24 种主题/配色的手机抽屉。确认实际圆角、上下留白、标题同色和无横向溢出；2560/1024/768px 下的帖子菜单与发帖窗口、文档滚动和标题返回顶部、短窗口账号菜单，以及四种风味/皮肤的高级紧凑多栏布局均通过。手机抽屉另在 320/390/430px 宽度验证遮罩关闭，并检查短屏滚动、账号面板、触屏滑动及导航后关闭。最终浏览器验收无运行时异常；Stylelint、格式检查、生产构建及当前 manifest 引用的 CSS 产物检查通过。
 
+### Tangerine Neue 3.0 beta
+
+Tangerine 的五款配色从 `2.6.5` 更新至上游 `3.0.0-beta.1`，固定提交 `c35fcc2e8c156610cea69e30148265076ee92e72`，保留 `tangerine-ui/{tangerine,purple,cherry,lagoon,granite}` 标识和已有偏好。来源为发布 tag 中的五份 SCSS，按本仓库的 oxfmt/Stylelint 规则规范格式；上游 MIT 许可及来源记录放在 `styles/tangerine-ui/`。
+
+新版提供 5.0 的基础颜色、阴影、图表变量，修正帖子操作区和新版媒体标签的适配，并包含 2.6.6 的高对比度及多栏修复。五个入口改用上游原生的 5.0 变量，移除临时 `nofan-redesign` 颜色桥接；其他风味保持原有入口。原散落在五份第三方源码中的发帖工具栏补丁移入 `_nofan-fixes.scss`，与那年今日图标补丁一起加载，便于继续同步上游。
+
+此版本仍是上游 beta，对应 5.0 的新导航与弹出发帖布局；主题更新本身不增加旧版常驻侧栏发帖组件。
+
+验证：五款配色 × 深浅模式 × 1440px 桌面/390px 手机，共 20 个布局场景通过。检查实际 beta 版本和基础颜色变量、8px 面板圆角、标题同色、无横向溢出；Markdown 选择、草稿最小化恢复、发帖窗口和至少 44px 的账号切换入口均正常。另检查每款配色在深浅模式下的媒体 ALT 查看、隐藏/显示、帖子菜单及私信底色；高对比度深浅模式、紧凑高级多栏和跟随系统配色均通过，浏览器无运行时异常。
+
+Stylelint、oxfmt、`git diff --check` 和全部皮肤的生产构建通过；当前 manifest 引用的五款 Tangerine CSS 均包含 `v3.0.0-beta.1` 及上游新设计变量，不含旧 `v2.6.5` 标记。
+
 ### 独立环境与迁移演练
 
 本地应用使用 `mastodon_5_adaptation` / `mastodon_5_adaptation_test`，独立 Redis 端口 6385。网页 3105、Vite 3136、Streaming 4105；未启动 Sidekiq，开发邮件使用本地/test delivery。测试 ES 前缀为 `nofan5_adaptation_test`，不使用既有本地索引前缀。
@@ -118,3 +130,4 @@ Vite 端口通过 `.env.development.local` 中的 `VITE_DEV_SERVER_PORT=3136` �
 - https://blog.joinmastodon.org/2026/10/5.0-a-closer-look/
 - https://github.com/mastodon/mastodon/releases
 - https://github.com/mastodon/mastodon/pull/40236
+- https://github.com/mattbirchler/Tangerine-Neue-for-Mastodon/releases/tag/3.0.0-beta.1

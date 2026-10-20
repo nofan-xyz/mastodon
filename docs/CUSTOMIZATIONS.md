@@ -57,6 +57,7 @@
 
 - 5.0 分支将太空饭否并入饭否经典，保留其配色并使用原生布局；清除旧毛玻璃、阴影和组件覆盖，再通过现有变量及少量表面样式还原饭否网页版的青蓝背景、白色内容区、浅绿导航、方头像与紧凑间距。当前为 3 个 flavour、12 个 skin，Mastodon 风味提供 5 款主题；旧 `space_fanfou` 用户和站点偏好映射为 `fanfou_classic`。
 - 5.0 面板统一使用 8px 圆角和上下留白；手机抽屉仅在远离屏幕边缘的一侧使用圆角，外层统一裁切，导航内外共用背景变量，避免饭否浅绿圆角处露白。保留原生滚动、断点和组件结构。
+- 5.0 分支中的 Tangerine 五款配色已更新至 Tangerine Neue `3.0.0-beta.1`，使用上游 5.0 设计变量并保留原有主题标识。nofan 工具栏及那年今日补丁集中在 `styles/tangerine-ui/_nofan-fixes.scss`；来源提交及 MIT 许可见同目录 README/LICENSE。
 - 4.7 基线共有 3 个 flavour、13 个 skin，均复用主前端脚本。旧文档“已移除 Tangerine UI”的描述与本次基线代码不符。
 - 三套饭否类主题之外，还有 Bird UI、Tangerine、樱花和 Graphite，以及多种主题下的账号菜单、那年今日、移动导航和个人主页样式。
 - 运行时：`app/lib/themes.rb`、`app/helpers/theme_helper.rb`、`app/helpers/settings_helper.rb`、appearance 页面、`app/models/user_settings.rb`。
