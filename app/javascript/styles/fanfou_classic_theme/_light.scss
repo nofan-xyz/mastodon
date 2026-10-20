@@ -32,6 +32,7 @@
   /* BACKGROUND TOKENS */
 
   // Neutrals — teal-tinted to harmonise with Fanfou's #acdae5 page background
+  --color-bg: #b1dae1;
   --color-bg-primary: var(--color-white);
   --overlay-strength-secondary: 5%;
   --color-bg-secondary: var(--color-space-teal-50);
@@ -73,7 +74,7 @@
 
   /* BORDER TOKENS */
 
-  --color-border-primary: var(--color-space-teal-200);
+  --color-border-primary: var(--color-grey-200);
   --color-border-brand: var(--color-text-brand);
   --color-border-brand-soft: var(--color-space-blue-200);
   --color-border-error: var(--color-red-700);
