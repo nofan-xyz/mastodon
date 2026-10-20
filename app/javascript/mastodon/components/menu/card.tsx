@@ -96,6 +96,8 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   closeOnClickOutside,
   children,
   className,
+  minWidth,
+  maxWidth,
   ...props
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
@@ -103,7 +105,11 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   if (isMobile && isOpen) {
     return (
       <Portal container={container}>
-        <BottomSheet {...props} onClose={onClose}>
+        <BottomSheet
+          {...props}
+          onClose={onClose}
+          reference={reference instanceof Element ? reference : null}
+        >
           {children}
         </BottomSheet>
       </Portal>
@@ -128,10 +134,9 @@ export const PopoverMenuCard = <As extends React.ElementType>({
         <MenuCard
           {...popoverChildProps}
           {...(props as React.ComponentPropsWithoutRef<As>)}
-          className={classNames(
-            className,
-            props.maxWidth && classes.fullWidthCard,
-          )}
+          minWidth={minWidth}
+          maxWidth={maxWidth}
+          className={classNames(className, maxWidth && classes.fullWidthCard)}
         >
           <div className={classes.scrollableInnerCard}>{children}</div>
         </MenuCard>

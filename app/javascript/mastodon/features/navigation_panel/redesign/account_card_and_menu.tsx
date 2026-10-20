@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   DotsThreeIcon,
+  CaretDownIcon,
   UserIcon,
   GearIcon,
   CirclesFourIcon,
@@ -20,12 +21,17 @@ import {
 
 import { openModal } from '@/mastodon/actions/modal';
 import { openNavigation } from '@/mastodon/actions/navigation';
+import type { AccountSwitcherHeaderProps } from '@/mastodon/components/account_switcher';
 import { AccountSwitcher } from '@/mastodon/components/account_switcher';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
-import { LockupContent, LockupWrapper } from '@/mastodon/components/lockup';
+import {
+  LockupContent,
+  LockupLink,
+  LockupWrapper,
+} from '@/mastodon/components/lockup';
 import {
   Menu,
   MenuItem,
@@ -45,25 +51,65 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
 
-export const NavigationAccountCardAndMenu: React.FC = () => {
+export const NavigationAccountCardAndMenu: React.FC = () => (
+  <AccountSwitcher header={NavigationAccountCard} />
+);
+
+const NavigationAccountCard: React.FC<AccountSwitcherHeaderProps> = ({
+  profileProps,
+  toggleProps,
+}) => {
   const { accountId } = useIdentity();
+  const account = useAccount(accountId);
+  const handle = useAccountHandle(account);
+
   if (!accountId) return null;
 
   return (
-    <div className={classes.root}>
-      <AccountSwitcher size={32} />
-      <Menu type='navigation'>
-        <MenuTrigger as={IconButton} icon={DotsThreeIcon} size='sm'>
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </MenuTrigger>
-        <MenuList placement='top' offset={12} strategy='fixed' minWidth={220}>
-          <AccountMenuItems />
-        </MenuList>
-      </Menu>
-    </div>
+    <LockupWrapper
+      icon={<Avatar account={account} size={32} />}
+      sideContent={
+        <>
+          <IconButton
+            {...toggleProps}
+            icon={CaretDownIcon}
+            size='sm'
+            variant='ghost'
+            className={classes.switchButton}
+          >
+            <FormattedMessage
+              id='account_switcher.switch'
+              defaultMessage='Switch account'
+            />
+          </IconButton>
+          <Menu type='navigation'>
+            <MenuTrigger as={IconButton} icon={DotsThreeIcon} size='sm'>
+              <FormattedMessage
+                id='tabs_bar.account_settings'
+                defaultMessage='Account settings'
+              />
+            </MenuTrigger>
+            <MenuList
+              placement='top'
+              offset={12}
+              strategy='fixed'
+              minWidth={220}
+            >
+              <AccountMenuItems />
+            </MenuList>
+          </Menu>
+        </>
+      }
+      className={classes.root}
+    >
+      <LockupLink
+        {...profileProps}
+        subtitle={handle}
+        className={classes.accountLink}
+      >
+        <DisplayName variant='simple' account={account} />
+      </LockupLink>
+    </LockupWrapper>
   );
 };
 

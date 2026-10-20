@@ -1,5 +1,5 @@
 import type { ComponentPropsWithRef } from 'react';
-import { useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -15,12 +15,14 @@ interface BottomSheetProps extends Omit<
   'onClose'
 > {
   onClose: (e: Event) => void;
+  reference?: Element | null;
 }
 
 export const BottomSheet: React.FC<BottomSheetProps> = ({
   children,
   className,
   onClose,
+  reference = null,
   ...props
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -35,11 +37,19 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     dialog.showModal();
 
     return () => {
-      dialog.requestClose();
+      dialog.close();
     };
   }, []);
 
-  useOnClickOutside(contentRef, (e) => {
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent<HTMLDialogElement>) => {
+      event.preventDefault();
+      onClose(event.nativeEvent);
+    },
+    [onClose],
+  );
+
+  useOnClickOutside([contentRef, reference], (e) => {
     onClose(e);
   });
 
@@ -51,6 +61,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   return (
     <dialog
       {...props}
+      onCancel={handleCancel}
       className={classNames(
         classes.dialog,
         !isInViewport && classes.withGradient,

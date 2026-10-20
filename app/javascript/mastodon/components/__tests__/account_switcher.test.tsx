@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
+import { NavigationAccountCardAndMenu } from '@/mastodon/features/navigation_panel/redesign/account_card_and_menu';
 import {
   render,
   screen,
@@ -40,12 +41,17 @@ vi.mock('mastodon/hooks/useAccount', () => ({
     acct: 'alice',
     username: 'alice',
     display_name: 'Alice',
+    display_name_html: 'Alice',
+    emojis: [],
     avatar: '',
     avatar_static: '',
   }),
 }));
 
-describe('AccountSwitcher', () => {
+describe.each([
+  ['legacy', AccountSwitcher],
+  ['native navigation', NavigationAccountCardAndMenu],
+])('AccountSwitcher (%s)', (_layout, Component) => {
   beforeEach(() => {
     // JSDOM applies the popover UA display:none rule but has no showPopover API.
     // The component mounts/unmounts its menu; browser checks cover placement.
@@ -76,7 +82,7 @@ describe('AccountSwitcher', () => {
     const Location = () => <output>{useLocation().pathname}</output>;
     render(
       <>
-        <AccountSwitcher />
+        <Component />
         <Location />
       </>,
     );
@@ -94,7 +100,7 @@ describe('AccountSwitcher', () => {
   });
 
   it('disables profile hover while the switcher is open and restores it on outside dismissal', async () => {
-    render(<AccountSwitcher />);
+    render(<Component />);
     const profile = screen.getByRole('link', { name: /Alice/ });
     const toggle = screen.getByRole('button', { name: 'Switch account' });
     fireEvent.click(toggle);
@@ -114,7 +120,7 @@ describe('AccountSwitcher', () => {
   });
 
   it('shows the saved accounts and disables the current account', async () => {
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     const current = await screen.findByRole('button', { name: /Alice/ });
     expect(current.hasAttribute('disabled')).toBe(true);
@@ -124,7 +130,7 @@ describe('AccountSwitcher', () => {
   });
 
   it('sends the target and current account IDs and displays a failed switch', async () => {
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     fireEvent.click(await screen.findByRole('button', { name: /Bob/ }));
     await waitFor(() => {
@@ -141,7 +147,7 @@ describe('AccountSwitcher', () => {
   });
 
   it('starts the add-account flow', async () => {
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     await screen.findByRole('button', { name: /Bob/ });
     fireEvent.click(
@@ -159,7 +165,7 @@ describe('AccountSwitcher', () => {
   it('keeps a draft when the user cancels switching', async () => {
     mocks.hasDraft = true;
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     fireEvent.click(await screen.findByRole('button', { name: /Bob/ }));
     expect(confirm).toHaveBeenCalled();
@@ -167,11 +173,16 @@ describe('AccountSwitcher', () => {
   });
 
   it('closes the list with Escape and returns focus to the toggle', async () => {
-    render(<AccountSwitcher />);
+    render(<Component />);
     const summary = screen.getByLabelText('Switch account');
     fireEvent.click(summary);
     const target = await screen.findByRole('button', { name: /Bob/ });
     fireEvent.keyDown(target, { key: 'Escape' });
+    const outerEscape = vi.fn();
+    document.addEventListener('keyup', outerEscape);
+    fireEvent.keyUp(summary, { key: 'Escape' });
+    document.removeEventListener('keyup', outerEscape);
+    expect(outerEscape).not.toHaveBeenCalled();
     expect(summary.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(summary);
   });
@@ -180,7 +191,7 @@ describe('AccountSwitcher', () => {
     mocks.get.mockResolvedValue({
       data: { current_account_id: '2', accounts: [] },
     });
-    render(<AccountSwitcher />);
+    render(<Component />);
     await screen.findByRole('alertdialog');
     const reload = screen.getByRole('button', { name: 'Reload page' });
     await waitFor(() => {
@@ -195,7 +206,7 @@ describe('AccountSwitcher', () => {
 
   it('removes a saved account without switching or losing the current draft', async () => {
     mocks.hasDraft = true;
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     fireEvent.click(await screen.findByRole('button', { name: 'Remove @bob' }));
     await waitFor(() => {
@@ -210,7 +221,7 @@ describe('AccountSwitcher', () => {
 
   it('retains the saved account when removal fails', async () => {
     mocks.delete.mockRejectedValue(new Error('Request failed'));
-    render(<AccountSwitcher />);
+    render(<Component />);
     fireEvent.click(screen.getByLabelText('Switch account'));
     fireEvent.click(await screen.findByRole('button', { name: 'Remove @bob' }));
     await screen.findByRole('alert');
