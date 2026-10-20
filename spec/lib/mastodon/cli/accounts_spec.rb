@@ -1617,7 +1617,7 @@ RSpec.describe Mastodon::CLI::Accounts do
     return false if signature.nil? || signature['creator'] != key_uri
 
     to_be_signed = Digest::SHA256.hexdigest(canonicalize(signature.without('type', 'id', 'signatureValue').merge('@context' => ActivityPub::LinkedDataSignature::CONTEXT))) +
-                   Digest::SHA256.hexdigest(canonicalize(payload.without('signature')))
+      Digest::SHA256.hexdigest(canonicalize(payload.without('signature')))
     OpenSSL::PKey::RSA.new(public_key).verify(OpenSSL::Digest.new('SHA256'), Base64.decode64(signature['signatureValue']), to_be_signed)
   end
 end

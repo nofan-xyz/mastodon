@@ -34,8 +34,16 @@ export const LinkFooter: React.FC<{
               </Link>
             </li>
           )}
-          <li><a href='https://donate.nofan.xyz/' target='_blank' rel='noopener'>Donate</a></li>
-          <li><a href='https://roadmap.nofan.xyz/' target='_blank' rel='noopener'>Roadmap</a></li>
+          <li>
+            <a href='https://donate.nofan.xyz/' target='_blank' rel='noopener'>
+              Donate
+            </a>
+          </li>
+          <li>
+            <a href='https://roadmap.nofan.xyz/' target='_blank' rel='noopener'>
+              Roadmap
+            </a>
+          </li>
           {statusPageUrl && (
             <li>
               <a href={statusPageUrl} target='_blank' rel='noopener'>

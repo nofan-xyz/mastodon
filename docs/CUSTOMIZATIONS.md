@@ -49,11 +49,11 @@
 
 实际主题入口以 `app/javascript/flavours/*/theme.yml` 和 `app/javascript/skins/*/*` 为准，不能只看 `config/themes.yml`。
 
-| Flavour | Skin |
-| --- | --- |
-| mastodon-ui | default、fanfou_classic、space_fanfou、vermilion_seal、graphite、sakura |
-| bird-ui | mastodon-bird-ui-auto、sakura |
-| tangerine-ui | tangerine、cherry、granite、lagoon、purple |
+| Flavour      | Skin                                                                    |
+| ------------ | ----------------------------------------------------------------------- |
+| mastodon-ui  | default、fanfou_classic、space_fanfou、vermilion_seal、graphite、sakura |
+| bird-ui      | mastodon-bird-ui-auto、sakura                                           |
+| tangerine-ui | tangerine、cherry、granite、lagoon、purple                              |
 
 - 当前共有 3 个 flavour、13 个 skin，均复用主前端脚本。旧文档“已移除 Tangerine UI”的描述与本次基线代码不符。
 - 三套饭否类主题之外，还有 Bird UI、Tangerine、樱花和 Graphite，以及多种主题下的账号菜单、那年今日、移动导航和个人主页样式。
