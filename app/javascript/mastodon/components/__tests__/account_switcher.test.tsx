@@ -7,6 +7,8 @@ import {
   waitFor,
   cleanup,
 } from '@/testing/rendering';
+import type * as InitialState from 'mastodon/initial_state';
+import type * as Store from 'mastodon/store';
 
 import { AccountSwitcher } from '../account_switcher';
 
@@ -20,8 +22,18 @@ const mocks = vi.hoisted(() => ({
 vi.mock('mastodon/api', () => ({
   default: () => ({ get: mocks.get, post: mocks.post, delete: mocks.delete }),
 }));
-vi.mock('mastodon/initial_state', () => ({ me: '1', autoPlayGif: false }));
-vi.mock('mastodon/store', () => ({ useAppSelector: () => mocks.hasDraft }));
+vi.mock('mastodon/initial_state', async (importOriginal) => ({
+  ...(await importOriginal<typeof InitialState>()),
+  me: '1',
+  autoPlayGif: false,
+}));
+vi.mock('mastodon/store', async (importOriginal) => ({
+  ...(await importOriginal<typeof Store>()),
+  useAppSelector: () => mocks.hasDraft,
+}));
+vi.mock('mastodon/features/ui/hooks/useBreakpoint', () => ({
+  useBreakpoint: () => false,
+}));
 vi.mock('mastodon/hooks/useAccount', () => ({
   useAccount: () => ({
     id: '1',
@@ -35,6 +47,12 @@ vi.mock('mastodon/hooks/useAccount', () => ({
 
 describe('AccountSwitcher', () => {
   beforeEach(() => {
+    // JSDOM applies the popover UA display:none rule but has no showPopover API.
+    // The component mounts/unmounts its menu; browser checks cover placement.
+    const style = document.createElement('style');
+    style.dataset.popoverTest = 'true';
+    style.textContent = '[popover] { display: block !important; }';
+    document.head.append(style);
     mocks.hasDraft = false;
     mocks.get.mockReset().mockResolvedValue({
       data: {
@@ -91,6 +109,7 @@ describe('AccountSwitcher', () => {
 
   afterEach(() => {
     cleanup();
+    document.querySelector('[data-popover-test]')?.remove();
     vi.restoreAllMocks();
   });
 
@@ -164,9 +183,13 @@ describe('AccountSwitcher', () => {
     render(<AccountSwitcher />);
     await screen.findByRole('alertdialog');
     const reload = screen.getByRole('button', { name: 'Reload page' });
-    expect(document.activeElement).toBe(reload);
+    await waitFor(() => {
+      expect(document.activeElement).toBe(reload);
+    });
     fireEvent.keyDown(reload, { key: 'Tab' });
-    expect(document.activeElement).toBe(reload);
+    await waitFor(() => {
+      expect(document.activeElement).toBe(reload);
+    });
     expect(screen.queryByLabelText('Switch account')).toBeNull();
   });
 

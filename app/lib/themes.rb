@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'singleton'
-require 'yaml'
-
 class Themes
   include Singleton
 
@@ -12,6 +9,7 @@ class Themes
   }.freeze
 
   def initialize
+    @conf = YAML.load_file(Rails.root.join('config', 'themes.yml'))
     @flavours = {}
 
     Rails.root.glob('app/javascript/flavours/*/theme.yml') do |pathname|
@@ -92,5 +90,16 @@ class Themes
     flavours.map do |flavour|
       [flavour, skins_for(flavour).map { |skin| [flavour, skin] }]
     end
+  end
+
+  def names
+    @conf.keys
+  end
+
+  def available_theme_colors(theme)
+    theme = theme.last if theme.is_a?(Array)
+    return [] unless @conf[theme].is_a?(Hash) && @conf[theme]['colors'].present?
+
+    @conf[theme]['colors']
   end
 end

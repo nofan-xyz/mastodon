@@ -58,7 +58,7 @@
 - 当前共有 3 个 flavour、13 个 skin，均复用主前端脚本。旧文档“已移除 Tangerine UI”的描述与本次基线代码不符。
 - 三套饭否类主题之外，还有 Bird UI、Tangerine、樱花和 Graphite，以及多种主题下的账号菜单、那年今日、移动导航和个人主页样式。
 - 运行时：`app/lib/themes.rb`、`app/helpers/theme_helper.rb`、`app/helpers/settings_helper.rb`、appearance 页面、`app/models/user_settings.rb`。
-- 构建：`config/vite/plugin-nofan-themes.ts`、`vite.config.mts`；样式：`app/javascript/styles/`；字体及品牌图片：`app/javascript/fonts/`、`app/javascript/images/`。
+- 构建：`config/vite/plugin-nofan-themes.mts`、`vite.config.mts`；样式：`app/javascript/styles/`；字体及品牌图片：`app/javascript/fonts/`、`app/javascript/images/`。
 - 用户和站点主题设置为 `flavour`/`skin`；已有迁移从旧 `theme` 迁入，升级不能忽略现有选择。深浅模式、系统模式和高对比度需要分别验证。
 - 验证：theme helper、Themes、user settings、CSP 测试，加所有主题的生产构建及浏览器验收。
 

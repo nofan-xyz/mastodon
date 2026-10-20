@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { List as ImmutableList } from 'immutable';
 
+import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 import api from 'mastodon/api';
 import { useAccount } from 'mastodon/hooks/useAccount';
@@ -15,6 +16,7 @@ import { useAppSelector } from 'mastodon/store';
 import { accountSwitchNavigation } from 'mastodon/utils/account_switch';
 
 import { Avatar } from './avatar';
+import { PopoverMenuCard } from './menu/card';
 
 import './account_switcher.scss';
 
@@ -73,6 +75,10 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
   const account = useAccount(me);
   const container = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
+  const [toggleElement, setToggleElement] = useState<HTMLButtonElement | null>(
+    null,
+  );
+  const toggleRef = useMergedRefs(toggle, setToggleElement);
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState<SavedAccount[]>([]);
@@ -85,6 +91,8 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     const attachments = state.compose.get('media_attachments');
     return (
       (typeof text === 'string' && !!text.trim()) ||
+      !!state.compose.get('spoiler_text') ||
+      Number(state.compose.get('pending_media_attachments')) > 0 ||
       (ImmutableList.isList(attachments) && attachments.size > 0) ||
       state.compose.get('poll') != null ||
       state.compose.get('quoted_status_id') != null
@@ -114,7 +122,8 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     const handlePointerDown = (event: PointerEvent) => {
       if (
         container.current &&
-        !container.current.contains(event.target as Node)
+        !container.current.contains(event.target as Node) &&
+        !document.getElementById(menuId)?.contains(event.target as Node)
       ) {
         setOpen(false);
       }
@@ -128,7 +137,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('pointerdown', handlePointerDown);
     };
-  }, []);
+  }, [menuId]);
 
   const changeAccount = useCallback(
     async (target?: string) => {
@@ -215,6 +224,10 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     [],
   );
 
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
   const handleToggle = useCallback(() => {
     setOpen((value) => !value);
   }, []);
@@ -247,7 +260,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
         <button
           className='account-switcher__toggle'
           type='button'
-          ref={toggle}
+          ref={toggleRef}
           aria-label={intl.formatMessage(messages.switch)}
           aria-expanded={open}
           aria-controls={menuId}
@@ -257,8 +270,19 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
           <span aria-hidden>▾</span>
         </button>
       </div>
-      {open && (
-        <div id={menuId} className='account-switcher__menu' aria-busy={busy}>
+      <PopoverMenuCard
+        isOpen={open}
+        onClose={handleClose}
+        reference={toggleElement}
+        placement='top-end'
+        strategy='fixed'
+        minWidth={260}
+        maxWidth='min(320px, calc(100vw - 32px))'
+        id={menuId}
+        className='account-switcher__menu'
+        aria-busy={busy}
+      >
+        <div className='account-switcher'>
           {loading && (
             <p role='status'>{intl.formatMessage(messages.loading)}</p>
           )}
@@ -322,7 +346,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
             </p>
           )}
         </div>
-      )}
+      </PopoverMenuCard>
     </div>
   );
 };

@@ -64,16 +64,8 @@ export function Status () {
   return import('../../status');
 }
 
-export function GettingStarted () {
-  return import('../../getting_started');
-}
-
 export function KeyboardShortcuts () {
   return import('../../keyboard_shortcuts');
-}
-
-export function PinnedStatuses () {
-  return import('../../pinned_statuses');
 }
 
 export function AccountTimeline () {
@@ -136,10 +128,6 @@ export function BookmarkedStatuses () {
 
 export function Blocks () {
   return import('../../blocks');
-}
-
-export function DomainBlocks () {
-  return import('../../domain_blocks');
 }
 
 export function Mutes () {

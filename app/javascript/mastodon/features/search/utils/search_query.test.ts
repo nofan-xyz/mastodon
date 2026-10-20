@@ -1,4 +1,5 @@
 import {
+  searchNeedsKeywords,
   clearSearchFilters,
   getSearchFilters,
   isSearchDateRangeValid,
@@ -230,5 +231,25 @@ describe('search query filters', () => {
         '摄影 "夜间 街景" language:zh after:2026-08-12 before:2026-08-20 in:public from:@searchmock has:poll -is:reply',
       ),
     ).toBe('摄影 "夜间 街景" language:zh');
+  });
+});
+
+describe('5.0 status search requirements', () => {
+  test.each(['has:media', 'after:2026-01-01 -spam', 'from:someone has:poll'])(
+    'requires positive text for %s',
+    (query) => {
+      expect(searchNeedsKeywords(query, 'alice', 'example.com')).toBe(true);
+    },
+  );
+  test.each([
+    '中文 has:media',
+    '"中文 词组" has:media',
+    'in:library has:media',
+    'from:me has:poll',
+    'from:@alice after:2026-01-01',
+    'from:Alice@example.com has:media',
+    '',
+  ])('accepts %s', (query) => {
+    expect(searchNeedsKeywords(query, 'alice', 'example.com')).toBe(false);
   });
 });

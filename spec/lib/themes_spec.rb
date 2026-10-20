@@ -65,4 +65,16 @@ RSpec.describe Themes do
       )
     end
   end
+
+  describe '#available_theme_colors' do
+    it 'supports the stored flavour and skin pair used by the appearance page' do
+      expect(themes.available_theme_colors(%w(mastodon-ui default)))
+        .to eq(themes.available_theme_colors('default'))
+        .and include('indigo', 'pink')
+    end
+
+    it 'does not add an accent palette to a custom skin' do
+      expect(themes.available_theme_colors(%w(bird-ui sakura))).to be_empty
+    end
+  end
 end

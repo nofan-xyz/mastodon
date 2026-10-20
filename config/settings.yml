@@ -17,6 +17,7 @@ defaults: &defaults
   local_topic_feed_access: 'public'
   remote_topic_feed_access: 'public'
   show_staff_badge: true
+  postpone_confirmation_emails: false
   preview_sensitive_media: false
   noindex: false
   # Deprecated: kept only so pre-4.x deployments still boot before admins re-run
@@ -38,6 +39,8 @@ defaults: &defaults
   captcha_enabled: false
   allow_referrer_origin: false
   landing_page: 'trends'
+  opt_in_server_directory: false
+  opt_in_server_recommendation: false
   wrapstodon: true
 
 development:

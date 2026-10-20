@@ -4,20 +4,23 @@
 #
 # Table name: bulk_imports
 #
-#  id                :bigint(8)        not null, primary key
-#  finished_at       :datetime
-#  imported_items    :integer          default(0), not null
-#  likely_mismatched :boolean          default(FALSE), not null
-#  missing_status    :boolean          default(FALSE), not null
-#  original_filename :string           default(""), not null
-#  overwrite         :boolean          default(FALSE), not null
-#  processed_items   :integer          default(0), not null
-#  state             :integer          not null
-#  total_items       :integer          default(0), not null
-#  type              :integer          not null
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  account_id        :bigint(8)        not null
+#  id                     :bigint(8)        not null, primary key
+#  finished_at            :datetime
+#  imported_items         :integer          default(0), not null
+#  likely_mismatched      :boolean          default(FALSE), not null
+#  missing_status         :boolean          default(FALSE), not null
+#  original_filename      :string           default(""), not null
+#  overwrite              :boolean          default(FALSE), not null
+#  processed_items        :integer          default(0), not null
+#  rejection_reason       :text
+#  reviewed_at            :datetime
+#  state                  :integer          not null
+#  total_items            :integer          default(0), not null
+#  type                   :integer          not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  account_id             :bigint(8)        not null
+#  reviewed_by_account_id :bigint(8)
 #
 class BulkImport < ApplicationRecord
   self.inheritance_column = false

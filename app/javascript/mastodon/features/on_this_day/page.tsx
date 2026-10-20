@@ -7,12 +7,12 @@ import { useHistory } from 'react-router';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import { focusCompose } from '@/mastodon/actions/compose';
 import { Button } from '@/mastodon/components/button';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { Icon } from '@/mastodon/components/icon';
-import { StatusQuoteManager } from '@/mastodon/components/status_quoted';
+import { Status } from '@/mastodon/components/status';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import {
   fetchOnThisDayData,
   fetchOnThisDayState,
@@ -83,7 +83,7 @@ export const OnThisDayPage: FC = () => {
 
   const handleWrite = useCallback(() => {
     history.push('/home');
-    dispatch(focusCompose());
+    dispatch(openNewComposer({}));
   }, [dispatch, history]);
 
   const pageTitle = intl.formatMessage({
@@ -93,12 +93,7 @@ export const OnThisDayPage: FC = () => {
 
   return (
     <Column>
-      <ColumnHeader
-        icon='history'
-        iconComponent={HistoryIcon}
-        title={pageTitle}
-        multiColumn={false}
-      />
+      <ColumnHeader title={pageTitle} withBackButton='auto' />
 
       {isLoading ? (
         <div className={styles.wrapper} role='status' aria-label='Loading'>
@@ -239,11 +234,7 @@ export const OnThisDayPage: FC = () => {
                 <h2 className={styles.yearDivider}>{year}</h2>
                 <div className={styles.statusList}>
                   {data?.years[year]?.map((statusId) => (
-                    <StatusQuoteManager
-                      key={statusId}
-                      id={statusId}
-                      showActions
-                    />
+                    <Status key={statusId} id={statusId} showActions />
                   ))}
                 </div>
               </section>
