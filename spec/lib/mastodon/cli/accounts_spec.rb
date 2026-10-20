@@ -992,13 +992,7 @@ RSpec.describe Mastodon::CLI::Accounts do
         expect(ActivityPub::UpdateDistributionWorker).to have_received(:perform_in).with(anything, account.id, anything).once
       end
 
-      context 'when the account only has a legacy key' do
-        let(:account) { Fabricate(:account, legacy_keypair: true) }
-
-        before do
-          account.keypairs.delete_all
-        end
-
+      context 'when the migrated account uses the legacy key URI' do
         it 'signs the update with the old legacy key URI' do
           options = nil
 
@@ -1016,7 +1010,7 @@ RSpec.describe Mastodon::CLI::Accounts do
         end
 
         it 'delivers an Update signed with the old legacy key end-to-end' do
-          old_public_key = account.public_key
+          old_public_key = account.keypair.public_key
           old_key_uri = ActivityPub::TagManager.instance.key_uri_for(account)
           inbox_url = 'https://example.com/inbox'
           options = nil

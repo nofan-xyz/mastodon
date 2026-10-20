@@ -499,7 +499,7 @@ RSpec.describe Auth::SessionsController do
         end
 
         it 'redirects to home' do
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to('/home')
         end
 
         it 'logs the user in' do
