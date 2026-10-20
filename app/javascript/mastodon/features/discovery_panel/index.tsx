@@ -1,7 +1,10 @@
 import { useRouteMatch } from 'react-router';
 
 import { Search } from '@/mastodon/features/compose/components/search';
+import { Trends } from '@/mastodon/features/navigation_panel/components/trends';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from '@/mastodon/identity_context';
+import { isXUi } from '@/mastodon/initial_state';
 
 import { FooterLinks } from './footer_links';
 import classes from './styles.module.scss';
@@ -28,6 +31,7 @@ const ROUTES_WITHOUT_SEARCH_BAR = [
 
 export const DiscoveryPanel: React.FC = () => {
   const { signedIn } = useIdentity();
+  const isNarrow = useBreakpoint('full');
 
   const isRouteWithSearchBar = !useRouteMatch({
     path: ROUTES_WITHOUT_SEARCH_BAR,
@@ -39,6 +43,8 @@ export const DiscoveryPanel: React.FC = () => {
       {signedIn && isRouteWithSearchBar && (
         <Search singleColumn context='sidebar' />
       )}
+
+      {isXUi && signedIn && !isNarrow && <Trends />}
 
       <footer className={classes.footer}>
         <FooterLinks context='search' />

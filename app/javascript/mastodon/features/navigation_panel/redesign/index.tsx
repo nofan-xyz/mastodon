@@ -28,6 +28,7 @@ import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   disabledAccountId,
+  isXUi,
   localLiveFeedAccess,
   remoteLiveFeedAccess,
   trendsEnabled,
@@ -50,6 +51,7 @@ import { ListSection } from './list_section';
 import { DisabledAccountBanner, LoggedOutInfo } from './logged_out_info';
 import { NavigationLink } from './navigation_link';
 import classes from './styles.module.scss';
+import { XNavigationPanel } from './x_navigation';
 
 const messages = defineMessages({
   main: {
@@ -165,6 +167,26 @@ export const RedesignNavigationPanel: React.FC<{
     useScrollSensor({
       placement: 'bottom',
     });
+
+  if (isXUi && signedIn) {
+    return (
+      <XNavigationPanel
+        siteName={siteName}
+        mode={mode}
+        multiColumn={multiColumn}
+        layoutNotice={transientSingleColumn && <TransientSingleColumnCallout />}
+        notificationsCount={notificationsCount}
+        onCompose={openComposer}
+        topSensor={topSensor}
+        bottomSensor={bottomSensor}
+        isScrolledToTop={isScrolledToTop}
+        exploreLink={<ExploreLink />}
+        publicFeedLink={<PublicFeedsLink />}
+        customFeeds={customFeeds}
+        followedHashtags={followedHashtags}
+      />
+    );
+  }
 
   return (
     <nav

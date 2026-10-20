@@ -1092,6 +1092,7 @@
   "navigation_bar.powered_by_mastodon": "powered by {logo}Mastodon",
   "navigation_bar.preferences": "Preferences",
   "navigation_bar.privacy_and_reach": "Privacy and reach",
+  "navigation_bar.profile": "Profile",
   "navigation_bar.relationships": "Relationships",
   "navigation_bar.saved_posts": "Saved Posts",
   "navigation_bar.search": "Search",

@@ -97,6 +97,9 @@ export interface InitialState {
   features: string[];
 }
 
+// Flavour IDs remain stable when their display names change.
+export const isXUi = document.documentElement.dataset.flavour === 'bird-ui';
+
 const element = document.getElementById('initial-state');
 export const initialState: InitialState | undefined = element?.textContent
   ? (JSON.parse(element.textContent) as InitialState)

@@ -1787,8 +1787,8 @@ zh-CN:
       name: Mastodon UI
       description: Mastodon 默认前端，可搭配不同皮肤。
     bird-ui:
-      name: Mastodon Bird UI
-      description: Mastodon Bird UI 前端，可搭配不同皮肤。
+      name: X UI
+      description: 采用 X 风格的界面，可搭配不同配色。
     tangerine-ui:
       name: Tangerine UI
       description: Tangerine UI 前端，可搭配不同皮肤。

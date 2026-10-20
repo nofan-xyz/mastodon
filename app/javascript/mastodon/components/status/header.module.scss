@@ -73,3 +73,12 @@ a.nameLink {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.inlineHandle {
+  font-weight: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 2;
+}

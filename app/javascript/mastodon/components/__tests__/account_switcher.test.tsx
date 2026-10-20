@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 
 import { NavigationAccountCardAndMenu } from '@/mastodon/features/navigation_panel/redesign/account_card_and_menu';
+import { XNavigationAccount } from '@/mastodon/features/navigation_panel/redesign/x_navigation';
 import {
   render,
   screen,
@@ -51,6 +52,7 @@ vi.mock('mastodon/hooks/useAccount', () => ({
 describe.each([
   ['legacy', AccountSwitcher],
   ['native navigation', NavigationAccountCardAndMenu],
+  ['X UI', XNavigationAccount],
 ])('AccountSwitcher (%s)', (_layout, Component) => {
   beforeEach(() => {
     // JSDOM applies the popover UA display:none rule but has no showPopover API.

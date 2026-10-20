@@ -1811,8 +1811,8 @@ en:
       name: Mastodon UI
       description: The stock Mastodon frontend with selectable skins.
     bird-ui:
-      name: Mastodon Bird UI
-      description: The Mastodon Bird UI frontend with selectable skins.
+      name: X UI
+      description: An X-inspired interface with selectable skins.
     tangerine-ui:
       name: Tangerine UI
       description: The Tangerine UI frontend with selectable skins.

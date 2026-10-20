@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
+import { isXUi } from '@/mastodon/initial_state';
 import type { AccountStatusShape } from '@/mastodon/models/status';
 
 import { Avatar } from '../avatar';
@@ -39,6 +40,9 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
     status.mentions.find(({ id }) => id !== currentAccountId)?.id,
   );
 
+  // Keep the native recipient and visibility layout for restricted posts.
+  const inlineHandle =
+    isXUi && ['public', 'unlisted'].includes(status.visibility);
   const handleId = useId();
   const accountLinkProps = accountStatusLinkProps(account);
 
@@ -106,6 +110,17 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
       <div>
         <p className={classes.name}>
           {displayName}
+          {inlineHandle && (
+            <Link
+              {...accountLinkProps}
+              role='presentation'
+              tabIndex={-1}
+              id={handleId}
+              className={classes.inlineHandle}
+            >
+              {handle ?? <Skeleton width='7ch' />}
+            </Link>
+          )}
           &bull;
           <Link
             to={{
@@ -118,16 +133,18 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
           </Link>
         </p>
 
-        <p className={classes.handle}>
-          <Link
-            {...accountLinkProps}
-            role='presentation'
-            tabIndex={-1}
-            id={handleId}
-          >
-            {handle ?? <Skeleton width='7ch' />}
-          </Link>
-        </p>
+        {!inlineHandle && (
+          <p className={classes.handle}>
+            <Link
+              {...accountLinkProps}
+              role='presentation'
+              tabIndex={-1}
+              id={handleId}
+            >
+              {handle ?? <Skeleton width='7ch' />}
+            </Link>
+          </p>
+        )}
       </div>
 
       {children}

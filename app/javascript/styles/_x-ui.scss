@@ -1,0 +1,145 @@
+$accent: #1d9bf0 !default;
+$link-light: #086fa8 !default;
+$link-dark: #1d9bf0 !default;
+
+@mixin colors($bg, $fg, $muted, $line, $hover, $link) {
+  --base-color-bg: #{$bg};
+  --base-color-bg-desktop: #{$bg};
+  --base-color-fg: #{$fg};
+  --base-color-accent: #{$link};
+  --base-color-fg-on-accent: #0f1419;
+  --color-bg: #{$bg};
+  --color-bg-primary: #{$bg};
+  --color-bg-desktop: #{$bg};
+  --color-bg-navigation: #{$bg};
+  --color-bg-secondary-base: #{$hover};
+  --color-bg-secondary-solid: #{$hover};
+  --color-bg-secondary: #{$hover};
+  --color-bg-tertiary: #{$hover};
+  --color-bg-overlay: #000;
+  --color-bg-overlay-highlight: #{$hover};
+  --color-bg-highlight: #{$hover};
+  --color-bg-inverted: #{$fg};
+  --color-text-primary: #{$fg};
+  --color-text-secondary: #{$muted};
+  --color-text-tertiary: #{$muted};
+  --color-text-inverted: #{$bg};
+  --color-text-on-inverted: #{$bg};
+  --color-text-brand: #{$link};
+  --color-text-status-links: #{$link};
+  --color-accent: #{$accent};
+  --color-bg-brand-base: #{$accent};
+  --color-text-on-brand-base: #0f1419;
+  --color-border-primary: #{$line};
+  --color-border: #{$line};
+  --color-border-main: #{$line};
+  --color-border-input: #{$line};
+  --color-field: #{$bg};
+  --color-field-border: #{$line};
+  --color-field-placeholder: #{$muted};
+}
+
+:root:root {
+  @include colors(#000, #e7e9ea, #8b98a5, #2f3336, #16181c, $link-dark);
+}
+
+html[data-color-scheme='light']:root {
+  @include colors(#fff, #0f1419, #536471, #eff3f4, #f0f3f4, $link-light);
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-color-scheme]):root {
+    @include colors(#fff, #0f1419, #536471, #eff3f4, #f0f3f4, $link-light);
+  }
+}
+
+html[data-flavour='bird-ui'] {
+  // Dedicated 5.0 layer, loaded only by the two existing bird-ui skin entries.
+  .layout-single-column {
+    ._comp_columns_area__root {
+      --search-column-width: 350px;
+      --columns-area-grid-gap: 0px;
+
+      @media (width >= 1200px) {
+        --navigation-width: 275px;
+      }
+
+      @media (760px <= width < 1200px) {
+        --navigation-width: 88px;
+      }
+    }
+
+    ._comp_columns_area__main {
+      border-inline: 1px solid var(--color-border-primary);
+    }
+
+    ._comp_columns_area__discoveryWrapper {
+      padding-top: 0;
+      padding-inline: 24px 12px;
+    }
+  }
+
+  ._comp_column_header__root {
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  ._comp_column_header__root::after {
+    display: none;
+  }
+
+  ._comp_column_header__layout {
+    min-height: 52px;
+  }
+
+  ._comp_status_header__name:has(._comp_status_header__inlineHandle) {
+    align-items: center;
+    white-space: nowrap;
+    font-size: 15px;
+  }
+
+  ._comp_status_header__root > div,
+  ._comp_status_header__nameLink {
+    min-width: 0;
+  }
+
+  ._comp_status__variantFeed {
+    row-gap: 8px;
+    padding-block: 12px;
+  }
+
+  ._comp_status__variantFeed:hover {
+    background: color-mix(in srgb, var(--color-bg-highlight) 35%, transparent);
+  }
+
+  ._comp_status__variantFeed ._comp_status_header__root {
+    align-items: start;
+  }
+
+  ._comp_status__variantFeed
+    ._comp_status__header:has(._comp_status_header__inlineHandle)
+    + ._comp_status__contentWrapper {
+    margin-top: -24px;
+  }
+
+  ._comp_status__variantFeed ._comp_status_header__date {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+  }
+
+  // High contrast remains an explicit user choice.
+  &[data-contrast='high'] {
+    --color-border-primary: var(--color-text-secondary);
+  }
+
+  ._discovery_panel__root > .navigation-panel__portal {
+    margin: 20px 0;
+    padding: 16px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 16px;
+  }
+
+  .getting-started__trends-heading {
+    font-size: 20px;
+    font-weight: 700;
+  }
+}

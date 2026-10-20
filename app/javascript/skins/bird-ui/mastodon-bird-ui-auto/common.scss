@@ -1,5 +1,4 @@
-// Skin shim around the Bird UI auto stylesheet; override layers belong
-// here next to the import once skins grow their own rules.
-@use '../../../styles/mastodon-bird-ui-auto';
-
-@use '../../../styles/nofan-redesign';
+// X UI uses the native 5.0 component styles with a dedicated palette and layout.
+// Keep this skin path stable for existing bird-ui preferences.
+@use '../../../styles/application';
+@use '../../../styles/x-ui';

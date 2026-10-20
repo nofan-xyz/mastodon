@@ -1,13 +1,8 @@
-// Skin shim around the wxw.moe Sakura (樱色) Bird UI stylesheet — a
-// self-contained fork of the Bird UI tree with NIPPON COLORS sakura
-// palettes, adapted from wxwmoe/mastodon's overlay; override layers
-// belong here next to the import once skins grow their own rules.
-@use '../../../styles/mastodon-bird-ui-sakura';
-
-// Same custom-icon gap as our own bird-ui skin: the icon replacement
-// system hides every .column-link icon path and has no replacement for
-// the On This Day (那年今日) history icon, so restore it. The partial
-// is plain rules shared with styles/mastodon-bird-ui/.
-@use '../../../styles/mastodon-bird-ui/on-this-day-fix';
-
-@use '../../../styles/nofan-redesign';
+// X UI shares the native 5.0 structure; Sakura changes only the accent palette.
+// Keep this skin path stable for existing bird-ui preferences.
+@use '../../../styles/application';
+@use '../../../styles/x-ui' with (
+  $accent: #e88ca5,
+  $link-light: #a7355d,
+  $link-dark: #f3a9c0
+);

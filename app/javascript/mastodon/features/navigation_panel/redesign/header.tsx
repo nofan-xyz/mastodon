@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
 import { IconLogo } from '@/mastodon/components/logo';
-import { customAppIcon, domain, title } from '@/mastodon/initial_state';
+import { customAppIcon, domain, isXUi, title } from '@/mastodon/initial_state';
 
 import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
 
@@ -25,6 +25,24 @@ export const LogoLockup: React.FC<{
   siteName?: string;
   className?: string;
 }> = ({ siteName, className }) => {
+  if (isXUi) {
+    return (
+      <Link
+        to='/home'
+        className={classNames(classes.xBrand, className)}
+        id={getNavigationSkipLinkId()}
+        aria-label={siteName ?? title ?? domain ?? 'Mastodon'}
+        title={siteName ?? title ?? domain}
+      >
+        {customAppIcon ? (
+          <img src={customAppIcon} alt='' />
+        ) : (
+          <IconLogo role='presentation' />
+        )}
+      </Link>
+    );
+  }
+
   return (
     <Link
       to='/'
