@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,8 +12,6 @@ import {
   BellIcon,
   ChatCircleDotsIcon,
   BookmarkSimpleIcon,
-  UserIcon,
-  DotsThreeCircleIcon,
   DotsThreeIcon,
   CaretDownIcon,
   PenNibIcon,
@@ -60,6 +58,10 @@ interface Props {
   customFeeds: { id: string; title: string }[];
   followedHashtags: { name: string }[];
 }
+
+const XNavigationMenuContext = createContext<
+  Pick<Props, 'layoutNotice' | 'customFeeds' | 'followedHashtags'>
+>({ customFeeds: [], followedHashtags: [] });
 
 export const XNavigationPanel: React.FC<Props> = ({
   siteName,
@@ -108,138 +110,134 @@ export const XNavigationPanel: React.FC<Props> = ({
       )?.size ?? 0,
   );
 
+  const menuContext = useMemo(
+    () => ({ layoutNotice, customFeeds, followedHashtags }),
+    [layoutNotice, customFeeds, followedHashtags],
+  );
+
   return (
-    <nav
-      className={classes.root}
-      data-mode={mode}
-      data-multi-column={multiColumn}
-      onKeyDownCapture={handleMenuKeyDown}
-      onKeyUpCapture={handleMenuKeyUp}
-      aria-label={intl.formatMessage({
-        id: 'navigation_bar.main',
-        defaultMessage: 'Main',
-      })}
-    >
-      {topSensor}
-      <NavigationHeader siteName={siteName} isStuck={!isScrolledToTop} />
-      {mode === 'slide-out' && <XNavigationAccount />}
-      <ul className={classes.list}>
-        <NavigationLink to='/home' iconComponent={HouseIcon}>
-          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-        </NavigationLink>
-        {exploreLink}
-        <NavigationLink
-          to='/notifications'
-          iconComponent={BellIcon}
-          badgeCount={notificationsCount}
-        >
-          <FormattedMessage
-            id='tabs_bar.notifications'
-            defaultMessage='Notifications'
-          />
-        </NavigationLink>
-        <NavigationLink to='/conversations' iconComponent={ChatCircleDotsIcon}>
-          <FormattedMessage id='tabs_bar.messages' defaultMessage='Messages' />
-        </NavigationLink>
-        <NavigationLink to='/bookmarks' iconComponent={BookmarkSimpleIcon}>
-          <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
-        </NavigationLink>
-        <OnThisDayNavItem redesigned />
-        {publicFeedLink}
-        {(account?.locked || followRequests > 0) && (
+    <XNavigationMenuContext value={menuContext}>
+      <nav
+        className={classes.root}
+        data-mode={mode}
+        data-multi-column={multiColumn}
+        onKeyDownCapture={handleMenuKeyDown}
+        onKeyUpCapture={handleMenuKeyUp}
+        aria-label={intl.formatMessage({
+          id: 'navigation_bar.main',
+          defaultMessage: 'Main',
+        })}
+      >
+        {topSensor}
+        <NavigationHeader siteName={siteName} isStuck={!isScrolledToTop} />
+        {mode === 'slide-out' && <XNavigationAccount />}
+        <ul className={classes.list}>
+          <NavigationLink to='/home' iconComponent={HouseIcon}>
+            <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+          </NavigationLink>
+          {exploreLink}
           <NavigationLink
-            to='/follow_requests'
-            iconComponent={UsersThreeIcon}
-            badgeCount={followRequests}
+            to='/notifications'
+            iconComponent={BellIcon}
+            badgeCount={notificationsCount}
           >
             <FormattedMessage
-              id='navigation_bar.follow_requests'
-              defaultMessage='Follow requests'
+              id='tabs_bar.notifications'
+              defaultMessage='Notifications'
             />
           </NavigationLink>
-        )}
-        <NavigationLink
-          to={`/@${account?.acct}`}
-          exact
-          iconComponent={UserIcon}
-        >
-          <FormattedMessage
-            id='navigation_bar.profile'
-            defaultMessage='Profile'
-          />
-        </NavigationLink>
-        <li>
-          <Menu type='navigation'>
-            <MenuTrigger
-              as={Button}
-              variant='ghost'
-              leadingIcon={DotsThreeCircleIcon}
-              className={classes.more}
+          <NavigationLink
+            to='/conversations'
+            iconComponent={ChatCircleDotsIcon}
+          >
+            <FormattedMessage
+              id='tabs_bar.messages'
+              defaultMessage='Messages'
+            />
+          </NavigationLink>
+          <NavigationLink to='/bookmarks' iconComponent={BookmarkSimpleIcon}>
+            <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
+          </NavigationLink>
+          <OnThisDayNavItem redesigned />
+          {publicFeedLink}
+          {(account?.locked || followRequests > 0) && (
+            <NavigationLink
+              to='/follow_requests'
+              iconComponent={UsersThreeIcon}
+              badgeCount={followRequests}
             >
               <FormattedMessage
-                id='navigation_bar.more'
-                defaultMessage='More'
+                id='navigation_bar.follow_requests'
+                defaultMessage='Follow requests'
               />
-            </MenuTrigger>
-            <MenuList placement='right-end' minWidth={260}>
-              {layoutNotice}
-              <AccountMenuItems />
-              <MenuItemDivider />
-              <MenuItemGroup
-                label={
-                  <FormattedMessage
-                    id='tabs_bar.custom_feeds'
-                    defaultMessage='Custom Feeds'
-                  />
-                }
-              >
-                {customFeeds.map((feed) => (
-                  <MenuItemLink key={feed.id} to={`/lists/${feed.id}`}>
-                    {feed.title}
-                  </MenuItemLink>
-                ))}
-                <MenuItemLink to='/lists/new'>
-                  <FormattedMessage
-                    id='tabs_bar.create_custom_feed'
-                    defaultMessage='Create Feed'
-                  />
-                </MenuItemLink>
-              </MenuItemGroup>
-              {followedHashtags.length > 0 && (
-                <MenuItemGroup
-                  label={
-                    <FormattedMessage
-                      id='tabs_bar.followed_hashtags'
-                      defaultMessage='Followed Hashtags'
-                    />
-                  }
-                >
-                  {followedHashtags.map((tag) => (
-                    <MenuItemLink key={tag.name} to={`/tags/${tag.name}`}>
-                      #{tag.name}
-                    </MenuItemLink>
-                  ))}
-                </MenuItemGroup>
-              )}
-            </MenuList>
-          </Menu>
-        </li>
-      </ul>
-      <Button
-        leadingIcon={PenNibIcon}
-        onClick={onCompose}
-        className={classes.post}
-        size='lg'
-        variant='solid'
+            </NavigationLink>
+          )}
+        </ul>
+        <Button
+          leadingIcon={PenNibIcon}
+          onClick={onCompose}
+          className={classes.post}
+          size='lg'
+          variant='solid'
+        >
+          <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
+        </Button>
+        <footer className={classes.footer}>
+          {mode !== 'slide-out' && <XNavigationAccount />}
+          <FooterLinks context='navigation' multiColumn={multiColumn} />
+        </footer>
+        {bottomSensor}
+      </nav>
+    </XNavigationMenuContext>
+  );
+};
+
+const XAccountMenuItems: React.FC = () => {
+  const { layoutNotice, customFeeds, followedHashtags } = useContext(
+    XNavigationMenuContext,
+  );
+  return (
+    <>
+      {layoutNotice}
+      <AccountMenuItems />
+      <MenuItemDivider />
+      <MenuItemGroup
+        label={
+          <FormattedMessage
+            id='tabs_bar.custom_feeds'
+            defaultMessage='Custom Feeds'
+          />
+        }
       >
-        <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
-      </Button>
-      <footer className={classes.footer}>
-        {mode !== 'slide-out' && <XNavigationAccount />}
-        <FooterLinks context='navigation' multiColumn={multiColumn} />
-      </footer>
-      {bottomSensor}
-    </nav>
+        {customFeeds.map((feed) => (
+          <MenuItemLink key={feed.id} to={`/lists/${feed.id}`}>
+            {feed.title}
+          </MenuItemLink>
+        ))}
+        <MenuItemLink to='/lists/new'>
+          <FormattedMessage
+            id='tabs_bar.create_custom_feed'
+            defaultMessage='Create Feed'
+          />
+        </MenuItemLink>
+      </MenuItemGroup>
+      {followedHashtags.length > 0 && (
+        <MenuItemGroup
+          label={
+            <FormattedMessage
+              id='tabs_bar.followed_hashtags'
+              defaultMessage='Followed Hashtags'
+            />
+          }
+        >
+          {followedHashtags.map((tag) => (
+            <MenuItemLink key={tag.name} to={`/tags/${tag.name}`}>
+              #{tag.name}
+            </MenuItemLink>
+          ))}
+        </MenuItemGroup>
+      )}
+    </>
   );
 };
 
@@ -297,7 +295,7 @@ const XAccountHeader: React.FC<AccountSwitcherHeaderProps> = ({
           />
         </MenuTrigger>
         <MenuList placement='top' minWidth={220}>
-          <AccountMenuItems />
+          <XAccountMenuItems />
         </MenuList>
       </Menu>
     </div>

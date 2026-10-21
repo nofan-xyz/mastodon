@@ -11,6 +11,7 @@ import { XNavigationPanel } from './x_navigation';
 vi.mock('@/mastodon/initial_state', async (importOriginal) => ({
   ...(await importOriginal<typeof InitialState>()),
   isXUi: true,
+  me: '123',
 }));
 vi.mock('@/mastodon/hooks/useAccount', () => ({
   useAccount: () => ({
@@ -84,10 +85,12 @@ it('keeps primary routes and unread notifications directly accessible in the ver
   expect(
     screen.getByRole('link', { name: /Notifications/ }).textContent,
   ).toContain('3');
-  for (const label of ['Messages', 'Saved', 'On This Day', 'Profile'])
+  for (const label of ['Messages', 'Saved', 'On This Day'])
     expect(screen.getByRole('link', { name: label })).toBeTruthy();
+  expect(screen.queryByRole('link', { name: 'Profile' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'More' })).toBeNull();
   expect(
-    screen.getByRole('link', { name: 'Profile' }).getAttribute('href'),
+    screen.getByRole('link', { name: 'Alice (@alice)' }).getAttribute('href'),
   ).toBe('/@alice');
 });
 
@@ -98,9 +101,9 @@ it('opens composition through the existing callback instead of adding a persiste
   expect(screen.queryByRole('textbox')).toBeNull();
 });
 
-it('keeps collections, liked posts, custom feeds and followed tags reachable under More', async () => {
+it('keeps collections, liked posts, custom feeds and followed tags reachable under the account menu', async () => {
   await mount();
-  fireEvent.click(screen.getByRole('button', { name: 'More' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
   for (const label of [
     'Collections',
     'Liked Posts',
@@ -123,7 +126,7 @@ it('dismisses a submenu before allowing Escape to close the mobile drawer', asyn
   const outsideKeyUp = vi.fn();
   document.addEventListener('keyup', outsideKeyUp);
   try {
-    const trigger = screen.getByRole('button', { name: 'More' });
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
     fireEvent.click(trigger);
     fireEvent.keyDown(trigger, { key: 'Escape', code: 'Escape' });
     fireEvent.keyUp(trigger, { key: 'Escape', code: 'Escape' });
