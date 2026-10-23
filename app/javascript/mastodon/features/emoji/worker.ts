@@ -30,7 +30,7 @@ async function loadData(storeName: string) {
     importCount = (await importEmojiData(storeName))?.length;
   }
 
-  if (importCount) {
+  if (importCount !== undefined) {
     self.postMessage({
       type: 'done',
       storeName,

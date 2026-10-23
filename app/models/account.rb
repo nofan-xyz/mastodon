@@ -40,7 +40,6 @@
 #  memorial                      :boolean          default(FALSE), not null
 #  note                          :text             default(""), not null
 #  outbox_url                    :string           default(""), not null
-#  private_key                   :text
 #  protocol                      :integer          default("ostatus"), not null
 #  public_key                    :text             default(""), not null
 #  requested_deletion_at         :datetime
@@ -64,7 +63,7 @@
 #
 
 class Account < ApplicationRecord
-  self.ignored_columns += %w(devices_url)
+  self.ignored_columns += %w(private_key)
 
   BACKGROUND_REFRESH_INTERVAL = 1.week.freeze
   REFRESH_DEADLINE = 6.hours
@@ -111,6 +110,7 @@ class Account < ApplicationRecord
   include DomainNormalizable
   include Paginable
   include Reviewable
+  include AuthorizedFetchHelper
 
   enum :protocol, { ostatus: 0, activitypub: 1 }
   enum :suspension_origin, { local: 0, remote: 1 }, prefix: true
@@ -124,6 +124,7 @@ class Account < ApplicationRecord
 
   # Remote user validations
   validates :uri, presence: true, exclusion: { in: [''] }, uniqueness: true, unless: :local?, on: :create
+  validates :inbox_url, presence: true, if: -> { !local? && (new_record? || will_save_change_to_inbox_url?) }
 
   # Local user validations
   validates :username, format: { with: /\A[a-z0-9_]+\z/i }, length: { maximum: USERNAME_LENGTH_LIMIT }, if: -> { local? && will_save_change_to_username? && !actor_type_application? }
@@ -533,11 +534,12 @@ class Account < ApplicationRecord
   end
 
   before_validation :prepare_contents, if: :local?
+  before_create :prepare_reach_filter, if: :local?
   before_create :generate_keys
   before_destroy :clean_feed_manager
 
   def ensure_keys!
-    return unless local? && private_key.blank? && public_key.blank? && keypairs.empty?
+    return unless local? && public_key.blank? && keypairs.empty?
 
     generate_keys
     save!
@@ -551,13 +553,19 @@ class Account < ApplicationRecord
 
   private
 
+  def prepare_reach_filter
+    return if instance_actor?
+
+    build_reach_filter if actors_require_signature?
+  end
+
   def prepare_contents
     display_name&.strip!
     note&.strip!
   end
 
   def generate_keys
-    return unless local? && private_key.blank? && public_key.blank? && keypairs.empty?
+    return unless local? && public_key.blank? && keypairs.empty?
 
     keypair = OpenSSL::PKey::RSA.new(2048)
     keypairs << keypairs.build(local_fragment: "#rsa-#{SecureRandom.hex(8)}", type: :rsa, public_key: keypair.public_key.to_pem, private_key: keypair.to_pem)

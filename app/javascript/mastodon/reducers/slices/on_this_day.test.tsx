@@ -47,7 +47,7 @@ const mount = async (store: ReturnType<typeof makeStore>) => {
     render(
       <Provider store={store}>
         <OnThisDayController />
-        <OnThisDayNavItem />
+        <OnThisDayNavItem redesigned />
       </Provider>,
     );
     await Promise.resolve();

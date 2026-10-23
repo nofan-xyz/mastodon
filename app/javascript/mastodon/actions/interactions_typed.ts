@@ -6,6 +6,7 @@ import {
   apiRevokeQuote,
   apiGetQuotes,
 } from '@/mastodon/api/interactions';
+import { browserHistory } from '@/mastodon/components/router';
 import type { StatusContextType } from '@/mastodon/components/status/types';
 import type { VisibilityModalCallback } from '@/mastodon/features/ui/components/visibility_modal';
 import type { StatusShape, StatusVisibility } from '@/mastodon/models/status';
@@ -14,12 +15,12 @@ import {
   createDataLoadingThunk,
 } from '@/mastodon/store/typed_functions';
 
-import { deleteModal } from '../initial_state';
+import { boostModal, deleteModal } from '../initial_state';
+import { selectComposerIsChanged } from '../reducers/slices/composer';
 import { selectStatusInteractions } from '../selectors/statuses';
 
 import { showAlert, showGenericAlert } from './alerts';
-import { replyCompose } from './compose';
-import { quoteComposeById } from './compose_typed';
+import { replyComposeById, quoteComposeById } from './compose_typed';
 import { importFetchedStatus, importFetchedStatuses } from './importer';
 import {
   bookmark,
@@ -42,6 +43,7 @@ import {
 
 export type StatusInteractionIntent =
   | 'bookmark'
+  | 'copy'
   | 'delete'
   | 'editQuotePolicy'
   | 'edit'
@@ -59,6 +61,10 @@ export type StatusInteractionIntent =
   | 'translate';
 
 const messages = defineMessages({
+  copied: {
+    id: 'status.copied',
+    defaultMessage: 'Copied post link to clipboard',
+  },
   noEdits: {
     id: 'status.cannot_edit',
     defaultMessage: 'You are not allowed to edit this post',
@@ -73,16 +79,23 @@ const messages = defineMessages({
   },
 });
 
+function navigateHomeAfterDelete() {
+  // Avoid the multi-column UI scrolling away from the composer
+  browserHistory.push('/', { preventMultiColumnAutoScroll: 'true' });
+}
+
 export const statusInteraction = createAppThunk(
   (
     {
       statusId,
       contextType,
       intent,
+      force = false,
     }: {
       statusId?: string;
       contextType?: StatusContextType;
       intent: StatusInteractionIntent;
+      force?: boolean;
     },
     { getState, dispatch },
   ) => {
@@ -127,6 +140,8 @@ export const statusInteraction = createAppThunk(
       return;
     }
 
+    const isComposerDirty = selectComposerIsChanged(state);
+
     // Handle intents for all statuses.
     switch (intent) {
       case 'bookmark':
@@ -136,21 +151,31 @@ export const statusInteraction = createAppThunk(
           dispatch(bookmark(statusImmutable));
         }
         return;
-      case 'delete':
+      case 'copy':
+        void navigator.clipboard
+          .writeText(status.url ?? status.uri)
+          .then(() => {
+            dispatch(showAlert({ message: messages.copied }));
+          });
+        return;
+      case 'delete': {
+        // The detailed view no longer has a status to show once it's deleted.
+        const onDeleteSuccess =
+          contextType === 'detailed' ? navigateHomeAfterDelete : undefined;
         if (!deleteModal) {
-          void dispatch(deleteStatus(statusId));
+          void dispatch(deleteStatus(statusId)).then(onDeleteSuccess);
         } else {
           dispatch(
             openModal({
               modalType: 'CONFIRM_DELETE_STATUS',
-              modalProps: { statusId },
+              modalProps: { statusId, onDeleteSuccess },
             }),
           );
         }
         return;
+      }
       case 'edit': {
-        const composerText = state.compose.get('text');
-        if (typeof composerText === 'string' && composerText.trim()) {
+        if (isComposerDirty) {
           dispatch(
             openModal({
               modalType: 'CONFIRM_EDIT_STATUS',
@@ -213,13 +238,27 @@ export const statusInteraction = createAppThunk(
         }
         return;
       case 'quote':
-        dispatch(quoteComposeById(statusId));
+        dispatch(quoteComposeById({ statusId }));
         return;
       case 'reblog':
         if (status.reblogged) {
           void dispatch(unreblog({ statusId }));
         } else {
-          void dispatch(reblog({ statusId, visibility: status.visibility }));
+          if (boostModal && !force) {
+            dispatch(
+              openModal({
+                modalType: 'BOOST',
+                modalProps: {
+                  statusId,
+                  onReblog: (visibility: StatusVisibility) => {
+                    void dispatch(reblog({ statusId, visibility }));
+                  },
+                },
+              }),
+            );
+          } else {
+            void dispatch(reblog({ statusId, visibility: status.visibility }));
+          }
         }
         return;
       case 'redraft':
@@ -238,7 +277,7 @@ export const statusInteraction = createAppThunk(
         }
         return;
       case 'reply':
-        dispatch(replyCompose(statusImmutable));
+        dispatch(replyComposeById({ statusId }));
         return;
       case 'report':
         dispatch(

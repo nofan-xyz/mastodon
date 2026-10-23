@@ -5,7 +5,7 @@
 # - Have alternative format representations
 
 %w(
-  /blocks
+  /blocks/(*any)
   /bookmarks
   /collections/(*any)
   /conversations
@@ -25,7 +25,6 @@
   /notifications_v2/(*any)
   /notifications/(*any)
   /on_this_day
-  /pinned
   /profile/(*any)
   /public
   /public/local

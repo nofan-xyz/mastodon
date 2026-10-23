@@ -1,6 +1,12 @@
-default: styles/application.scss
+default:
+  path: styles/application.scss
+  colors:
+    - indigo
+    - lime
+    - pink
+    - orange
+    - cyan
 mastodon-bird-ui-auto: styles/mastodon-bird-ui-auto.scss
 fanfou_classic: styles/fanfou_classic.scss
 vermilion_seal: styles/vermilion_seal.scss
-space_fanfou: styles/space_fanfou.scss
 graphite: styles/graphite.scss

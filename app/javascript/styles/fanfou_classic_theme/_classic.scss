@@ -1,0 +1,27 @@
+// Keep Mastodon's components and responsive layout. Shared tokens provide the
+// compact spacing and modest corners of the original Fanfou web interface.
+:root {
+  --font-heading: var(--font-body);
+  --avatar-border-radius: 4px;
+  --radius-2: 4px;
+  --radius-3: 6px;
+  --radius-4: 8px;
+  --radius-5: 10px;
+  --radius-6: 10px;
+  --radius-round: 6px;
+  --space-4: 12px;
+}
+
+html[data-color-scheme='light'] {
+  background-image: linear-gradient(to bottom, #7dcade, #b1dae1 360px);
+  background-attachment: fixed;
+}
+
+// Navigation and its drawer share the palette's navigation background token.
+html[data-color-scheme='light'] nav[data-mode] {
+  border-inline-end: 1px solid var(--color-space-green-300);
+}
+
+html[data-color-scheme='light'] input[inputmode='search'] {
+  background-color: var(--color-bg-primary);
+}

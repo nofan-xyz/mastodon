@@ -3,6 +3,33 @@
 require 'rails_helper'
 
 RSpec.describe ThemeHelper do
+  describe '#theme_color' do
+    let(:theme) { ['mastodon-ui', 'default'] }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(nil)
+      allow(helper).to receive(:available_theme_colors).with(theme).and_return(%w(indigo orange))
+    end
+
+    it 'uses the site default for a visitor when the skin supports it' do
+      Setting.theme_color = 'orange'
+      expect(helper.theme_color(theme)).to eq('orange')
+    end
+
+    it 'ignores a site color unsupported by the selected skin' do
+      Setting.theme_color = 'unknown'
+      expect(helper.theme_color(theme)).to eq('indigo')
+    end
+
+    it 'keeps the user color ahead of the site default' do
+      user = Fabricate(:user)
+      user.settings.update('web.theme_color': 'indigo')
+      allow(helper).to receive(:current_user).and_return(user)
+      Setting.theme_color = 'orange'
+      expect(helper.theme_color(theme)).to eq('indigo')
+    end
+  end
+
   describe 'theme_style_tags' do
     let(:result) { helper.theme_style_tags(theme) }
 
@@ -25,6 +52,14 @@ RSpec.describe ThemeHelper do
           .to include(
             href: have_attributes(value: match(%r{/assets/skins/mastodon-ui/fanfou_classic-[\w-]+\.css}))
           )
+      end
+    end
+
+    context 'when using the retired Space Fanfou skin' do
+      let(:theme) { ['mastodon-ui', 'space_fanfou'] }
+
+      it 'returns the merged Fanfou Classic stylesheet' do
+        expect(html_links.last['href']).to match(%r{/assets/skins/mastodon-ui/fanfou_classic-[\w-]+\.css})
       end
     end
   end
@@ -123,6 +158,12 @@ RSpec.describe ThemeHelper do
         it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
       end
 
+      context 'when the site default still uses Space Fanfou' do
+        before { Setting.skin = 'space_fanfou' }
+
+        it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
+      end
+
       context 'when skin is changed to an unknown value' do
         before { Setting.skin = 'fakethemename' }
 
@@ -149,6 +190,12 @@ RSpec.describe ThemeHelper do
         before { current_user.settings.update(flavour: 'mastodon-ui', skin: 'graphite', noindex: false) }
 
         it { is_expected.to eq(['mastodon-ui', 'graphite']) }
+      end
+
+      context 'when user previously selected Space Fanfou' do
+        before { current_user.settings.update(flavour: 'mastodon-ui', skin: 'space_fanfou') }
+
+        it { is_expected.to eq(['mastodon-ui', 'fanfou_classic']) }
       end
 
       context 'when user set an unknown skin' do

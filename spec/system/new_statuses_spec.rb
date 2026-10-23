@@ -16,13 +16,15 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
   it 'can be posted' do
     visit_homepage
 
-    within('.compose-form') do
-      fill_in frontend_translations('compose_form.placeholder'), with: status_text
-      click_on 'Post'
+    open_compose_form
+
+    within('form[role="dialog"]') do
+      fill_in frontend_translations('compose.post.placeholder'), with: status_text
+      click_on frontend_translations('compose.publish')
     end
 
     expect(page)
-      .to have_css('.status__content__text', text: status_text)
+      .to have_css('article[data-id]', text: status_text)
   end
 
   it 'can be posted using Markdown' do
@@ -30,30 +32,39 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
     bob.save!
     visit_homepage
 
+    open_compose_form
+
     format_button_label = frontend_translations('compose.content-type.change')
-    format_button = nil
+    format_button = open_format_menu
 
-    within('.compose-form') do
-      format_button = find_button(format_button_label)
-      format_button.click
-    end
-
+    expect(format_button['aria-label']).to eq format_button_label
     expect(format_button['aria-expanded']).to eq 'true'
 
-    find('[role="option"]', text: frontend_translations('compose.content-type.markdown')).click
+    find('[role="menuitemradio"]', text: frontend_translations('compose.content-type.markdown')).click
 
+    expect(page).to have_no_css('[role="menu"]')
     expect(format_button['aria-expanded']).to eq 'false'
     expect(page.evaluate_script("document.activeElement?.getAttribute('aria-label')")).to eq format_button_label
 
-    within('.compose-form') do
-      fill_in frontend_translations('compose_form.placeholder'), with: '**Markdown**'
-      click_on 'Post'
+    within('form[role="dialog"]') do
+      fill_in frontend_translations('compose.post.placeholder'), with: '**Markdown**'
+      click_on frontend_translations('compose.publish')
     end
 
     expect(page)
-      .to have_css('.status__content__text strong', text: 'Markdown')
+      .to have_css('article[data-id] strong', text: 'Markdown')
     expect(bob.account.statuses.first.content_type)
       .to eq('text/markdown')
+  end
+
+  def open_compose_form
+    within('nav') { click_on frontend_translations('tabs_bar.publish') }
+  end
+
+  def open_format_menu
+    button = find('form[role="dialog"]').find_button(frontend_translations('compose.content-type.plain'))
+    button.click
+    button
   end
 
   def visit_homepage
@@ -61,6 +72,5 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
 
     expect(page)
       .to have_css('div.app-holder')
-      .and have_css('form.compose-form')
   end
 end
