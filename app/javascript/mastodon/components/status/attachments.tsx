@@ -249,7 +249,11 @@ const MediaAttachments: React.FC<{
     isMediaAttachmentOfType(attachment, 'video') ||
     isMediaAttachmentOfType(attachment, 'gifv')
   ) {
-    aspectRatio = `${attachment.meta.original.width} / ${attachment.meta.original.height}`;
+    const width = attachment.meta?.original?.width;
+    const height = attachment.meta?.original?.height;
+    if (width && height) {
+      aspectRatio = `${width} / ${height}`;
+    }
   } else if (isMediaAttachmentOfType(attachment, 'audio')) {
     aspectRatio = '16 / 9';
   }
@@ -271,7 +275,7 @@ const MediaAttachments: React.FC<{
   >;
 
   if (isMediaAttachmentOfType(attachment, 'audio')) {
-    const { colors, original } = attachment.meta;
+    const { colors, original } = attachment.meta ?? {};
     return (
       <MediaAttachmentWrapper {...wrapperProps} type='audio'>
         <Audio
@@ -282,7 +286,7 @@ const MediaAttachments: React.FC<{
           backgroundColor={colors?.background}
           foregroundColor={colors?.foreground}
           accentColor={colors?.accent}
-          duration={original.duration}
+          duration={original?.duration}
           deployPictureInPicture={handleDeployPictureInPicture}
           blurhash={attachment.blurhash}
           onToggleVisibility={handleToggleMediaVisibility}
@@ -293,7 +297,7 @@ const MediaAttachments: React.FC<{
   }
 
   if (isMediaAttachmentOfType(attachment, 'video')) {
-    const { original } = attachment.meta;
+    const original = attachment.meta?.original;
     return (
       <MediaAttachmentWrapper {...wrapperProps} type='video'>
         <Video
@@ -301,7 +305,7 @@ const MediaAttachments: React.FC<{
           alt={description}
           lang={language}
           preview={attachment.preview_url}
-          frameRate={original.frame_rate}
+          frameRate={original?.frame_rate}
           aspectRatio={aspectRatio}
           blurhash={attachment.blurhash}
           onOpenVideo={handleOpenVideo}

@@ -11,6 +11,7 @@ import {
   COMPOSE_MENTION,
   COMPOSE_REPLY,
   COMPOSE_SET_STATUS,
+  COMPOSE_UPLOAD_REQUEST,
   directCompose,
   resetCompose,
   submitCompose,
@@ -59,12 +60,14 @@ interface ComposerState {
   displayState: DisplayState;
   pendingFocus: PendingFocus | null;
   publishErrors: ComposerPublishError[];
+  initialText: string;
 }
 
 const initialState: ComposerState = {
   displayState: 'hidden',
   pendingFocus: null,
   publishErrors: [],
+  initialText: '',
 };
 
 const composerSlice = createSlice({
@@ -94,9 +97,25 @@ const composerSlice = createSlice({
       if (!state.publishErrors.includes(action.payload)) {
         state.publishErrors.push(action.payload);
       }
+      state.pendingFocus = { selection: null };
     },
     clearErrors(state) {
       state.publishErrors = [];
+    },
+    setInitialText(
+      state,
+      action: PayloadAction<
+        { text: string } & Partial<ComposerTextareaSelection>
+      >,
+    ) {
+      const { text, start = text.length, end = text.length } = action.payload;
+      state.initialText = text;
+      state.pendingFocus = { selection: { start, end } };
+    },
+    reset(state) {
+      state.pendingFocus = null;
+      state.publishErrors = [];
+      state.initialText = '';
     },
   },
   extraReducers(builder) {
@@ -109,6 +128,7 @@ const composerSlice = createSlice({
           COMPOSE_MENTION,
           COMPOSE_DIRECT,
           COMPOSE_SET_STATUS,
+          COMPOSE_UPLOAD_REQUEST,
           REDRAFT,
         ].includes(action.type),
       (state) => {
@@ -125,6 +145,29 @@ export const {
   clearPendingFocus: clearComposerFocusRequest,
   clearErrors: clearComposerErrors,
 } = composerSlice.actions;
+
+export const initializeComposer = createAppThunk(
+  (
+    arg:
+      | { noSelect?: boolean; selectAfterFirstSpace?: boolean }
+      | undefined = {},
+    { getState, dispatch },
+  ) => {
+    const text = getState().compose.get('text', '') as string;
+
+    let start = text.length;
+    let end = text.length;
+    if (arg.noSelect) {
+      start = 0;
+      end = 0;
+    }
+    if (arg.selectAfterFirstSpace) {
+      start = text.search(/\s/) + 1;
+    }
+
+    dispatch(composerSlice.actions.setInitialText({ text, start, end }));
+  },
+);
 
 export const minimizeComposerToggle = createAppThunk(
   (_arg, { dispatch, getState }) => {
@@ -148,9 +191,18 @@ export const selectComposerIsChanged = createAppSelector(
         'media_attachments',
       ) as unknown as Immutable.List<unknown>,
     (state) => Number(state.compose.get('pending_media_attachments')),
+    (state) => state.composer.initialText,
   ],
-  (text, spoilerText, hasPoll, hasQuote, attachments, pendingAttachmentsNum) =>
-    text.trim().length > 0 ||
+  (
+    text,
+    spoilerText,
+    hasPoll,
+    hasQuote,
+    attachments,
+    pendingAttachmentsNum,
+    initialText,
+  ) =>
+    text !== initialText ||
     spoilerText.trim().length > 0 ||
     hasPoll ||
     hasQuote ||
@@ -180,7 +232,8 @@ export const openNewComposer = createAppThunk(
     // Always show the composer if it is closed or minimized.
     dispatch(composerSlice.actions.showComposer());
 
-    if (!payload.force && selectComposerIsChanged(getState())) {
+    const isChanged = selectComposerIsChanged(getState());
+    if (!payload.force && isChanged) {
       dispatch(
         openModal({
           modalType: 'COMPOSER_DRAFT_DELETE',
@@ -192,8 +245,11 @@ export const openNewComposer = createAppThunk(
       return;
     }
 
+    // Reset but don't hide.
+    dispatch(composerSlice.actions.reset());
     dispatch(resetCompose());
-    dispatch(composerSlice.actions.clearErrors());
+    dispatch(clearComposeSuggestions());
+
     if (payload.type === 'message') {
       const account =
         !!payload.toAccountId && getState().accounts.get(payload.toAccountId);
@@ -212,8 +268,8 @@ export const openNewComposer = createAppThunk(
 );
 
 export const resetComposer = createAppThunk((_arg, { dispatch }) => {
+  dispatch(composerSlice.actions.reset());
   dispatch(composerSlice.actions.hideComposer());
-  dispatch(composerSlice.actions.clearErrors());
   dispatch(resetCompose());
   dispatch(clearComposeSuggestions());
 });
@@ -221,30 +277,15 @@ export const resetComposer = createAppThunk((_arg, { dispatch }) => {
 export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
   const isChanged = selectComposerIsChanged(getState());
 
-  if (!isChanged) {
-    dispatch(resetComposer());
-  } else {
+  if (isChanged) {
     dispatch(
       openModal({
         modalType: 'COMPOSER_DRAFT_DELETE',
         modalProps: {},
       }),
     );
-  }
-});
-
-export const newComposer = createAppThunk((_arg, { getState, dispatch }) => {
-  const isChanged = selectComposerIsChanged(getState());
-
-  if (!isChanged) {
-    dispatch(resetComposer());
   } else {
-    dispatch(
-      openModal({
-        modalType: 'COMPOSER_DRAFT_DELETE',
-        modalProps: {},
-      }),
-    );
+    dispatch(resetComposer());
   }
 });
 

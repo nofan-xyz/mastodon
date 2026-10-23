@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import type { Map as ImmutableMap } from 'immutable';
 
 import {
+  GavelIcon,
+  ShieldStarIcon,
   HouseIcon,
   BellIcon,
   ChatCircleDotsIcon,
@@ -36,6 +38,10 @@ import { FooterLinks } from '@/mastodon/features/discovery_panel/footer_links';
 import { OnThisDayNavItem } from '@/mastodon/features/on_this_day/nav_item';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import {
+  canManageReports,
+  canViewAdminDashboard,
+} from '@/mastodon/permissions';
 import { useAppSelector } from '@/mastodon/store';
 
 import { AccountMenuItems } from './account_card_and_menu';
@@ -193,6 +199,7 @@ export const XNavigationPanel: React.FC<Props> = ({
 };
 
 const XAccountMenuItems: React.FC = () => {
+  const { permissions } = useIdentity();
   const { layoutNotice, customFeeds, followedHashtags } = useContext(
     XNavigationMenuContext,
   );
@@ -200,6 +207,22 @@ const XAccountMenuItems: React.FC = () => {
     <>
       {layoutNotice}
       <AccountMenuItems />
+      {canViewAdminDashboard(permissions) && (
+        <MenuItemLink as='a' href='/admin/dashboard' icon={GavelIcon}>
+          <FormattedMessage
+            id='navigation_bar.administration'
+            defaultMessage='Administration'
+          />
+        </MenuItemLink>
+      )}
+      {canManageReports(permissions) && (
+        <MenuItemLink as='a' href='/admin/reports' icon={ShieldStarIcon}>
+          <FormattedMessage
+            id='navigation_bar.moderation'
+            defaultMessage='Moderation'
+          />
+        </MenuItemLink>
+      )}
       <MenuItemDivider />
       <MenuItemGroup
         label={

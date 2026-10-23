@@ -4,9 +4,17 @@
 
 - 2026-10-19 开始，分支 `codex/upgrade-mastodon-5`，独立工作区 `/home/twoheart/projects/mastodon-5`。
 - nofan 基线：v4.7.3.3，`0afb546c7d8139688642c80c1cc14d6e17335317`。
-- 评估目标：上游 `2a3b728653dd6b067650358133f92bee956f6da0`，自报 5.0.0-alpha.1；不是正式版。
+- 当前固定上游：`559688e153ce3a50b26e327bfe488743da99f3dc`（2026-10-23 同步）；初始评估基线为 `2a3b728653dd6b067650358133f92bee956f6da0`，自报 5.0.0-alpha.1；不是正式版。
 - 先让官方默认界面和现有核心功能运行，再移植全部主题；不以隐藏功能或清空用户偏好作为兼容方案。
 - 原工作区未提交的 `docs/CUSTOMIZATIONS.md`、`docs/MARKDOWN.md` 保留在原处，本分支从已提交版本建立。
+
+## 2026-10-23 上游同步
+
+同步至固定提交 `559688e153ce3a50b26e327bfe488743da99f3dc`，纳入初始基线之后的 57 个提交，版本标记仍为 5.0.0-alpha.1。解决 10 个文件冲突，保留富文本、X UI 单行账号、圆角及标题同色、账号切换、主题标识和偏好。搜索采用上游单一 ScrollableList，避免嵌套滚动；管理入口在 X UI 中保留于账号菜单。新增站点默认颜色适配 grouped flavour/skin 表单及动态颜色选择。界面密度选项随上游移除。
+
+新增 `20261013134454_add_action_category_to_warning_presets` 迁移，独立预览库已迁移并确认字段存在；依赖 excon 升至 1.8.0。Ruby 保持 4.0.7，Node 保持 26.12，符合上游更新后的要求。
+
+回归：79 项前端测试、255 项后端测试通过；TypeScript、ESLint、Stylelint、RuboCop、HAML lint、格式与冲突标记检查通过，全部皮肤生产构建通过。X UI 两款配色在深浅模式及 2048/1440/1024/390/320px 下共 20 个布局场景通过，保留文字/间距/600px 主栏与手机账号菜单。Tangerine 五款配色在深浅模式及桌面/手机共 20 个布局场景通过；发帖、Markdown 草稿恢复、账号菜单均正常。
 
 ## 阶段状态
 
@@ -28,7 +36,7 @@
 | 新导航       | `features/navigation_panel/redesign/`                       | 那年今日、账号切换、手机和高级界面入口                              |
 | 那年今日页面 | 新 ColumnHeader、`components/status`                        | 消除旧组件引用、帖子操作、23:00/00:00/00:05、旧响应丢弃、删除过滤   |
 | 账号切换     | 新账号卡片、ReauthConcern、sign-in token                    | 草稿提示、失效会话、2FA、安全密钥、跨标签页以及资料卡               |
-| 主题         | 上游 `theme/color/density` 与本地 `flavour/skin`            | 兼容已有设置、构建插件、配色变量及新 DOM                            |
+| 主题         | 上游 `theme/color` 与本地 `flavour/skin`                    | 兼容已有设置、构建插件、配色变量及新 DOM                            |
 | 搜索         | Query.validate_clauses!                                     | 仅筛选请求、from:me/in:library 特例、中文词组及日期边界             |
 | 表情         | 新发帖框及 Status DOM                                       | 个人选包、排序/编号、放大预览和后台管理                             |
 | 品牌入口     | 新 FooterLinks 和导航、路由变化                             | 欢迎页、登录落点、品牌资源、Donate/Roadmap                          |

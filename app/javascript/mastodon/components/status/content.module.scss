@@ -1,4 +1,5 @@
 @use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables' as vars;
 
 .root {
   @include mixins.type-body;
@@ -68,6 +69,18 @@
     vertical-align: super;
   }
 
+  overflow-wrap: break-word;
+
+  &:lang(#{vars.$vertical-lr-langs}) {
+    writing-mode: vertical-lr;
+    max-height: 10lh;
+    overflow-wrap: normal;
+
+    [data-variant='page'] & {
+      max-height: 50vh;
+    }
+  }
+
   p,
   pre,
   blockquote,
@@ -77,11 +90,7 @@
     unicode-bidi: plaintext;
 
     &:not(:last-child) {
-      margin-block-end: var(--space-4);
-
-      [data-density='compact'] & {
-        margin-block-end: var(--space-2);
-      }
+      margin-block-end: 0.6lh;
     }
   }
 

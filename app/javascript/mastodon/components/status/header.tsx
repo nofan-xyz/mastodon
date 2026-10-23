@@ -5,14 +5,17 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
+import IconPinned from '@/images/icons/icon_pinned.svg?react';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { isXUi } from '@/mastodon/initial_state';
 import type { AccountStatusShape } from '@/mastodon/models/status';
 
 import { Avatar } from '../avatar';
+import { Badge } from '../badge';
 import { DisplayName } from '../display_name';
 import { useAccountHandle } from '../display_name/default';
+import { Icon } from '../icon';
 import { RelativeTimestamp } from '../relative_timestamp';
 import { Skeleton } from '../skeleton';
 
@@ -24,14 +27,14 @@ interface StatusRedesignHeaderProps {
     AccountStatusShape,
     'id' | 'account' | 'created_at' | 'visibility' | 'mentions'
   >;
-  children?: React.ReactNode;
   className?: string;
+  featured?: boolean;
 }
 
 export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
   status,
-  children,
   className,
+  featured,
 }) => {
   const account = status.account;
   const handle = useAccountHandle(account);
@@ -97,7 +100,13 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
   }
 
   return (
-    <header className={classNames(className, classes.root)}>
+    <header
+      className={classNames(
+        className,
+        classes.root,
+        featured && classes.isFeatured,
+      )}
+    >
       <Link
         {...accountLinkProps}
         role='presentation'
@@ -107,7 +116,7 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
         <Avatar account={account} size={null} />
       </Link>
 
-      <div>
+      <div className={classes.contents}>
         <p className={classes.name}>
           {displayName}
           {inlineHandle && (
@@ -147,7 +156,18 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
         )}
       </div>
 
-      {children}
+      {featured && (
+        <Badge
+          className={classes.pinnedBadge}
+          icon={<Icon id='pinned' icon={IconPinned} />}
+          label={
+            <FormattedMessage
+              id='account.timeline.pinned'
+              defaultMessage='Pinned'
+            />
+          }
+        />
+      )}
     </header>
   );
 };

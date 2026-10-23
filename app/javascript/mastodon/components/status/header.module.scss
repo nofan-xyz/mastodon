@@ -22,6 +22,10 @@
   }
 }
 
+.isFeatured {
+  grid-template-columns: var(--first-col-width) 1fr max-content;
+}
+
 .avatar {
   padding-inline-end: var(--col-gap);
 
@@ -52,6 +56,10 @@ a.nameLink {
   > span {
     display: inline;
   }
+
+  :global(.display-name__html) {
+    font-weight: inherit;
+  }
 }
 
 .date {
@@ -81,4 +89,9 @@ a.nameLink {
   white-space: nowrap;
   min-width: 0;
   flex-shrink: 2;
+}
+
+.pinnedBadge {
+  margin-inline-start: var(--col-gap);
+  align-self: flex-start;
 }

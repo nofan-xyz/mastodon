@@ -25,6 +25,7 @@ defaults: &defaults
   theme: 'default'
   flavour: 'mastodon-ui'
   skin: 'default'
+  theme_color: 'indigo'
   thumbnail_description: ''
   trends: true
   trendable_by_default: false

@@ -32,6 +32,10 @@
     // Constrain browser panning on the scroll container, before the drag wrapper.
     touch-action: pan-y;
   }
+
+  &[data-scrollable='true'] {
+    overscroll-behavior: contain;
+  }
 }
 
 .list {

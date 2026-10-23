@@ -186,7 +186,7 @@ async function loaded() {
 
   updateThemeColorsFromTheme(
     document.querySelector(
-      '#user_settings_attributes_theme, #user_settings_attributes_flavour_and_skin',
+      '#user_settings_attributes_theme, #user_settings_attributes_flavour_and_skin, #form_admin_settings_flavour_and_skin',
     ),
   );
 
@@ -499,12 +499,18 @@ const updateThemeColorsFromTheme = (themeSelect: EventTarget | null) => {
   if (!colors) return;
 
   const themeColorDiv = themeSelect.form.querySelector<HTMLDivElement>(
-    '.user_settings_web\\.theme_color .label_input__wrapper',
+    '.user_settings_web\\.theme_color .label_input__wrapper, .form_admin_settings_theme_color .label_input__wrapper',
   );
   if (!themeColorDiv) return;
 
+  const hiddenInput =
+    themeColorDiv.querySelector<HTMLInputElement>('input[type=hidden]');
+  if (!hiddenInput) return;
+
+  const inputName = hiddenInput.name;
+
   const selectedColor = themeSelect.form.querySelector<HTMLInputElement>(
-    'input[name="user[settings_attributes][web.theme_color]"]:checked',
+    `input[name="${inputName}"]:checked`,
   )?.value;
 
   // Remove existing fields
@@ -527,7 +533,7 @@ const updateThemeColorsFromTheme = (themeSelect: EventTarget | null) => {
     newInputElement.className = 'radio_buttons optional';
     newInputElement.type = 'radio';
     newInputElement.value = color;
-    newInputElement.name = 'user[settings_attributes][web.theme_color]';
+    newInputElement.name = inputName;
     newInputElement.id = `user_settings_attributes_web.theme_color_${color}`;
     newInputElement.checked = color === selectedColor;
 
@@ -551,7 +557,7 @@ const updateThemeColorsFromTheme = (themeSelect: EventTarget | null) => {
 
 on(
   'change',
-  '#user_settings_attributes_theme, #user_settings_attributes_flavour_and_skin',
+  '#user_settings_attributes_theme, #user_settings_attributes_flavour_and_skin, #form_admin_settings_flavour_and_skin',
   ({ target }) => {
     updateThemeColorsFromTheme(target);
   },

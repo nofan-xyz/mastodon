@@ -18,8 +18,20 @@
               group_label_method: ->(flavour_and_skin) { I18n.t("flavours.#{flavour_and_skin.first}.name", default: flavour_and_skin.first) },
               label_method: ->(flavour_and_skin) { I18n.t("themes.#{flavour_and_skin.last}", default: flavour_and_skin.last) },
               value_method: ->(flavour_and_skin) { flavour_and_skin.join('/') },
+              input_html: { data: { theme_colors: flavour_theme_colors.to_json } },
               include_blank: false,
               wrapper: :with_label
+
+    .input.horizontal-options
+      = f.input :theme_color,
+                as: :radio_buttons,
+                collection: available_theme_colors([f.object.flavour, f.object.skin]),
+                hint: false,
+                include_blank: false,
+                label_method: ->(color) { I18n.t("color_theme.#{color}", default: color) },
+                label: I18n.t('simple_form.labels.defaults.setting_theme_color'),
+                wrapper: :with_label,
+                required: false
 
   .fields-group
     = f.input :custom_css,

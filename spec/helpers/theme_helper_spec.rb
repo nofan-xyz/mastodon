@@ -3,6 +3,33 @@
 require 'rails_helper'
 
 RSpec.describe ThemeHelper do
+  describe '#theme_color' do
+    let(:theme) { ['mastodon-ui', 'default'] }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(nil)
+      allow(helper).to receive(:available_theme_colors).with(theme).and_return(%w(indigo orange))
+    end
+
+    it 'uses the site default for a visitor when the skin supports it' do
+      Setting.theme_color = 'orange'
+      expect(helper.theme_color(theme)).to eq('orange')
+    end
+
+    it 'ignores a site color unsupported by the selected skin' do
+      Setting.theme_color = 'unknown'
+      expect(helper.theme_color(theme)).to eq('indigo')
+    end
+
+    it 'keeps the user color ahead of the site default' do
+      user = Fabricate(:user)
+      user.settings.update('web.theme_color': 'indigo')
+      allow(helper).to receive(:current_user).and_return(user)
+      Setting.theme_color = 'orange'
+      expect(helper.theme_color(theme)).to eq('indigo')
+    end
+  end
+
   describe 'theme_style_tags' do
     let(:result) { helper.theme_style_tags(theme) }
 
