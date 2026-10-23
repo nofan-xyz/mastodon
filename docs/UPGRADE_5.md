@@ -85,15 +85,17 @@
 
 ### Tangerine Neue 3.0 beta
 
-Tangerine 的五款配色从 `2.6.5` 更新至上游 `3.0.0-beta.1`，固定提交 `c35fcc2e8c156610cea69e30148265076ee92e72`，保留 `tangerine-ui/{tangerine,purple,cherry,lagoon,granite}` 标识和已有偏好。来源为发布 tag 中的五份 SCSS，按本仓库的 oxfmt/Stylelint 规则规范格式；上游 MIT 许可及来源记录放在 `styles/tangerine-ui/`。
+Tangerine 的五款配色从 `2.6.5` 更新至上游 `3.0.0-beta.3`，固定提交 `7f8b3d72b2b102aee4f6b86e9694965b467e9246`，保留 `tangerine-ui/{tangerine,purple,cherry,lagoon,granite}` 标识和已有偏好。来源为发布 tag 中的五份 SCSS，按本仓库的 oxfmt/Stylelint 规则规范格式；上游 MIT 许可及来源记录放在 `styles/tangerine-ui/`。
 
 新版提供 5.0 的基础颜色、阴影、图表变量，修正帖子操作区和新版媒体标签的适配，并包含 2.6.6 的高对比度及多栏修复。五个入口改用上游原生的 5.0 变量，移除临时 `nofan-redesign` 颜色桥接；其他风味保持原有入口。原散落在五份第三方源码中的发帖工具栏补丁移入 `_nofan-fixes.scss`，与那年今日图标补丁一起加载，便于继续同步上游。
 
+beta 3 同步本地 Fredoka 字体及 SIL OFL 许可，更新个人资料按钮/字段/标签、加载更多、发帖次级按钮、图片与栏目边框、投票、搜索、简介链接和页脚署名。保留 nofan 独立补丁及现有五款主题标识；仅删除被后续同名规则覆盖的重复动画关键帧，并对格式化后的 CSS 数学表达式豁免 SCSS 运算符换行规则。
+
 此版本仍是上游 beta，对应 5.0 的新导航与弹出发帖布局；主题更新本身不增加旧版常驻侧栏发帖组件。
 
-验证：五款配色 × 深浅模式 × 1440px 桌面/390px 手机，共 20 个布局场景通过。检查实际 beta 版本和基础颜色变量、8px 面板圆角、标题同色、无横向溢出；Markdown 选择、草稿最小化恢复、发帖窗口和至少 44px 的账号切换入口均正常。另检查每款配色在深浅模式下的媒体 ALT 查看、隐藏/显示、帖子菜单及私信底色；高对比度深浅模式、紧凑高级多栏和跟随系统配色均通过，浏览器无运行时异常。
+beta 1 接入时验证：五款配色 × 深浅模式 × 1440px 桌面/390px 手机，共 20 个布局场景通过。检查实际 beta 版本和基础颜色变量、8px 面板圆角、标题同色、无横向溢出；Markdown 选择、草稿最小化恢复、发帖窗口和至少 44px 的账号切换入口均正常。另检查每款配色在深浅模式下的媒体 ALT 查看、隐藏/显示、帖子菜单及私信底色；高对比度深浅模式、紧凑高级多栏和跟随系统配色均通过，浏览器无运行时异常。
 
-Stylelint、oxfmt、`git diff --check` 和全部皮肤的生产构建通过；当前 manifest 引用的五款 Tangerine CSS 均包含 `v3.0.0-beta.1` 及上游新设计变量，不含旧 `v2.6.5` 标记。
+Stylelint、oxfmt、`git diff --check` 和全部皮肤的生产构建通过；当前 manifest 引用的五款 Tangerine CSS 均包含 `v3.0.0-beta.3` 及上游新设计变量，不含旧 `v2.6.5` 标记。
 
 ### 原生账号卡片与账号切换
 
@@ -175,4 +177,4 @@ Vite 端口通过 `.env.development.local` 中的 `VITE_DEV_SERVER_PORT=3136` �
 - https://blog.joinmastodon.org/2026/10/5.0-a-closer-look/
 - https://github.com/mastodon/mastodon/releases
 - https://github.com/mastodon/mastodon/pull/40236
-- https://github.com/mattbirchler/Tangerine-Neue-for-Mastodon/releases/tag/3.0.0-beta.1
+- https://github.com/mattbirchler/Tangerine-Neue-for-Mastodon/releases/tag/3.0.0-beta.3
