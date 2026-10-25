@@ -181,7 +181,7 @@ GEM
     crack (1.0.1)
       bigdecimal
       rexml
-    crass (1.0.7)
+    crass (1.0.8)
     css_parser (3.3.0)
       addressable
       base64
@@ -603,7 +603,7 @@ GEM
     pastel (0.8.0)
       tty-color (~> 0.5)
     pg (1.6.3)
-    pghero (4.0.1)
+    pghero (4.1.0)
       activerecord (>= 7.2)
     playwright-ruby-client (1.64.0)
       base64
