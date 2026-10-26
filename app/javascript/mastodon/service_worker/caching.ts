@@ -28,7 +28,10 @@ export function handleFetch(event: FetchEvent) {
     event.respondWith(cacheFirst({ event, name: 'locales' }));
   } else if (event.request.destination === 'font') {
     event.respondWith(cacheFirst({ event, name: 'fonts' }));
-  } else if (event.request.destination === 'image') {
+  } else if (
+    event.request.destination === 'image' &&
+    url.origin === self.location.origin
+  ) {
     event.respondWith(cacheFirst({ event, name: 'images', ttl: DAY * 7 }));
   }
 }
@@ -51,7 +54,7 @@ async function cacheFirst({
   // Start expiring cache items while the process continues.
   void expireCachedItems({ name, ttl, max });
 
-  if (cachedResponse) {
+  if (cachedResponse?.ok) {
     // If we have a cached response, check the TTL header.
     const ttlHeader = Number.parseInt(
       cachedResponse.headers.get(CACHE_HEADER_TTL) ?? '0',
@@ -64,8 +67,8 @@ async function cacheFirst({
 
   const networkResponse = await fetch(request);
 
-  // For opaque responses, the status will be zero so we can't clone them.
-  if (networkResponse.status !== 0) {
+  // Error and opaque responses must not become persistent broken images.
+  if (networkResponse.ok) {
     // Clone request with a custom header to store timestamp.
     const cloneHeaders = new Headers(networkResponse.headers);
     cloneHeaders.set(CACHE_HEADER_TTL, Date.now().toString());
