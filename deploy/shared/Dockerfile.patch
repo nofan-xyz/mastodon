@@ -6,7 +6,7 @@ COPY --chown=mastodon:mastodon overlay/ /opt/mastodon/
 COPY gems/ /tmp/shared-gems/
 RUN for package in /tmp/shared-gems/*.gem; do \
       [ -f "$package" ] || continue; \
-      gem install --local --no-document --install-dir /usr/local/bundle "$package" || exit 1; \
+      gem install --local --no-document --ignore-dependencies --install-dir /usr/local/bundle "$package" || exit 1; \
     done && bundle check
 
 ARG PATCH_REVISION

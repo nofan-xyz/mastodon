@@ -1,0 +1,21 @@
+'use strict';
+const fs=require('node:fs');
+const {request,api,assert,mark,users}=require('./verify_rehearsal.cjs');
+(async()=>{
+ const boundary='rehearsal-'+Date.now();
+ const payload=Buffer.concat([Buffer.from('--'+boundary+'\r\nContent-Disposition: form-data; name="file"; filename="fixture.png"\r\nContent-Type: image/png\r\n\r\n'),fs.readFileSync('/tools/fixture.png'),Buffer.from('\r\n--'+boundary+'--\r\n')]);
+ let uploaded=await api('next','/api/v2/media',{method:'POST',user:'a',data:payload,headers:{'Content-Type':'multipart/form-data; boundary='+boundary}});
+ let media;const end=Date.now()+30000;
+ do {const r=await request('old','/api/v1/media/'+uploaded.id,{user:'a'});if(r.status===200){media=r.json;break;}assert(r.status===206,'Media processing failed '+r.status);await new Promise(r=>setTimeout(r,300));}while(Date.now()<end);
+ assert(media?.url,'Media URL missing');
+ assert(media.url.includes('beta-nofan-box/shared-rehearsal-'),'Upload escaped isolated bucket prefix');
+ const post=await api('old','/api/v1/statuses',{method:'POST',user:'a',data:{status:'Shared media rehearsal',media_ids:[media.id]}});
+ const copy=await api('next','/api/v1/statuses/'+post.id,{user:'b'});
+ assert(copy.media_attachments[0].url===media.url,'Media URLs differ between Webs');mark('5.0 media upload attaches to 4.7 post and is readable through both Webs');
+ const response=await fetch(media.url,{redirect:'error'});assert(response.status===200,'Public media alias returned '+response.status);await response.arrayBuffer();mark('uploaded image is accessible through the configured media alias');
+ const avatarPayload=Buffer.from(payload.toString('binary').replace('name="file"','name="avatar"'),'binary');
+ const changed=await api('old','/api/v1/accounts/update_credentials',{method:'PATCH',user:'a',data:avatarPayload,headers:{'Content-Type':'multipart/form-data; boundary='+boundary}});
+ const me=await api('next','/api/v1/accounts/verify_credentials',{user:'a'});
+ assert(me.avatar===changed.avatar&&me.avatar.includes('shared-rehearsal-'),'Avatar update not shared or wrong bucket');mark('4.7 avatar upload visible through 5.0');
+ await api('next','/api/v1/statuses/'+post.id,{method:'DELETE',user:'a'});
+})().catch(e=>{console.error('FAIL '+e.message);process.exitCode=1;});

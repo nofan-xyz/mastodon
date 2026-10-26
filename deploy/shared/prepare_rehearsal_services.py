@@ -15,7 +15,7 @@ assert env['DB_NAME'] == 'mastodon_shared_rehearsal' and env['S3_BUCKET'] == 'be
 for key in list(env):
     if key.startswith('REPLICA_DB_') or key in {'DATABASE_URL', 'SIDEKIQ_REDIS_HOST', 'SIDEKIQ_REDIS_PASSWORD', 'SIDEKIQ_REDIS_USER', 'CACHE_REDIS_HOST', 'CACHE_REDIS_PASSWORD', 'CACHE_REDIS_USER', 'CDN_HOST'}:
         del env[key]
-env.update(SIDEKIQ_REDIS_URL='redis://redis:6379/0', NOFAN_SHARED_WEB_ORIGINS='https://beta.nofan.xyz', RAILS_LOG_LEVEL='warn')
+env.update(SIDEKIQ_REDIS_URL='redis://redis:6379/0', NOFAN_SHARED_WEB_ORIGINS='https://beta.nofan.xyz', RAILS_LOG_LEVEL='warn', NOFAN_SHARED_CACHE_REDIS_URLS='redis://redis:6379/1,redis://redis:6379/2')
 env_file.write_text(''.join(f'{key}={value}\n' for key, value in env.items()))
 shutil.copyfile('/tmp/rehearsal_isolation.rb', root / 'rehearsal_isolation.rb')
 shutil.copyfile('/tmp/rehearsal_sidekiq.yml', root / 'rehearsal_sidekiq.yml')
