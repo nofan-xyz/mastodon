@@ -7,7 +7,7 @@
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
 | 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:6cf1fb7e9a85b7446f1393d79f47c73392d08157ff6778ee0a67f54fb171a0f0` | `1d03b99d8412785da33b127eb72336d0898045bc` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:e736342d74cd43d3409a81d160f7b284c8d68c88b764072bd5cbabe8a60f3c61` | `e89c5c38dc9b67b03f0a12f2f16ecb1b6099087e` |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:b81ddcf72bc68f25755919686c5f1b17e3c54d011d57fbc9107ce0c687aa6f09` | `584b877ed0355e5cff9bd5623678ef4cdcb9fa4b` |
 | Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:1ed93ed34faf5e0c865faae70158e673b3d13f0a7339fb604af9a21933b6b1c8` | 首次 5.0 CI，Streaming 源码未变 |
 
 共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
@@ -54,3 +54,7 @@ curl -fsS https://beta.nofan.xyz/health
 若需关闭 beta，可停用 `web-beta` 并调整 beta nginx 入口，正式 4.7 兼容 Web 与 5.0 workers 继续运行。若需回退某一 Web，优先保留扩展后的数据库与能消费新载荷的 5.0 workers，选择已验证兼容镜像；不能直接恢复旧数据库丢弃新写入，也不能让未经适配的旧 4.7 消费者抢走新任务。原始 4.7 镜像对扩展 schema 的只读回退探针已通过，不代表旧后台消费者能处理所有新载荷。真正恢复数据库属于另一次维护窗口。
 
 登录后媒体问题的浏览器复现、修复及公网验收见 [MEDIA_SERVICE_WORKER_FIX.md](MEDIA_SERVICE_WORKER_FIX.md)。Worker 脚本现按发布版本注册，/sw.js 不进入长缓存。
+
+2026-10-26 20:04（北京时间）更新 5.0 Web / workers 至 584b877ed0，构建 [40300967672](https://github.com/nofan-xyz/mastodon/actions/runs/40300967672)。发布前逐文件核对三份样式源文件及镜像 SOURCE_COMMIT，更新后全部应用容器健康，未执行数据库迁移、未重启 Streaming。修复范围见 [DARK_SELECT_FIX.md](DARK_SELECT_FIX.md) 与 [STICKY_HEADER_FIX.md](STICKY_HEADER_FIX.md)。
+
+同日 19:59 修复 ban.fan 静态资源跨域回归：4.7 Web 的 CDN_HOST 显式设为空，使资源使用当前访问域名；5.0 继续使用 beta 域名。部署生成器同步修正，详见 [BAN_ASSET_HOST_FIX.md](BAN_ASSET_HOST_FIX.md)。

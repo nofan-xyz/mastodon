@@ -35,7 +35,7 @@ cache47,cache50=redis_url(1),redis_url(2)
 aliases=set(filter(None,re.split(r'[,\s]+',env.get('ALTERNATE_DOMAINS',''))))|{'beta.nofan.xyz'}
 common={'NOFAN_SHARED_DATA':'true','NOFAN_SNAPSHOT_MODE':'false','LOCAL_DOMAIN':'nofan.xyz','WEB_DOMAIN':'nofan.xyz','ALTERNATE_DOMAINS':','.join(sorted(aliases)),'NOFAN_SHARED_WEB_ORIGINS':'https://beta.nofan.xyz','NOFAN_SHARED_CACHE_REDIS_URLS':cache47+','+cache50}
 override={'services':{}}
-override['services']['web']={'image':args.legacy_image,'environment':{**common,'CACHE_REDIS_URL':cache47,'CDN_HOST':'https://nofan.xyz','SOURCE_TAG':'codex/v4.7.3.3-shared-data'},'command':['bundle','exec','puma','-C','config/puma.rb'],'volumes':['./public/system:/opt/mastodon/public/system']}
+override['services']['web']={'image':args.legacy_image,'environment':{**common,'CACHE_REDIS_URL':cache47,'CDN_HOST':'','SOURCE_TAG':'codex/v4.7.3.3-shared-data'},'command':['bundle','exec','puma','-C','config/puma.rb'],'volumes':['./public/system:/opt/mastodon/public/system']}
 for service in ['sidekiq','sidekiq-ingress','sidekiq-push']:
     override['services'][service]={'image':args.new_image,'environment':{**common,'CACHE_REDIS_URL':cache50,'CDN_HOST':'https://beta.nofan.xyz'},'volumes':['./public/system:/opt/mastodon/public/system']}
 override['services']['streaming']={'image':args.streaming_image,'command':['node','./streaming/index.js']}
