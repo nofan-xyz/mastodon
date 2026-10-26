@@ -726,12 +726,21 @@ code {
     outline: 0;
     font-family: inherit;
     resize: vertical;
-    background: var(--color-bg-secondary);
+
+    // Native popups can composite translucent field backgrounds over white.
+    // Use an opaque themed surface for both the field and its grouped options.
+    background: var(--color-bg-primary);
     border: 1px solid var(--color-border-primary);
     border-radius: 4px;
     padding-inline-start: 10px;
     padding-inline-end: 30px;
     height: 41px;
+
+    option,
+    optgroup {
+      background-color: var(--color-bg-primary);
+      color: var(--color-text-primary);
+    }
 
     &:focus-visible {
       outline: var(--outline-focus-default);
