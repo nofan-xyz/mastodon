@@ -7,10 +7,10 @@
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
 | 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:6cf1fb7e9a85b7446f1393d79f47c73392d08157ff6778ee0a67f54fb171a0f0` | `1d03b99d8412785da33b127eb72336d0898045bc` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:ebbda0f9deaf5c63c632de8a75b6fc5e69802d7cc7950e06c04d1990b00ce8f3` | `bc6791217d59b4fb283bb792f08e402f239975fe` |
-| Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:1ed93ed34faf5e0c865faae70158e673b3d13f0a7339fb604af9a21933b6b1c8` | 同次 5.0 CI |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:e736342d74cd43d3409a81d160f7b284c8d68c88b764072bd5cbabe8a60f3c61` | `e89c5c38dc9b67b03f0a12f2f16ecb1b6099087e` |
+| Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:1ed93ed34faf5e0c865faae70158e673b3d13f0a7339fb604af9a21933b6b1c8` | 首次 5.0 CI，Streaming 源码未变 |
 
-两次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。没有覆盖 stable/latest 镜像标签。
+共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
 
 部署目录 `/home/mastodon`，项目 `mastodon`。`web` 为 4.7，回环端口 3000；`web-beta` 为 5.0，回环端口 3106。Streaming 为 5.0，端口 4000，两域名的 nginx 均指向它。三个后台进程都使用 5.0 镜像，分别消费 default/mailers/scheduler/fasp、ingress、push/pull；只有第一个进程监听 scheduler。
 
@@ -52,3 +52,5 @@ curl -fsS https://beta.nofan.xyz/health
 镜像以 override 中的 digest 为准，不能只修改原 `.env` 的 stable 标签，不能再次执行独立 beta 的快照清洗、迁移或媒体复制脚本。后续源码变更先走独立演练，更新镜像前核对两版兼容性与所有应用角色。
 
 若需关闭 beta，可停用 `web-beta` 并调整 beta nginx 入口，正式 4.7 兼容 Web 与 5.0 workers 继续运行。若需回退某一 Web，优先保留扩展后的数据库与能消费新载荷的 5.0 workers，选择已验证兼容镜像；不能直接恢复旧数据库丢弃新写入，也不能让未经适配的旧 4.7 消费者抢走新任务。原始 4.7 镜像对扩展 schema 的只读回退探针已通过，不代表旧后台消费者能处理所有新载荷。真正恢复数据库属于另一次维护窗口。
+
+登录后媒体问题的浏览器复现、修复及公网验收见 [MEDIA_SERVICE_WORKER_FIX.md](MEDIA_SERVICE_WORKER_FIX.md)。Worker 脚本现按发布版本注册，/sw.js 不进入长缓存。

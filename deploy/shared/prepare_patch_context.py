@@ -19,9 +19,9 @@ assert not destination.exists(), 'Use a new context directory for every artifact
 def git(*argv):
     return subprocess.check_output(['git', '-C', str(project), *argv])
 
-assert not git('diff', '--name-only', 'HEAD', '--', 'app', 'config', 'db', 'Gemfile', 'Gemfile.lock').strip(), 'Commit runtime changes before building'
+assert not git('diff', '--name-only', 'HEAD', '--', 'app', 'config', 'db', 'lib', 'Gemfile', 'Gemfile.lock').strip(), 'Commit runtime changes before building'
 changed = set(git('diff', '--name-only', '-z', args.baseline, 'HEAD').decode().split('\0'))
-runtime = sorted(p for p in changed if p and (p.startswith(('app/', 'config/', 'db/')) or p in {'Gemfile', 'Gemfile.lock'}))
+runtime = sorted(p for p in changed if p and (p.startswith(('app/', 'config/', 'db/', 'lib/')) or p in {'Gemfile', 'Gemfile.lock'}))
 assert not any(p.startswith('app/javascript/') for p in runtime), 'Frontend changes require a full application image build'
 assert all((project / p).is_file() for p in runtime), 'Runtime deletions require an explicit image migration'
 assert all(not (project / p).is_symlink() for p in runtime), 'Runtime overlays must contain regular files'
