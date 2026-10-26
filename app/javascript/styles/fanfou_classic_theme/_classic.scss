@@ -13,7 +13,13 @@
 }
 
 html[data-color-scheme='light'] {
-  background-image: linear-gradient(to bottom, #7dcade, #b1dae1 360px);
+  --column-panel-gap-background: linear-gradient(
+    to bottom,
+    #7dcade,
+    #b1dae1 360px
+  );
+
+  background-image: var(--column-panel-gap-background);
   background-attachment: fixed;
 }
 

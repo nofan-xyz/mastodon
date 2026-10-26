@@ -9,7 +9,23 @@
   border-radius: var(--column-panel-radius, 8px) var(--column-panel-radius, 8px)
     0 0;
 
-  // Scroll fade that overlays the scrollable content below
+  // Cover the reserved viewport gap and rounded corners while sticky. The
+  // layout's opaque background paints above this layer without changing height.
+  &::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    top: calc(-1 * var(--column-panel-offset, 0px));
+    inset-inline: 0;
+    z-index: -1;
+    height: calc(
+      var(--column-panel-offset, 0px) + var(--column-panel-radius, 8px)
+    );
+    background: var(--column-panel-gap-background, var(--color-bg-desktop));
+    background-attachment: fixed;
+  }
+
+  // A solid divider avoids fading images through the title's lower edge.
   &::after {
     content: '';
     pointer-events: none;
@@ -17,12 +33,8 @@
     top: 100%;
     inset-inline: 0;
     z-index: -1;
-    height: var(--space-10);
-    background: linear-gradient(
-      to bottom,
-      var(--color-bg-primary),
-      transparent
-    );
+    height: 1px;
+    background: var(--color-border-primary);
     transition:
       opacity,
       transform 250ms ease-out;
