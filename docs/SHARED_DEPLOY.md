@@ -7,7 +7,7 @@
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
 | 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:6cf1fb7e9a85b7446f1393d79f47c73392d08157ff6778ee0a67f54fb171a0f0` | `1d03b99d8412785da33b127eb72336d0898045bc` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:b81ddcf72bc68f25755919686c5f1b17e3c54d011d57fbc9107ce0c687aa6f09` | `584b877ed0355e5cff9bd5623678ef4cdcb9fa4b` |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:fc3b0ed459196defa19a129ec4c61f33dcaccbe57fdf51acc7d69a4c6c86052f` | `b7bdcba68320de523bbd6c763129586f89926145` |
 | Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:1ed93ed34faf5e0c865faae70158e673b3d13f0a7339fb604af9a21933b6b1c8` | 首次 5.0 CI，Streaming 源码未变 |
 
 共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
@@ -18,7 +18,7 @@
 
 `docker-compose.override.yml` 固定所有应用镜像及共享参数，权限 600；`.env.production` 继续使用正式站原密钥。没有复制 beta 的 SECRET/VAPID 或媒体写入配置到正式环境。账号签名、AR 加密、OTP、SECRET 和 VAPID 均沿用原正式配置。两个 Web 的 LOCAL_DOMAIN/WEB_DOMAIN 都是 nofan.xyz，beta 为明确允许的别名及 WebAuthn 来源，RP ID 为 nofan.xyz。
 
-4.7 的 `SOURCE_TAG` 指向真实分支 `codex/v4.7.3.3-shared-data`，该引用与镜像 SOURCE_COMMIT 相同，使原有 tag 推导的第四段版本号保持 3。源码 SHA 与镜像均未因此更改；公开版本为 `4.7.3.3+shared47-...`。5.0 仍固定上游 `559688e153ce3a50b26e327bfe488743da99f3dc`，不是 5.0 稳定版。
+4.7 的 `SOURCE_TAG` 指向真实分支 `codex/v4.7.3.3-shared-data`，该引用与镜像 SOURCE_COMMIT 相同，使原有 tag 推导的第四段版本号保持 3。源码 SHA 与镜像均未因此更改；公开版本为 `4.7.3.3+shared47-...`。5.0 现固定上游 `08941b303f2ba297ada70c3e646d600916403666`，不是 5.0 稳定版。
 
 ## 备份、迁移与隔离环境
 
@@ -58,3 +58,11 @@ curl -fsS https://beta.nofan.xyz/health
 2026-10-26 20:04（北京时间）更新 5.0 Web / workers 至 584b877ed0，构建 [40300967672](https://github.com/nofan-xyz/mastodon/actions/runs/40300967672)。发布前逐文件核对三份样式源文件及镜像 SOURCE_COMMIT，更新后全部应用容器健康，未执行数据库迁移、未重启 Streaming。修复范围见 [DARK_SELECT_FIX.md](DARK_SELECT_FIX.md) 与 [STICKY_HEADER_FIX.md](STICKY_HEADER_FIX.md)。
 
 同日 19:59 修复 ban.fan 静态资源跨域回归：4.7 Web 的 CDN_HOST 显式设为空，使资源使用当前访问域名；5.0 继续使用 beta 域名。部署生成器同步修正，详见 [BAN_ASSET_HOST_FIX.md](BAN_ASSET_HOST_FIX.md)。
+
+## 2026-10-27 完整上游镜像更新
+
+北京时间 01:57 更新完成，来源、完整演练与检查范围见 [UPSTREAM_20261027_RELEASE.md](UPSTREAM_20261027_RELEASE.md)。本次仅新增 `admin_server_checks` 表，5.0 Web 与三个消费者统一更新到当前表格中的镜像；4.7 Web、Streaming、Redis 分区和 S3 配置保留原值。4.7 的 `CDN_HOST` 仍为空，ban.fan 资源继续使用自身域名。
+
+新的一致性备份位于 `/home/mastodon/shared-rollout/20261026T172616Z/production.dump`，约 7.1 GiB；01:46 完成并验证恢复目录，未声称该份备份已再次完整恢复。迁移前后正式密码、本地签名密钥及旧密钥摘要一致。
+
+两入口认证资料/偏好/主页/通知验收通过，三个后台进程健康且只有一个 scheduler 消费者；上线后检查未发现新的缺表/缺列/类或方法兼容错误，联邦新动态持续入库。beta、nofan、ban 三入口公网健康、版本、登录页引用的本站 JS/CSS 和 sw.js 均正常，ban.fan 未重现跨域资源回归。独立演练的六个服务与临时测试隧道已停止，临时本地凭据副本已清理。
