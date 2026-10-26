@@ -56,6 +56,7 @@ class User < ApplicationRecord
   include User::Activity
   include User::Confirmation
   include User::HasSettings
+  include SharedUserSettings
   include User::LdapAuthenticable
   include User::Omniauthable
   include User::PamAuthenticable
@@ -117,6 +118,7 @@ class User < ApplicationRecord
   before_create :set_age_verified_at
   after_commit :send_pending_devise_notifications
   after_create_commit :trigger_webhooks
+  after_commit :reload_home_feed, if: :saved_change_to_settings, on: [:create, :update]
 
   normalizes :locale, with: ->(locale) { I18n.available_locales.exclude?(locale.to_sym) ? nil : locale }
   normalizes :time_zone, with: ->(time_zone) { ActiveSupport::TimeZone[time_zone].nil? ? nil : time_zone }
@@ -523,5 +525,10 @@ class User < ApplicationRecord
 
   def trigger_webhooks
     TriggerWebhookWorker.perform_async('account.created', 'Account', account_id)
+  end
+
+  def reload_home_feed
+    previous = saved_change_to_settings.first
+    MultiMergeIntoOwnHomeWorker.perform_async(account.id, previous['display_own_posts'], previous['display_own_boosts'])
   end
 end

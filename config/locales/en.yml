@@ -603,6 +603,11 @@ en:
         title: Import domain blocks
       no_file: No file selected
     fasp:
+      capabilities:
+        activation_msg: Capability enabled
+        deactivation_msg: Capability disabled
+        disable: Disable
+        enable: Enable
       debug:
         callbacks:
           created_at: Created at
@@ -614,6 +619,7 @@ en:
         active: Active
         base_url: Base URL
         callback: Callback
+        capabilities: Capabilities
         delete: Delete
         edit: Edit Provider
         finish_registration: Finish registration

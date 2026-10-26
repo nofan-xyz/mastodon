@@ -593,6 +593,11 @@ zh-CN:
         title: 导入域名列表
       no_file: 没有选择文件
     fasp:
+      capabilities:
+        activation_msg: 已启用能力
+        deactivation_msg: 已停用能力
+        disable: 停用
+        enable: 启用
       debug:
         callbacks:
           created_at: 创建于
@@ -604,6 +609,7 @@ zh-CN:
         active: 有效
         base_url: 基础 URL
         callback: 回调
+        capabilities: 能力
         delete: 删除
         edit: 编辑提供商
         finish_registration: 完成注册

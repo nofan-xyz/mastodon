@@ -74,6 +74,11 @@ class Setting < ApplicationRecord
     end
 
     def [](key)
+      if ENV['NOFAN_SHARED_DATA'] == 'true'
+        record = find_by(var: key.to_s)
+        return record ? record.value : default_settings[key.to_s]
+      end
+
       Rails.cache.fetch(cache_key(key)) do
         db_val = find_by(var: key)
         db_val ? db_val.value : default_settings[key]
