@@ -8,11 +8,19 @@ module SharedFaspCapabilities
   extend ActiveSupport::Concern
 
   included do
+    before_save :lock_shared_fasp_provider
+    before_destroy :lock_shared_fasp_provider
     after_save :mirror_legacy_fasp_capabilities
     after_destroy :mirror_legacy_fasp_capabilities
   end
 
   private
+
+  def lock_shared_fasp_provider
+    return unless ENV['NOFAN_SHARED_DATA'] == 'true'
+
+    Fasp::Provider.where(id: fasp_provider_id).lock.pick(:id)
+  end
 
   def mirror_legacy_fasp_capabilities
     return unless ENV['NOFAN_SHARED_DATA'] == 'true' && Fasp::Provider.column_names.include?('capabilities')

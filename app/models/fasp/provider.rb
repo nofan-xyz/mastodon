@@ -35,6 +35,7 @@ class Fasp::Provider < ApplicationRecord
   validates :remote_identifier, presence: true
 
   before_create :create_keypair
+  before_destroy :lock_shared_provider_before_deletion, prepend: true
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :with_capability, lambda { |capability_name|
@@ -123,6 +124,10 @@ class Fasp::Provider < ApplicationRecord
   end
 
   private
+
+  def lock_shared_provider_before_deletion
+    self.class.where(id:).lock.pick(:id) if ENV['NOFAN_SHARED_DATA'] == 'true'
+  end
 
   def create_keypair
     self.server_private_key_pem ||=
