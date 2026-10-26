@@ -1,0 +1,24 @@
+name: Build nofan shared legacy Web image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: nofan-shared-legacy-image
+  cancel-in-progress: false
+
+jobs:
+  rails:
+    uses: ./.github/workflows/build-container-image.yml
+    with:
+      file_to_build: Dockerfile
+      push_to_images: ghcr.io/nofan-xyz/mastodon
+      version_metadata: shared47-${{ github.sha }}
+      flavor: latest=false
+      tags: |
+        type=raw,value=shared47-${{ github.sha }}
+    secrets: inherit
