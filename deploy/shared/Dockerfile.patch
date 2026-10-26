@@ -1,0 +1,18 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+USER root
+COPY --chown=mastodon:mastodon overlay/ /opt/mastodon/
+COPY gems/ /tmp/shared-gems/
+RUN for package in /tmp/shared-gems/*.gem; do \
+      [ -f "$package" ] || continue; \
+      gem install --local --no-document --install-dir /usr/local/bundle "$package" || exit 1; \
+    done && bundle check
+
+ARG PATCH_REVISION
+ARG PATCH_METADATA
+ARG BASE_IMAGE
+ENV SOURCE_COMMIT=${PATCH_REVISION} MASTODON_VERSION_METADATA=${PATCH_METADATA}
+LABEL org.opencontainers.image.revision=${PATCH_REVISION} \
+      org.opencontainers.image.base.name=${BASE_IMAGE}
+USER mastodon

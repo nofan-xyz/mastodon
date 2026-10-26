@@ -20,12 +20,12 @@ class CreateFaspCapabilities < ActiveRecord::Migration[8.1]
           FROM fasp_providers, jsonb_array_elements(fasp_providers.capabilities) AS capabilities;
       SQL
 
-      remove_column :fasp_providers, :capabilities
+      remove_column :fasp_providers, :capabilities unless ENV['NOFAN_SHARED_DATA'] == 'true'
     end
   end
 
   def down
-    add_column :fasp_providers, :capabilities, :jsonb, default: [], null: false
+    add_column :fasp_providers, :capabilities, :jsonb, default: [], null: false unless column_exists?(:fasp_providers, :capabilities)
 
     safety_assured do
       execute(<<~SQL.squish)

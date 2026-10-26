@@ -13,6 +13,8 @@
 #  fasp_provider_id :bigint(8)        not null
 #
 class Fasp::Capability < ApplicationRecord
+  include SharedFaspCapabilities
+
   belongs_to :fasp_provider, class_name: 'Fasp::Provider'
 
   before_update :update_remote_capability

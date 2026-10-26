@@ -1,0 +1,7 @@
+---
+:concurrency: 2
+:queues:
+  - default
+  - ingress
+:scheduler:
+  :enabled: false

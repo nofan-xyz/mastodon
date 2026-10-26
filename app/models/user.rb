@@ -54,6 +54,7 @@ class User < ApplicationRecord
   include User::Activity
   include User::Confirmation
   include User::HasSettings
+  include SharedUserSettings
   include User::LdapAuthenticable
   include User::Omniauthable
   include User::PamAuthenticable
