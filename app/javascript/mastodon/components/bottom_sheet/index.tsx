@@ -37,6 +37,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     dialog.showModal();
 
     return () => {
+      // Close directly during unmount; do not emit another cancel request.
+      // close() is also supported by browsers without requestClose().
       dialog.close();
     };
   }, []);

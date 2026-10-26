@@ -94,3 +94,7 @@
       cron: '5 0 * * * Asia/Shanghai'
       class: Scheduler::OnThisDayScheduler
       queue: scheduler
+    server_checks_scheduler:
+      every: '15 minutes'
+      class: Scheduler::ServerChecksScheduler
+      queue: scheduler

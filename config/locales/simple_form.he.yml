@@ -18,6 +18,7 @@ he:
       account_migration:
         acct: נא לציין משתמש@דומיין של החשבון אליו תרצה/י לעבור
       account_warning_preset:
+        action_category: יש לבחור את פעולת הפיקוח שאותה תשמש תגובה זו. בחרו ב"כל הפעולות" אם התגובה רלוונטית ליותר מפעולה אחת.
         text: ניתן להשתמש בתחביר הודעות, כגון קישוריות, תגיות ואזכורים
         title: אופציונלי. בלתי נראה למקבל ההודעה
       admin_account_action:
@@ -196,6 +197,7 @@ he:
       account_migration:
         acct: שם משתמש של החשבון החדש
       account_warning_preset:
+        action_category: בחירת פעולת פיקוח
         text: טקסט תגובה
         title: כותרת
       admin_account_action:
@@ -204,6 +206,7 @@ he:
         text: תגובה מוכנה מראש
         type: פעולה
         types:
+          all_actions: כל הפעולות
           disable: הקפא
           none: שלח התרעה
           sensitive: רגיש
@@ -276,7 +279,6 @@ he:
         setting_system_scrollbars_ui: להשתמש בפס הגלילה שהוא ברירת המחדל של המערכת
         setting_theme: ערכת העיצוב של האתר
         setting_theme_color: צבע ערכת העיצוב
-        setting_trends: הצגת הנושאים החמים
         setting_unfollow_modal: להראות תיבת אישור לפני הפסקת מעקב אחרי אחרים
         setting_use_blurhash: הצגת גראדיינטים צבעוניים למדיה מוסתרת
         setting_use_pending_items: מצב איטי

@@ -4,9 +4,23 @@
 
 - 2026-10-19 开始，分支 `codex/upgrade-mastodon-5`，独立工作区 `/home/twoheart/projects/mastodon-5`。
 - nofan 基线：v4.7.3.3，`0afb546c7d8139688642c80c1cc14d6e17335317`。
-- 当前固定上游：`559688e153ce3a50b26e327bfe488743da99f3dc`（2026-10-23 同步）；初始评估基线为 `2a3b728653dd6b067650358133f92bee956f6da0`，自报 5.0.0-alpha.1；不是正式版。
+- 当前固定上游：`08941b303f2ba297ada70c3e646d600916403666`（2026-10-27 同步）；初始评估基线为 `2a3b728653dd6b067650358133f92bee956f6da0`，自报 5.0.0-alpha.1；不是正式版。
 - 先让官方默认界面和现有核心功能运行，再移植全部主题；不以隐藏功能或清空用户偏好作为兼容方案。
 - 原工作区未提交的 `docs/CUSTOMIZATIONS.md`、`docs/MARKDOWN.md` 保留在原处，本分支从已提交版本建立。
+
+## 2026-10-27 上游同步
+
+从上次固定基线 559688e153ce3a50b26e327bfe488743da99f3dc 合并 mastodon/mastodon main 至 08941b303f2ba297ada70c3e646d600916403666（本次拉取时最新），共27个上游提交。合并前备份分支 codex/backup-before-upstream-20261027，原始本地工作区未提交文件未动。
+
+纳入 UTS58 文本/URL解析、较低饱和度配色、移动底部导航、发帖框遮挡修复、高级界面帖子宽度、服务健康检查与依赖更新。Ruby/Docker/CI 对齐4.0.8，yarn与Bundler按锁文件安装完成。
+
+两处冲突已处理：BottomSheet保留卸载时直接close()及账号菜单外部引用/取消事件处理，避免requestClose()再次发出取消请求，并兼容未支持requestClose()的浏览器；Sidekiq同时保留23:00次日预计算、00:05补算和上游15分钟健康检查任务。独立解析ERB/YAML确认三个任务均处于scheduler配置中。
+
+新增迁移20261013133732_create_admin_server_checks仅在本地mastodon_shared_compat_test执行成功，schema仅新增表和索引，没有删除共库兼容字段。原生产/演练拓扑与历史验证仍见SHARED_DEPLOY.md，本次合并尚未构建发布镜像或部署，不能把此前版本的双版本演练验收当成本次新版已验收。后续上线需要Ruby4.0.8完整构建，不能将新Gemfile覆盖到Ruby4.0.7旧镜像后直接启动；新增迁移和5.0后台角色需一起纳入部署演练。
+
+验证：TypeScript、完整生产前端构建、相关TS ESLint/SCSS Stylelint及合并冲突文件格式检查通过；既有JSX入口被当前ESLint配置忽略，不计入其覆盖。前端40个测试文件共4255项最终全部通过；首次并发编译期间html性能阈值测试超时，单独复测及整套重跑均通过，未放宽阈值。Windows Edge加载本次构建产物：72个主题/深浅/屏宽滚动场景、240个select皮肤/模式/主题色/对比度场景均通过，包含X UI与Tangerine皮肤。
+
+Ruby4.0.8下后端重点回归300+210=510项通过，涵盖提取器、富文本/安全过滤、发帖API、账号/登录/安全密钥选项、那年今日、共库缓存与偏好/FASP/迁移保留、上游健康检查。首轮健康检查测试有两项失败，因上游测试桩写死chewy_specifications，适配为Chewy::Stash::Specification.index_name后，带隔离ES前缀的整组300项重跑通过；没有改动生产健康检查逻辑。相关Ruby文件及修改的测试文件RuboCop通过。不是整个上游后端测试套件，也未使用真实用户账号或生产数据库。
 
 ## 2026-10-23 上游同步
 
@@ -47,7 +61,7 @@
 
 上游新增 `db/post_migrate/20261016161747_remove_private_key_from_accounts.rb`；4.7 已将本地私钥迁至 `keypairs`，仍须验证历史迁移完整执行。删除字段后的回滚不能仅假设更换旧镜像即可。
 
-当前目标构建配置为 Ruby 4.0.7 / Node 26，最终最低要求以正式版为准。线上只读基线：Rails v4.7.3.3、Streaming v4.7.3.0、PostgreSQL 14、Redis 7、Elasticsearch 8.19.15。不要把开发环境依赖版本与服务最低版本混淆。
+当前目标构建配置为 Ruby 4.0.8 / Node 26，最终最低要求以正式版为准。线上只读基线：Rails v4.7.3.3、Streaming v4.7.3.0、PostgreSQL 14、Redis 7、Elasticsearch 8.19.15。不要把开发环境依赖版本与服务最低版本混淆。
 
 ## 验证记录
 
