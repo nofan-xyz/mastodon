@@ -7,3 +7,5 @@
 19:59 旧 Web 重建并健康，原 Compose 备份至当前发布计划的 before-ban-assets-compose.override.yml。同步修正 prepare_production.py，fix_ban_assets.py 保留本次修复操作。以后回退 Compose 时需保留 CDN_HOST 为空，避免恢复带问题的旧配置。
 
 Windows Edge 使用全新上下文验证三个域名登录页：密码框可见，收到的 /packs/ 样式和脚本无 4xx/5xx、无跨域资源地址、无资源请求失败；ban.fan 本次加载 32 个资源。Cloudflare 统计 beacon 仍被 CSP 阻止，与此次应用资源 CORS 问题不同。ban.fan 页面可见，但等待 DOMContentLoaded 一度超时，不能把它描述为浏览器控制台完全无错误或已验证真实账号登录全过程。
+
+延长冷启动观察后，ban.fan /public/local 在约 90 秒完成 React 页面渲染，显示站点简介、活跃人数及 4.7.3.3 版本；同域 /api/v2/instance 返回 200、canonical domain 为 nofan.xyz。应用资源未出现 CORS 或 HTTP 错误。另见 Cloudflare /cdn-cgi/speculation 的 HTTP/2 协议错误，未阻止最终渲染。冷启动仍慢，本次不宣称加载性能已修复；没有使用真实用户密码验证登录。beta 公网版本已回读到 584b877ed0355e5cff9bd5623678ef4cdcb9fa4b。
