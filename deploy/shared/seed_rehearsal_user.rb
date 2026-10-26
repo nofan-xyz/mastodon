@@ -32,7 +32,7 @@ end
 user.update_columns(role_id: UserRole.order(position: :desc).first!.id) if role == 'c'
 
 policy = NotificationPolicy.find_or_initialize_by(account_id: user.account_id)
-policy.attributes = policy.class.column_names.grep(/\Afilter_/).to_h { |key| [key, false] }
+policy.attributes = policy.class.column_names.grep(/\Afilter_/).index_with(false)
 policy.save!
 
 token = Doorkeeper::AccessToken.create!(resource_owner_id: user.id, scopes: 'read write follow push')

@@ -1,6 +1,14 @@
 # beta.nofan.xyz 部署
 
-## 实例与来源
+2026-10-26 15:44（北京时间）已切换为正式数据互通：beta 使用 5.0 Web，nofan.xyz 保留 4.7 Web，两者共用正式 PostgreSQL、协调 Redis、账号密钥、设置和 nofan-box 媒体桶。后台任务统一由 5.0 消费，只有一个 scheduler 消费进程。
+
+当前部署位于 `/home/mastodon`，新增 `web-beta` 服务监听回环端口 3106。旧 `/home/mastodon-beta` 独立快照应用及媒体复制已停用，数据保留归档；旧 beta 测试写入未回灌正式库。访问 beta 后需要重新登录，使用正式站账号密码和两步验证；两个入口的修改均作用于正式数据。
+
+当前镜像、操作、验证和回退以 [SHARED_DEPLOY.md](SHARED_DEPLOY.md) 为准。下面仅保留独立快照时期的历史记录，不能作为当前更新指令。
+
+## 历史：独立快照部署（已停用）
+
+### 实例与来源
 
 - 这是独立的 5.0 测试站。2026-10-26 开始导入 nofan.xyz 的单向数据库及媒体快照；不是实时互通，beta 的改动不回写正式站。导入状态见下文。
 - 上游固定提交：`559688e153ce3a50b26e327bfe488743da99f3dc`。
@@ -11,7 +19,7 @@
 - 快照模式只复制解密已有两步验证数据所需的 Active Record 加密密钥与 OTP 配置；会话密钥和 VAPID 密钥保持独立。按用户要求复用 S3 Access Key / Secret Key，不连接正式站实时数据库和 Redis。快照模式关闭邮件，不复用 SMTP 发送能力。
 - 注册关闭；管理员创建测试账号或邀请后再开放测试。站点及反代均启用 noindex。
 
-## 网络与证书
+### 网络与证书
 
 Cloudflare 的 beta A 记录指向源站 `38.242.199.52`，保留代理。此域名不经过 ban.fan 香港反代。
 
@@ -19,7 +27,7 @@ Cloudflare 的 beta A 记录指向源站 `38.242.199.52`，保留代理。此域
 
 证书独立存放在 `/etc/letsencrypt-beta`，HTTP 验证目录 `/var/www/beta-acme`。`nofan-beta-cert-renew.timer` 每日两次调用 Certbot 容器续期并验证、重载 nginx，不修改正式站证书配置。
 
-## 日常操作
+### 日常操作
 
 在源站执行：
 
@@ -33,7 +41,7 @@ curl -fsS http://127.0.0.1:4105/api/v1/streaming/health
 
 `.env` 记录 PostgreSQL 密码和实际镜像引用，`.env.production` 记录应用密钥，均不入 Git。独立测试站最初的管理员凭据保存在受保护的 `secrets/ADMIN-CREDENTIALS.txt`；恢复正式站快照后，该测试账号被替换，此文件仅用于旧 beta 回退。快照账号使用正式站原有的登录邮箱、密码和两步验证。
 
-## 更新和回退
+### 更新和回退
 
 1. 在适配分支手动触发 Build nofan beta images；确认 Rails 和 Streaming 均成功。
 2. 核对 Rails 镜像内的 `SOURCE_COMMIT`、两款镜像的 `MASTODON_VERSION_METADATA` 与目标提交相同，使用镜像 digest 固定 `.env` 中的两个镜像引用。
@@ -49,7 +57,7 @@ curl -fsS http://127.0.0.1:4105/api/v1/streaming/health
 
 所有操作均限定 beta 的 Compose 项目和目录，不使用正式站的 deploy.sh，也不对正式站执行 down/recreate/migrate。
 
-## S3 媒体配置（2026-10-26）
+### S3 媒体配置（2026-10-26）
 
 使用 IDrive e2 法兰克福新桶 `beta-nofan-box`，区域 `eu-central-2`；不是巴黎 `eu-west-4` 的同名旧桶。按用户要求复用正式站 S3 密钥，密钥只保存在服务器权限 600 的环境文件中，不写入此仓库。
 
@@ -69,7 +77,7 @@ S3_OVERRIDE_PATH_STYLE=false
 
 此配置通过桶路径分离 beta 和正式站媒体；因为复用同一密钥，不应将其误认为 IAM 权限级隔离。
 
-## 正式站快照导入（2026-10-26）
+### 正式站快照导入（2026-10-26）
 
 本次任务已获用户授权：导入正式站账号、设置和媒体快照。正式站仅运行只读 `pg_dump` 和 S3 List/CopySource 读取；不迁移正式站数据库，不停止或重建正式站应用。
 
@@ -105,7 +113,7 @@ cat /home/mastodon-beta/backups/snapshot-20261026T035130Z/media-progress.json
 
 回退时先保留维护页、停止 beta web/sidekiq/streaming，再从本批次的 `beta-before.dump` 和 `.env.production` 恢复独立测试站，移走 `compose.override.yml`，恢复批次内原 nginx 配置及 beta Redis 空状态后重启。不要将 beta 快照导回正式站，也不要删除正式桶媒体。
 
-## 首次部署校验
+### 首次部署校验
 
 部署前修复 crass 1.0.8（GHSA-pq4g-8rxf-4g29）和 pghero 4.1.0（GHSA-5287-hmjh-qmqq），依赖扫描通过，相关 67 项回归通过。最终镜像构建为 Actions 40208096967。Rails 固定 digest 为 sha256:d361962fbc4039d4c9378bedda24b6d0d699406f5a6da44599400a00172ea307；Streaming 为 sha256:b1c0c41b0343fe42396e4e26c16180ddf3ecd8365a080b36a94f85b9a581f22d。服务器 release.json 另存提交与 digest，配置和初始化数据库已备份。
 
