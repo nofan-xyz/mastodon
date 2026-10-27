@@ -7,7 +7,7 @@
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
 | 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:6cf1fb7e9a85b7446f1393d79f47c73392d08157ff6778ee0a67f54fb171a0f0` | `1d03b99d8412785da33b127eb72336d0898045bc` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:fc3b0ed459196defa19a129ec4c61f33dcaccbe57fdf51acc7d69a4c6c86052f` | `b7bdcba68320de523bbd6c763129586f89926145` |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:6fe337e0d6dac8116b145cddcab8eca9f73da73f186a79067ad9ee4b15e5862d` | `a90036ab943cf4719869b1a4a9404790fddf6184` |
 | Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:1ed93ed34faf5e0c865faae70158e673b3d13f0a7339fb604af9a21933b6b1c8` | 首次 5.0 CI，Streaming 源码未变 |
 
 共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
@@ -61,8 +61,17 @@ curl -fsS https://beta.nofan.xyz/health
 
 ## 2026-10-27 完整上游镜像更新
 
-北京时间 01:57 更新完成，来源、完整演练与检查范围见 [UPSTREAM_20261027_RELEASE.md](UPSTREAM_20261027_RELEASE.md)。本次仅新增 `admin_server_checks` 表，5.0 Web 与三个消费者统一更新到当前表格中的镜像；4.7 Web、Streaming、Redis 分区和 S3 配置保留原值。4.7 的 `CDN_HOST` 仍为空，ban.fan 资源继续使用自身域名。
+北京时间 01:57 更新完成，来源、完整演练与检查范围见 [UPSTREAM_20261027_RELEASE.md](UPSTREAM_20261027_RELEASE.md)。本次仅新增 `admin_server_checks` 表，5.0 Web 与三个消费者当时统一更新至 b7bdcba683 / fc3b0ed459；4.7 Web、Streaming、Redis 分区和 S3 配置保留原值。4.7 的 `CDN_HOST` 仍为空，ban.fan 资源继续使用自身域名。
 
 新的一致性备份位于 `/home/mastodon/shared-rollout/20261026T172616Z/production.dump`，约 7.1 GiB；01:46 完成并验证恢复目录，未声称该份备份已再次完整恢复。迁移前后正式密码、本地签名密钥及旧密钥摘要一致。
 
 两入口认证资料/偏好/主页/通知验收通过，三个后台进程健康且只有一个 scheduler 消费者；上线后检查未发现新的缺表/缺列/类或方法兼容错误，联邦新动态持续入库。beta、nofan、ban 三入口公网健康、版本、登录页引用的本站 JS/CSS 和 sw.js 均正常，ban.fan 未重现跨域资源回归。独立演练的六个服务与临时测试隧道已停止，临时本地凭据副本已清理。
+## 2026-10-27 11:52 发帖浮层兼容修复
+
+5.0 Web / workers 更新为当前表格中的 a90036ab94 镜像，修复不支持原生 Popover / color-mix 的内核中的发帖菜单偏移、按钮悬停失去背景和表情层级遮挡，并替换表情分类的 toSorted 调用。保留引用可见范围确认、最小化行为、原生尺寸与现代浏览器流程。详见 [COMPOSER_OVERLAY_COMPAT_FIX.md](COMPOSER_OVERLAY_COMPAT_FIX.md)。
+
+[CI 40445649118](https://github.com/nofan-xyz/mastodon/actions/runs/40445649118) 双架构成功，最终镜像 5025 文件来源匹配；44 项相关测试、24 个开发界面组合及 48 个生产构建浏览器组合通过。后者包含 Windows Edge 156.0.4314.50、Windows Chrome 156.0.8078.47、Chromium 109 和当前 Chromium。
+
+本次没有待执行迁移，不运行 db:migrate，也不再次导入数据库。4.7 Web、Streaming、S3 与 CDN_HOST 配置保留原值。配置和旧镜像回退记录位于 `/home/mastodon/shared-rollout/20261027T035055Z-composer-ui`；`current-ui-update` 指向该目录，原一致性数据库备份继续保留。
+
+上线认证只读、密钥解密、队列及三入口公网资源验收通过；只有一个 scheduler 消费者，观察期内无新增兼容错误。独立演练六个服务和本次临时构建预览 3107 已停止，临时凭据、Cookie 与 TLS 密钥副本已删除。本地开发预览 3105 保留运行。
