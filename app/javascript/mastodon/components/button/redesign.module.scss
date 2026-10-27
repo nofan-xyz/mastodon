@@ -2,7 +2,12 @@
 
 .base {
   --bg: transparent;
-  --bg-hover: color-mix(in srgb, var(--bg) 90%, var(--fg));
+  --bg-hover: var(--bg);
+
+  @supports (color: color-mix(in srgb, black, white)) {
+    --bg-hover: color-mix(in srgb, var(--bg) 90%, var(--fg));
+  }
+
   --fg: var(--color-text-primary);
   --inline-padding: var(--space-2);
 

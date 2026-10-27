@@ -135,21 +135,30 @@
 
   // Brand
   --color-bg-brand-base: var(--base-color-bg-accent);
-  --color-bg-brand-base-hover: color-mix(
-    in srgb,
-    var(--base-color-bg-accent),
-    var(--color-text-on-brand-base) 10%
-  );
+  --color-bg-brand-base-hover: var(--base-color-bg-accent);
+
+  @supports (color: color-mix(in srgb, black, white)) {
+    --color-bg-brand-base-hover: color-mix(
+      in srgb,
+      var(--base-color-bg-accent),
+      var(--color-text-on-brand-base) 10%
+    );
+  }
+
   --color-bg-brand-soft: var(--color-bg-highlight); // legacy
   --color-bg-brand-softest: var(--color-bg-highlight); // legacy
 
   // Error
   --color-bg-error-base: var(--base-color-danger);
-  --color-bg-error-base-hover: color-mix(
-    in srgb,
-    var(--base-color-danger),
-    var(--color-text-on-error-base) 10%
-  ); // legacy
+  --color-bg-error-base-hover: var(--base-color-danger);
+
+  @supports (color: color-mix(in srgb, black, white)) {
+    --color-bg-error-base-hover: color-mix(
+      in srgb,
+      var(--base-color-danger),
+      var(--color-text-on-error-base) 10%
+    );
+  } // legacy
 
   --color-bg-error-soft: var(--color-red-100); // legacy
   --color-bg-error-softest: var(--color-red-50); // legacy

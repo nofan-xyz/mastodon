@@ -14,6 +14,7 @@ import { mergeProps } from '@react-aria/utils';
 import type { PopoverProps } from '@/mastodon/components/popover';
 import { Popover } from '@/mastodon/components/popover';
 import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
+import { supportsNativePopover } from '@/mastodon/utils/popover';
 
 import classes from './styles.module.scss';
 
@@ -202,7 +203,7 @@ const TooltipElement: React.FC<React.ComponentPropsWithRef<'span'>> = ({
 
   useLayoutEffect(() => {
     const popover = popoverRef.current;
-    if (!popover || !isPopoverAPISupported()) return;
+    if (!popover || !supportsNativePopover()) return;
 
     popover.showPopover();
 
@@ -212,12 +213,12 @@ const TooltipElement: React.FC<React.ComponentPropsWithRef<'span'>> = ({
   }, []);
 
   return (
-    <span {...otherProps} popover='manual' ref={useMergedRefs(ref, popoverRef)}>
+    <span
+      {...otherProps}
+      popover={supportsNativePopover() ? 'manual' : undefined}
+      ref={useMergedRefs(ref, popoverRef)}
+    >
       {children}
     </span>
   );
 };
-
-function isPopoverAPISupported() {
-  return 'popover' in HTMLElement.prototype;
-}

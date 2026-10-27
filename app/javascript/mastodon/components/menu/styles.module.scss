@@ -11,6 +11,7 @@
   border-radius: var(--radius-4);
   background: var(--color-bg-primary);
   overflow: hidden;
+  z-index: 2147483647; // Fallback for engines without calc(infinity).
   z-index: calc(infinity);
   max-height: var(--popover-height-available, 100vw); // Set by Popover component
   max-width: var(--_max-card-width, 100vw);

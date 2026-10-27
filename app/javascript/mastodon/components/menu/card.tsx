@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
+import { supportsNativePopover } from '@/mastodon/utils/popover';
 import type { PolymorphicProps } from '@/types/polymorphic';
 
 import { BottomSheet } from '../bottom_sheet';
@@ -44,7 +45,7 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 
   useLayoutEffect(() => {
     const card = cardRef.current;
-    if (popover !== 'manual' || !card || !isPopoverAPISupported()) return;
+    if (popover !== 'manual' || !card || !supportsNativePopover()) return;
 
     card.showPopover();
 
@@ -57,7 +58,7 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
     <Component
       {...props}
       ref={useMergedRefs(props.ref, cardRef)}
-      popover={popover}
+      popover={supportsNativePopover() ? popover : undefined}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -74,10 +75,6 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
     </Component>
   );
 };
-
-function isPopoverAPISupported() {
-  return 'popover' in HTMLElement.prototype;
-}
 
 export type PopoverMenuCardProps<As extends React.ElementType> =
   MenuCardProps<As> & Omit<PopoverProps, 'children'>;
@@ -122,7 +119,9 @@ export const PopoverMenuCard = <As extends React.ElementType>({
       onClose={onClose}
       reference={reference}
       popoverElement={popoverElement}
-      container={container}
+      container={
+        container === null && !supportsNativePopover() ? undefined : container
+      }
       placement={placement}
       offset={offset}
       flip={flip}
