@@ -221,10 +221,18 @@ export function useAutosuggestFloatingMenu({
       // Set top to scroll offset so the mirror matches the current line location.
       const lineOffset =
         mirrorElement.scrollHeight - mirrorElement.clientHeight;
+      const parent = mirrorElement.parentElement;
+      const sourceOffset = parent
+        ? source.getBoundingClientRect().top -
+          parent.getBoundingClientRect().top +
+          parent.scrollTop -
+          parent.clientTop
+        : 0;
       mirrorElement.style.setProperty(
         'top',
-        `${lineOffset - source.scrollTop}px`,
+        `${sourceOffset + lineOffset - source.scrollTop}px`,
       );
+      updatePopover.current?.();
 
       // Get the wrapper and mirror element bounds to check if the new location is out of sight...
       const wrapper = mirrorElement.parentElement?.getBoundingClientRect();

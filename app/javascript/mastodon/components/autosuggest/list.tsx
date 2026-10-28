@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import { usePrevious } from '@/mastodon/hooks/usePrevious';
+import { supportsNativePopover } from '@/mastodon/utils/popover';
 
 import { LocalCustomEmojiProvider } from '../emoji/context';
 import { Menu, useMenuContext } from '../menu';
@@ -92,7 +93,7 @@ const AutosuggestMenuList: React.FC<AutosuggestMenuListProps> = ({
       onClose={popover.closeMenu}
       reference={reference ?? null}
       popoverElement={popover.popover}
-      container={null}
+      container={supportsNativePopover() ? null : undefined}
       placement='bottom-start'
     >
       {({ props: popoverChildProps, update }) => {
