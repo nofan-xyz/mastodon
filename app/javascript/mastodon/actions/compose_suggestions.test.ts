@@ -11,6 +11,10 @@ const { get, emojiSearch } = vi.hoisted(() => ({
   emojiSearch: vi.fn(),
 }));
 vi.mock('mastodon/api', () => ({ default: () => ({ get }) }));
+vi.mock('./alerts', () => ({
+  showAlert: vi.fn(),
+  showAlertForError: () => ({ type: 'fixture-alert' }),
+}));
 vi.mock('./importer', () => ({
   importFetchedAccounts: () => ({ type: 'fixture-import' }),
   importFetchedStatus: vi.fn(),
@@ -140,5 +144,24 @@ describe('compose suggestion request lifetime', () => {
         ([action]) => action.type === COMPOSE_SUGGESTIONS_READY,
       ),
     ).toBe(false);
+  });
+  it('reports an active account search failure without throwing in the legacy error handler', async () => {
+    get.mockRejectedValueOnce(new Error('fixture network failure'));
+    const dispatch =
+      vi.fn<(action: { type: string; token?: string }) => void>();
+    fetchComposeSuggestions('@alice')(dispatch);
+    await flush();
+    expect(dispatch).toHaveBeenCalledWith({ type: 'fixture-alert' });
+  });
+
+  it('does not report a cancelled account search as an error', async () => {
+    get.mockRejectedValueOnce(
+      Object.assign(new Error('cancelled fixture'), { __CANCEL__: true }),
+    );
+    const dispatch =
+      vi.fn<(action: { type: string; token?: string }) => void>();
+    fetchComposeSuggestions('@alice')(dispatch);
+    await flush();
+    expect(dispatch).not.toHaveBeenCalledWith({ type: 'fixture-alert' });
   });
 });

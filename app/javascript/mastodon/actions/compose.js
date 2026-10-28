@@ -532,7 +532,7 @@ const fetchComposeSuggestionsAccounts = throttle((dispatch, token, generation) =
     dispatch(importFetchedAccounts(response.data));
     dispatch(readyComposeSuggestionsAccounts(token, response.data));
   }).catch(error => {
-    if (generation === composeSuggestionsGeneration && !isCancel(error)) {
+    if (generation === composeSuggestionsGeneration && !axios.isCancel(error)) {
       dispatch(showAlertForError(error));
     }
   }).finally(() => {
@@ -574,7 +574,7 @@ const fetchComposeSuggestionsTags = throttle((dispatch, token, generation) => {
       dispatch(readyComposeSuggestionsTags(token, data.hashtags));
     }
   }).catch(error => {
-    if (generation === composeSuggestionsGeneration && !isCancel(error)) {
+    if (generation === composeSuggestionsGeneration && !axios.isCancel(error)) {
       dispatch(showAlertForError(error));
     }
   }).finally(() => {
