@@ -112,6 +112,34 @@ export const ComposeTextarea: React.FC<ComposeTextareaProps> = ({
 
   const suggestions = useAppSelector(selectSuggestions);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const textarea = textAreaRef.current;
+    if (!wrapper || !textarea) return;
+
+    const observer = new ResizeObserver(() => {
+      if (document.activeElement !== textarea) return;
+      const field = textarea.getBoundingClientRect();
+      const visible = wrapper.getBoundingClientRect();
+      if (field.top < visible.top || field.bottom > visible.bottom) {
+        // Reflow after the virtual keyboard changes the available height.
+        // Only scroll the editor region; don't move the page or header.
+        const delta =
+          field.height <= visible.height
+            ? field.top < visible.top
+              ? field.top - visible.top
+              : field.bottom - visible.bottom
+            : Math.max(0, field.top - visible.top);
+        wrapper.scrollTop += delta;
+      }
+    });
+    observer.observe(wrapper);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Applies a focus/selection requested from elsewhere (e.g. reply, mention) once this textarea exists,
   // which also covers it not being mounted yet when the request was made (it's lazy-loaded).
@@ -177,6 +205,7 @@ export const ComposeTextarea: React.FC<ComposeTextareaProps> = ({
   return (
     <div
       className={classes.textareaWrapper}
+      ref={wrapperRef}
       data-scroll-down={!isInViewport}
       onScrollCapture={onScroll} // Requires capture so it fires before TextArea.
     >
