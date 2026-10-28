@@ -85,4 +85,75 @@ describe('HoverCardController', () => {
     await act(() => vi.advanceTimersByTime(750));
     expect(screen.queryByText('Profile 1')).toBeNull();
   });
+  const renderComposer = () =>
+    render(
+      <>
+        <HoverCardController />
+        <a href='/@alice' data-hover-card-account='1'>
+          Alice
+        </a>
+        <form role='dialog'>
+          <textarea aria-label='Draft' />
+          <div role='textbox' contentEditable aria-label='Rich draft' />
+        </form>
+      </>,
+    );
+
+  it('cancels a pending card when the composer receives focus', async () => {
+    renderComposer();
+    await hoverProfile();
+    act(() => {
+      screen.getByLabelText('Draft').focus();
+    });
+    await act(() => vi.advanceTimersByTime(900));
+    expect(screen.queryByText('Profile 1')).toBeNull();
+  });
+
+  it('closes an existing card when the composer receives focus', async () => {
+    renderComposer();
+    await hoverProfile();
+    await act(() => vi.advanceTimersByTime(750));
+    expect(screen.getByText('Profile 1')).toBeTruthy();
+    act(() => {
+      screen.getByLabelText('Draft').focus();
+    });
+    expect(screen.queryByText('Profile 1')).toBeNull();
+  });
+
+  it('does not open a profile over an already focused composer', async () => {
+    renderComposer();
+    act(() => {
+      screen.getByLabelText('Draft').focus();
+    });
+    await hoverProfile();
+    fireEvent.input(screen.getByLabelText('Draft'));
+    await act(() => vi.advanceTimersByTime(900));
+    expect(screen.queryByText('Profile 1')).toBeNull();
+  });
+
+  it('cancels a pending profile on IME composition in a rich editor', async () => {
+    renderComposer();
+    await hoverProfile();
+    fireEvent.compositionStart(screen.getByLabelText('Rich draft'));
+    await act(() => vi.advanceTimersByTime(900));
+    expect(screen.queryByText('Profile 1')).toBeNull();
+  });
+
+  it('preserves profile hover when an unrelated search field is focused', async () => {
+    render(
+      <>
+        <HoverCardController />
+        <input aria-label='Search' />
+        <a href='/@alice' data-hover-card-account='1'>
+          Alice
+        </a>
+      </>,
+    );
+    act(() => {
+      screen.getByLabelText('Search').focus();
+    });
+    await hoverProfile();
+    await act(() => vi.advanceTimersByTime(750));
+    expect(screen.getByText('Profile 1')).toBeTruthy();
+  });
 });

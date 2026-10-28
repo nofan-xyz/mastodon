@@ -27,6 +27,12 @@ export function textAtCursorMatchesToken(
 
   word = word.trim();
 
+  // Account handles end at whitespace. Otherwise a reply such as
+  // "@alice hello" is incorrectly searched as a two-word account name.
+  if (/^[@＠].*\s/u.test(word)) {
+    return [null, null] as const;
+  }
+
   if (word.length < 3 || (word[0] && !searchTokens.includes(word[0]))) {
     return [null, null] as const;
   }

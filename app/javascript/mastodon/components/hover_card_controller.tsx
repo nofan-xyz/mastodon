@@ -18,6 +18,14 @@ const activeMovementThreshold = 150;
 const isHoverCardAnchor = (element: HTMLElement) =>
   element.matches('[data-hover-card-account]');
 
+const isComposerInput = (element: EventTarget | null): boolean =>
+  element instanceof HTMLElement &&
+  !!element.closest('.compose-form, form[role="dialog"]') &&
+  (element.matches(
+    'input, textarea, [contenteditable="true"], [contenteditable=""], [contenteditable="plaintext-only"]',
+  ) ||
+    element.isContentEditable);
+
 export const HoverCardController: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [accountId, setAccountId] = useState<string | undefined>();
@@ -68,6 +76,14 @@ export const HoverCardController: React.FC = () => {
       setReference(undefined);
     };
 
+    const handleComposerInput = (event: Event) => {
+      if (isComposerInput(event.target)) {
+        cancelEnterTimeout();
+        cancelLeaveTimeout();
+        close();
+      }
+    };
+
     const handleTouchStart = () => {
       // Keeping track of touch events to prevent the
       // hover card from being displayed on touch devices
@@ -93,7 +109,12 @@ export const HoverCardController: React.FC = () => {
 
         // Bail out if we're scrolling, a touch is active,
         // or if there was no active mouse movement
-        if (isScrolling || !hasRecentMovement || isUsingTouch) {
+        if (
+          isScrolling ||
+          !hasRecentMovement ||
+          isUsingTouch ||
+          isComposerInput(document.activeElement)
+        ) {
           return;
         }
 
@@ -110,7 +131,11 @@ export const HoverCardController: React.FC = () => {
           setEnterTimeout(() => {
             // The anchor may have been disabled while waiting (e.g. when
             // opening the account switcher), or removed from the page.
-            if (target.isConnected && isHoverCardAnchor(target)) {
+            if (
+              target.isConnected &&
+              isHoverCardAnchor(target) &&
+              !isComposerInput(document.activeElement)
+            ) {
               open(target);
             }
           }, enterDelay);
@@ -172,6 +197,10 @@ export const HoverCardController: React.FC = () => {
       lastMouseMoveTime.current = Date.now();
     };
 
+    for (const type of ['focusin', 'input', 'compositionstart']) {
+      document.addEventListener(type, handleComposerInput, true);
+    }
+
     document.body.addEventListener('touchstart', handleTouchStart, {
       passive: true,
     });
@@ -197,11 +226,14 @@ export const HoverCardController: React.FC = () => {
     });
 
     return () => {
+      for (const type of ['focusin', 'input', 'compositionstart']) {
+        document.removeEventListener(type, handleComposerInput, true);
+      }
       document.body.removeEventListener('touchstart', handleTouchStart);
-      document.body.removeEventListener('mouseenter', handleMouseEnter);
+      document.body.removeEventListener('mouseenter', handleMouseEnter, true);
       document.body.removeEventListener('mousemove', handleMouseMove);
-      document.body.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('scroll', handleScroll);
+      document.body.removeEventListener('mouseleave', handleMouseLeave, true);
+      document.removeEventListener('scroll', handleScroll, true);
     };
   }, [
     setEnterTimeout,

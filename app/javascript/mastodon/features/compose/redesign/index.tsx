@@ -95,9 +95,8 @@ export const RedesignComposeForm: React.FC<
         }
       >
         <ComposeAttachments className={classes.attachments} />
+        <ComposeHints id={hintsId} />
       </ComposeTextarea>
-
-      <ComposeHints id={hintsId} />
 
       <ComposeFooter onEmojiPick={onEmojiPick} />
     </form>

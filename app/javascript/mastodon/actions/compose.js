@@ -519,103 +519,99 @@ export function undoUploadCompose(media_id) {
   };
 }
 
+let composeSuggestionsGeneration = 0;
+
 export function clearComposeSuggestions() {
+  composeSuggestionsGeneration++;
+  fetchComposeSuggestionsAccounts.cancel();
+  fetchComposeSuggestionsTags.cancel();
   fetchComposeSuggestionsAccountsController?.abort();
+  fetchComposeSuggestionsTagsController?.abort();
   searchComposeSuggestionsEmojiController?.abort();
   return {
     type: COMPOSE_SUGGESTIONS_CLEAR,
   };
 }
 
-const fetchComposeSuggestionsAccounts = throttle((dispatch, token) => {
-  if (fetchComposeSuggestionsAccountsController) {
-    fetchComposeSuggestionsAccountsController.abort();
-  }
-
-  fetchComposeSuggestionsAccountsController = new AbortController();
+const fetchComposeSuggestionsAccounts = throttle((dispatch, token, generation) => {
+  if (generation !== composeSuggestionsGeneration) return;
+  fetchComposeSuggestionsAccountsController?.abort();
+  const controller = new AbortController();
+  fetchComposeSuggestionsAccountsController = controller;
 
   api().get('/api/v1/accounts/search', {
-    signal: fetchComposeSuggestionsAccountsController.signal,
-
-    params: {
-      q: token.slice(1),
-      resolve: false,
-      limit: 4,
-    },
+    signal: controller.signal,
+    params: { q: token.slice(1), resolve: false, limit: 4 },
   }).then(response => {
+    if (generation !== composeSuggestionsGeneration || controller.signal.aborted) return;
     dispatch(importFetchedAccounts(response.data));
     dispatch(readyComposeSuggestionsAccounts(token, response.data));
   }).catch(error => {
-    if (!isCancel(error)) {
+    if (generation === composeSuggestionsGeneration && !isCancel(error)) {
       dispatch(showAlertForError(error));
     }
   }).finally(() => {
-    fetchComposeSuggestionsAccountsController = undefined;
+    if (fetchComposeSuggestionsAccountsController === controller) {
+      fetchComposeSuggestionsAccountsController = undefined;
+    }
   });
 }, 200, { leading: true, trailing: true });
 
 const fetchComposeSuggestionsEmojis = (dispatch, token) => {
   dispatch(clearComposeSuggestions());
-  searchComposeSuggestionsEmojiController = new AbortController();
+  const generation = composeSuggestionsGeneration;
+  const controller = new AbortController();
+  searchComposeSuggestionsEmojiController = controller;
 
-  void emojiMartSearch({
-    token,
-    // Right now we are hard-coding the locale to English since the picker search only supports English.
-    // Once we replace the legacy picker we can remove this and use the actual locale of the user.
-    locale: 'en',
-    limit: 5,
-    signal: searchComposeSuggestionsEmojiController.signal,
-  }).then((results) => {
-    if (results) {
+  void emojiMartSearch({ token, locale: 'en', limit: 5, signal: controller.signal }).then(results => {
+    if (results && generation === composeSuggestionsGeneration && !controller.signal.aborted) {
       dispatch(readyComposeSuggestionsEmojis(token, results));
     }
   }).finally(() => {
-    searchComposeSuggestionsEmojiController = undefined;
+    if (searchComposeSuggestionsEmojiController === controller) {
+      searchComposeSuggestionsEmojiController = undefined;
+    }
   });
-}
+};
 
-const fetchComposeSuggestionsTags = throttle((dispatch, token) => {
-  if (fetchComposeSuggestionsTagsController) {
-    fetchComposeSuggestionsTagsController.abort();
-  }
-
+const fetchComposeSuggestionsTags = throttle((dispatch, token, generation) => {
+  if (generation !== composeSuggestionsGeneration) return;
+  fetchComposeSuggestionsTagsController?.abort();
   dispatch(updateSuggestionTags(token));
-
-  fetchComposeSuggestionsTagsController = new AbortController();
+  const controller = new AbortController();
+  fetchComposeSuggestionsTagsController = controller;
 
   api().get('/api/v2/search', {
-    signal: fetchComposeSuggestionsTagsController.signal,
-
-    params: {
-      type: 'hashtags',
-      q: token.slice(1),
-      resolve: false,
-      limit: 4,
-      exclude_unreviewed: true,
-    },
+    signal: controller.signal,
+    params: { type: 'hashtags', q: token.slice(1), resolve: false, limit: 4, exclude_unreviewed: true },
   }).then(({ data }) => {
-    dispatch(readyComposeSuggestionsTags(token, data.hashtags));
+    if (generation === composeSuggestionsGeneration && !controller.signal.aborted) {
+      dispatch(readyComposeSuggestionsTags(token, data.hashtags));
+    }
   }).catch(error => {
-    if (!isCancel(error)) {
+    if (generation === composeSuggestionsGeneration && !isCancel(error)) {
       dispatch(showAlertForError(error));
     }
   }).finally(() => {
-    fetchComposeSuggestionsTagsController = undefined;
+    if (fetchComposeSuggestionsTagsController === controller) {
+      fetchComposeSuggestionsTagsController = undefined;
+    }
   });
 }, 200, { leading: true, trailing: true });
 
 export function fetchComposeSuggestions(token) {
-  return (dispatch) => {
+  return dispatch => {
+    const generation = ++composeSuggestionsGeneration;
     switch (token[0]) {
     case ':':
       void fetchComposeSuggestionsEmojis(dispatch, token);
       break;
     case '#':
     case '＃':
-      fetchComposeSuggestionsTags(dispatch, token);
+      fetchComposeSuggestionsTags(dispatch, token, generation);
       break;
     default:
-      fetchComposeSuggestionsAccounts(dispatch, token);
+      fetchComposeSuggestionsAccounts(dispatch, token, generation);
       break;
     }
   };
