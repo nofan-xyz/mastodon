@@ -6,8 +6,8 @@
 
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
-| 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:fe7bc0cd3e4b051febc97cd08f80e22b91933c6dc1fbf868928d4a4259bfc9c9` | `83690efb1bcc8ffd23e2f63205872ab58a86e174` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:0dceae2319bc9a3dd0f7bfe9ab2738674c9dfa11c51786c52355e624bcbfb227` | `8fbd95dfcff01dc7aebd2577900814c31967ce2f` |
+| 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:4ec64b192bf2dc27c491d953983789e7104f27dcf34709318971bd8169f37766` | `a6004bb2ea9e18140196c8949df6e8cf42925882` |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:cd29d3990cfdb26945c7f41e29e563b81cee85c7b5b5a6357f3131c954c39d42` | `bdbb820c403fe7ffa10ea70e5b4903e4fef9e0c7` |
 | Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:9feab6157f3f88c876d90e70a328691f701f02a5ca8969b14042f95ff3758fdb` | 保留 `8c3aaaf494` 构建 |
 
 共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
@@ -18,7 +18,7 @@
 
 `docker-compose.override.yml` 固定所有应用镜像及共享参数，权限 600；`.env.production` 继续使用正式站原密钥。没有复制 beta 的 SECRET/VAPID 或媒体写入配置到正式环境。账号签名、AR 加密、OTP、SECRET 和 VAPID 均沿用原正式配置。两个 Web 的 LOCAL_DOMAIN/WEB_DOMAIN 都是 nofan.xyz，beta 为明确允许的别名及 WebAuthn 来源，RP ID 为 nofan.xyz。
 
-4.7 的 `SOURCE_TAG` 指向真实分支 `codex/v4.7.3.3-compose-fix`，该引用与镜像 SOURCE_COMMIT 相同，使原有 tag 推导的第四段版本号保持 3。源码 SHA 与镜像均未因此更改；公开版本为 `4.7.3.3+shared47-...`。5.0 现固定上游 `68f6e597ee81f9146f0aeb876150cd389af5991e`，不是 5.0 稳定版。
+4.7现基于v4.7.4，`SOURCE_TAG`为`codex/v4.7.4-shared-data`，fork revision归零，公开版本为`4.7.4.0+shared47-...`。5.0固定上游`a0e2cf9c50d331bd8ab24a51150c37d46bf44cc0`，为5.0.0-alpha.2，仍非稳定版。
 
 ## 备份、迁移与隔离环境
 
@@ -88,3 +88,7 @@ curl -fsS https://beta.nofan.xyz/health
 ## 2026-10-29 旧页面资源保留
 
 修复旧8c3页面加载关注请求/通知设置的五个依赖404；72依赖回读通过。beta历史静态资源与发布前保留步骤见[BETA_LEGACY_ASSETS_FIX.md](BETA_LEGACY_ASSETS_FIX.md)。应用版本和数据库未变。
+
+## 2026-10-29 23:46 安全更新
+
+正式Web升级v4.7.4、beta与三组消费者更新alpha.2，完成安全修复与新发帖/emoji组件适配。固定源码、镜像、8381项JS测试、Ruby与浏览器范围、已知WebKit限制及新22.16GiB备份见[本次安全发布记录](SECURITY_474_ALPHA2_RELEASE.md)。无迁移，Streaming代码未变并保留已验证镜像，三个公网入口与认证读取通过。

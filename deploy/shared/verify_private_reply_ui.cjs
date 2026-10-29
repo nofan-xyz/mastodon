@@ -94,8 +94,8 @@ const pw = require(process.env.UI_PLAYWRIGHT_MODULE || 'playwright'),
           }, height);
           await p.waitForTimeout(300);
           const box = await t.evaluate((e) => {
-            const w = e.closest('._compose_redesign__textareaWrapper'),
-              h = document.querySelector('._compose_redesign__calloutWrapper'),
+            const w = e.closest('._feat_compose__textareaWrapper'),
+              h = document.querySelector('._feat_compose__calloutWrapper'),
               a = e.getBoundingClientRect(),
               v = w.getBoundingClientRect();
             return {
@@ -119,14 +119,10 @@ const pw = require(process.env.UI_PLAYWRIGHT_MODULE || 'playwright'),
           rows.push({ skin, mode, height, ...box });
         }
         await p.evaluate(() => {
-          const w = document.querySelector(
-            '._compose_redesign__textareaWrapper',
-          );
+          const w = document.querySelector('._feat_compose__textareaWrapper');
           w.scrollTop = w.scrollHeight;
         });
-        assert(
-          await p.locator('._compose_redesign__calloutWrapper').isVisible(),
-        );
+        assert(await p.locator('._feat_compose__calloutWrapper').isVisible());
         await t.fill('');
         await t.type('@bo', { delay: 120 });
         await p.waitForTimeout(500);
