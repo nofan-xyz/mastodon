@@ -92,3 +92,7 @@ curl -fsS https://beta.nofan.xyz/health
 ## 2026-10-29 23:46 安全更新
 
 正式Web升级v4.7.4、beta与三组消费者更新alpha.2，完成安全修复与新发帖/emoji组件适配。固定源码、镜像、8381项JS测试、Ruby与浏览器范围、已知WebKit限制及新22.16GiB备份见[本次安全发布记录](SECURITY_474_ALPHA2_RELEASE.md)。无迁移，Streaming代码未变并保留已验证镜像，三个公网入口与认证读取通过。
+
+## 2026-10-30 更新提醒元数据
+
+主站显示alpha.2紧急补丁是共表中的旧beta提醒，不是4.7.4升级失败。已备份并仅清理与当前beta相同的已安装版本记录，保持检查开启；发布验收增加两版待更新状态核对，见[更新提示排查记录](SHARED_UPDATE_NOTICE.md)。
