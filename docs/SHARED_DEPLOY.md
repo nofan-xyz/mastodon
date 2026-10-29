@@ -6,9 +6,9 @@
 
 | 角色 | 固定镜像 digest | 来源 |
 | --- | --- | --- |
-| 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:6cf1fb7e9a85b7446f1393d79f47c73392d08157ff6778ee0a67f54fb171a0f0` | `1d03b99d8412785da33b127eb72336d0898045bc` |
-| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:66c5c31c5937e2c78d64bc3c8d91e649d5ea4ce198c4b3658b71a2445837a5f7` | `8c3aaaf494798b7ba2a454d1e9ac0fced00d6d73` |
-| Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:9feab6157f3f88c876d90e70a328691f701f02a5ca8969b14042f95ff3758fdb` | 同一 `8c3aaaf494` 构建 |
+| 4.7 Web | `ghcr.io/nofan-xyz/mastodon@sha256:fe7bc0cd3e4b051febc97cd08f80e22b91933c6dc1fbf868928d4a4259bfc9c9` | `83690efb1bcc8ffd23e2f63205872ab58a86e174` |
+| 5.0 Web / workers | `ghcr.io/nofan-xyz/mastodon@sha256:0dceae2319bc9a3dd0f7bfe9ab2738674c9dfa11c51786c52355e624bcbfb227` | `8fbd95dfcff01dc7aebd2577900814c31967ce2f` |
+| Streaming | `ghcr.io/nofan-xyz/mastodon-streaming@sha256:9feab6157f3f88c876d90e70a328691f701f02a5ca8969b14042f95ff3758fdb` | 保留 `8c3aaaf494` 构建 |
 
 共库初次构建：[5.0](https://github.com/nofan-xyz/mastodon/actions/runs/40285173202)、[4.7 兼容 Web](https://github.com/nofan-xyz/mastodon/actions/runs/40285177869)。均完成 amd64/arm64 构建及 registry manifest 合并。媒体修复构建见 [40292802936](https://github.com/nofan-xyz/mastodon/actions/runs/40292802936)，16:40 更新 5.0 Web / workers，未运行数据库迁移、未重启 Streaming。没有覆盖 stable/latest 镜像标签。
 
@@ -18,7 +18,7 @@
 
 `docker-compose.override.yml` 固定所有应用镜像及共享参数，权限 600；`.env.production` 继续使用正式站原密钥。没有复制 beta 的 SECRET/VAPID 或媒体写入配置到正式环境。账号签名、AR 加密、OTP、SECRET 和 VAPID 均沿用原正式配置。两个 Web 的 LOCAL_DOMAIN/WEB_DOMAIN 都是 nofan.xyz，beta 为明确允许的别名及 WebAuthn 来源，RP ID 为 nofan.xyz。
 
-4.7 的 `SOURCE_TAG` 指向真实分支 `codex/v4.7.3.3-shared-data`，该引用与镜像 SOURCE_COMMIT 相同，使原有 tag 推导的第四段版本号保持 3。源码 SHA 与镜像均未因此更改；公开版本为 `4.7.3.3+shared47-...`。5.0 现固定上游 `08941b303f2ba297ada70c3e646d600916403666`，不是 5.0 稳定版。
+4.7 的 `SOURCE_TAG` 指向真实分支 `codex/v4.7.3.3-compose-fix`，该引用与镜像 SOURCE_COMMIT 相同，使原有 tag 推导的第四段版本号保持 3。源码 SHA 与镜像均未因此更改；公开版本为 `4.7.3.3+shared47-...`。5.0 现固定上游 `68f6e597ee81f9146f0aeb876150cd389af5991e`，不是 5.0 稳定版。
 
 ## 备份、迁移与隔离环境
 
@@ -80,3 +80,7 @@ curl -fsS https://beta.nofan.xyz/health
 当前表格更新为 8c3aaaf494，固定上游 68f6e597ee，仍为 5.0 alpha。Ruby 4.0.9 完整应用和同提交 Streaming 双架构构建及源码核验通过；无新增迁移，未运行数据库迁移。5039 文件核验、222 Ruby/4255 JS、48 个发帖浮层和12个账号/内容警告场景、双版本隔离演练及线上认证只读验收通过。
 
 `update_application_release.py` 已实际执行，9 个服务健康，scheduler 消费者一个、新兼容错误零。回退配置和旧镜像记录位于 `/home/mastodon/shared-rollout/20261027T163454Z-application`，`current-application-update` 指向此处。4.7 Web、S3、规范域名和 ban.fan nginx 配置保留，三个入口公网版本、健康、本站 JS/CSS、sw.js 正常。细节及既有 Streaming 类型检查限制见 [UPSTREAM_20261028_RELEASE.md](UPSTREAM_20261028_RELEASE.md)。
+
+## 2026-10-29 00:35 回复编辑器修复
+
+4.7 Web与5.0 Web/三组消费者均已更新，当前镜像见顶部表格。修复编辑时资料卡遮挡、英文回复账号候选误触发及迟到结果重开；5.0额外修复手机隐私提醒挤压、缩小后光标位置及候选定位/旧内核portal。无数据库迁移，Streaming、媒体与ban.fan配置保持原值。完整测试、54个移动布局、16个悬浮场景、最终镜像演练和线上认证/公网验收见[回复编辑器修复记录](COMPOSE_EDITING_FIX.md)。
