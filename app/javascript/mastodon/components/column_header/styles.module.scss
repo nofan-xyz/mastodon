@@ -1,9 +1,14 @@
 @use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables';
 
 .root {
   position: sticky;
   top: var(--column-panel-offset, 0);
   z-index: 10;
+
+  // Cover up outer borders on Column component
+  margin-inline: calc(-1 * var(--bw-default));
+  padding-top: var(--space-1);
   color: var(--color-text-primary);
   background: var(--color-bg-primary);
   border-radius: var(--column-panel-radius, 8px) var(--column-panel-radius, 8px)
@@ -25,6 +30,12 @@
     background-attachment: fixed;
   }
 
+  @media (width <= variables.$mobile-menu-breakpoint) {
+    padding-top: 0;
+    margin-inline: 0;
+    background: var(--color-bg-primary);
+  }
+
   // A solid divider avoids fading images through the title's lower edge.
   &::after {
     content: '';
@@ -38,6 +49,11 @@
     transition:
       opacity,
       transform 250ms ease-out;
+
+    @media (width > variables.$mobile-menu-breakpoint) {
+      // Prevent fade from overlapping column border
+      inset-inline: var(--bw-default);
+    }
   }
 
   &.rootScrolledToTop::after {
@@ -72,6 +88,11 @@
   //   border: var(--border-default);
   //   border-bottom: none;
   // }
+
+  @media (width > variables.$mobile-menu-breakpoint) {
+    border: var(--border-column);
+    border-bottom: none;
+  }
 }
 
 .unreadButton {
@@ -132,7 +153,7 @@
 .extraStickyContent {
   background: var(--color-bg-primary);
 
-  // html[data-color-scheme='dark'] & {
-  //   border-inline: var(--border-default);
-  // }
+  @media (width > variables.$mobile-menu-breakpoint) {
+    border-inline: var(--border-column);
+  }
 }

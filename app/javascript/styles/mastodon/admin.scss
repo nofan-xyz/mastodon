@@ -240,7 +240,7 @@ $content-width: 840px;
           border-radius: 4px;
           color: var(--color-text-secondary);
           text-decoration: none;
-          font-weight: 500;
+          font-weight: bold;
           gap: 5px;
           white-space: nowrap;
 
@@ -280,7 +280,7 @@ $content-width: 840px;
       h1 small {
         font-size: 12px;
         display: block;
-        font-weight: 500;
+        font-weight: bold;
         color: var(--color-text-secondary);
         line-height: 18px;
       }
@@ -322,12 +322,12 @@ $content-width: 840px;
       font-size: 16px;
       color: var(--color-text-primary);
       line-height: 28px;
-      font-weight: 500;
+      font-weight: bold;
     }
 
     .fields-group h6 {
       color: var(--color-text-primary);
-      font-weight: 500;
+      font-weight: bold;
     }
 
     .directory__tag h4 {
@@ -365,7 +365,7 @@ $content-width: 840px;
 
       strong {
         color: var(--color-text-primary);
-        font-weight: 500;
+        font-weight: bold;
 
         @each $lang in $cjk-langs {
           &:lang(#{$lang}) {
@@ -553,22 +553,22 @@ body,
 
   .positive-hint {
     color: var(--color-text-success);
-    font-weight: 500;
+    font-weight: bold;
   }
 
   .negative-hint {
     color: var(--color-text-error);
-    font-weight: 500;
+    font-weight: bold;
   }
 
   .neutral-hint {
     color: var(--color-text-primary);
-    font-weight: 500;
+    font-weight: bold;
   }
 
   .warning-hint {
     color: var(--color-text-warning);
-    font-weight: 500;
+    font-weight: bold;
   }
 }
 
@@ -608,7 +608,7 @@ kbd {
     }
 
     strong {
-      font-weight: 500;
+      font-weight: bold;
       text-transform: uppercase;
       font-size: 12px;
 
@@ -630,7 +630,7 @@ kbd {
       text-decoration: none;
       text-transform: uppercase;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: bold;
       border-bottom: 2px solid var(--color-bg-secondary);
 
       &:hover {
@@ -661,7 +661,7 @@ kbd {
   & > strong {
     display: block;
     margin: 0 0 10px -5px;
-    font-weight: 500;
+    font-weight: bold;
     font-size: 14px;
     line-height: 18px;
     color: var(--color-text-primary);
@@ -799,7 +799,7 @@ kbd {
   .target {
     color: var(--color-text-primary);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: bold;
   }
 
   a {
@@ -864,7 +864,7 @@ a.inline-name-tag,
   }
 
   .username {
-    font-weight: 500;
+    font-weight: bold;
   }
 
   &.suspended {
@@ -924,7 +924,7 @@ a.name-tag,
     line-height: 20px;
     border-radius: 4px 4px 4px 0;
     position: relative;
-    font-weight: 500;
+    font-weight: bold;
 
     a {
       color: var(--color-text-secondary);
@@ -964,7 +964,7 @@ a.name-tag,
 
     &__stats {
       flex: 0 0 auto;
-      font-weight: 500;
+      font-weight: bold;
       color: var(--color-text-secondary);
       text-transform: uppercase;
       text-align: end;
@@ -1014,7 +1014,7 @@ a.name-tag,
 
         &__icon {
           margin-inline-end: 4px;
-          font-weight: 500;
+          font-weight: bold;
         }
       }
 
@@ -1098,7 +1098,7 @@ a.name-tag,
     }
 
     dt {
-      font-weight: 500;
+      font-weight: bold;
       width: 120px;
       flex: 0 0 auto;
       color: var(--color-text-primary);
@@ -1135,7 +1135,7 @@ a.name-tag,
 
       a {
         color: var(--color-text-success);
-        font-weight: 500;
+        font-weight: bold;
       }
 
       &__mark {
@@ -1212,7 +1212,7 @@ a.name-tag,
     &__title {
       padding: 0 15px;
       display: block;
-      font-weight: 500;
+      font-weight: bold;
       font-size: 18px;
       line-height: 1.5;
       color: var(--color-text-primary);
@@ -1350,7 +1350,7 @@ a.name-tag,
       width: 52px;
       margin: 1px;
       padding: 10px;
-      font-weight: 500;
+      font-weight: bold;
       color: var(--color-text-primary);
       background: var(--color-bg-primary);
 
@@ -1390,14 +1390,14 @@ a.name-tag,
     &__total {
       display: block;
       margin-inline-end: 10px;
-      font-weight: 500;
+      font-weight: bold;
       font-size: 28px;
       color: var(--color-text-primary);
     }
 
     &__change {
       display: block;
-      font-weight: 500;
+      font-weight: bold;
       font-size: 18px;
       color: var(--color-text-secondary);
       margin-bottom: -3px;
@@ -1417,7 +1417,7 @@ a.name-tag,
     padding-bottom: 10px;
     text-transform: uppercase;
     color: var(--color-text-secondary);
-    font-weight: 500;
+    font-weight: bold;
   }
 
   &__graph {
@@ -1490,7 +1490,7 @@ a.sparkline {
     border-bottom: 1px solid var(--color-border-primary);
 
     &__key {
-      font-weight: 500;
+      font-weight: bold;
       padding: 11px 10px;
     }
 
@@ -1796,7 +1796,7 @@ a.sparkline {
 
       .username {
         color: var(--color-text-primary);
-        font-weight: 500;
+        font-weight: bold;
         margin-inline-end: 5px;
 
         a {
@@ -2084,7 +2084,7 @@ a.sparkline {
       position: absolute;
       content: counter(step);
       font-size: 0.625rem;
-      font-weight: 500;
+      font-weight: bold;
       inset-inline-start: 0;
       display: flex;
       justify-content: center;
@@ -2118,7 +2118,7 @@ a.sparkline {
 
   &__entry {
     h5 {
-      font-weight: 500;
+      font-weight: bold;
       color: var(--color-text-primary);
       line-height: 25px;
       margin-bottom: 16px;
@@ -2197,7 +2197,7 @@ a.sparkline {
         background: transparent;
         padding: 0;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: bold;
       }
 
       &:hover,
@@ -2340,7 +2340,7 @@ a.sparkline {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
+  font-weight: bold;
 
   &__indicator {
     display: inline-block;

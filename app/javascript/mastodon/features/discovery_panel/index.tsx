@@ -1,6 +1,6 @@
 import { useRouteMatch } from 'react-router';
 
-import { Search } from '@/mastodon/features/compose/components/search';
+import { Search } from '@/mastodon/components/search';
 import { Trends } from '@/mastodon/features/navigation_panel/components/trends';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from '@/mastodon/identity_context';
