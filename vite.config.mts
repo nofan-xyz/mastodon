@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import formatjs from '@formatjs/unplugin/vite';
 import { optimizeLodashImports } from '@optimize-lodash/rollup-plugin';
-import babel from '@rolldown/plugin-babel';
+import babel, { defineRolldownBabelPreset } from '@rolldown/plugin-babel';
 import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import browserslist from 'browserslist';
@@ -13,24 +13,48 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import {
   PluginOption,
   defineConfig,
+  loadEnv,
   UserConfigFnPromise,
   UserConfig,
 } from 'vite';
 import manifestSRI from 'vite-plugin-manifest-sri';
 import svgr from 'vite-plugin-svgr';
 
-import { MastodonAssetsManifest } from './config/vite/plugin-assets-manifest';
-import { MastodonThemes } from './config/vite/plugin-mastodon-themes';
-import { NofanThemes } from './config/vite/plugin-nofan-themes';
-import { MastodonServiceWorkerChunkPaths } from './config/vite/plugin-sw-chunk-paths';
-import { MastodonServiceWorkerLocales } from './config/vite/plugin-sw-locales';
+import { MastodonAssetsManifest } from './config/vite/plugin-assets-manifest.mts';
+import { MastodonThemes } from './config/vite/plugin-mastodon-themes.mts';
+import { NofanThemes } from './config/vite/plugin-nofan-themes.mts';
+import { MastodonServiceWorkerChunkPaths } from './config/vite/plugin-sw-chunk-paths.mts';
+import { MastodonServiceWorkerLocales } from './config/vite/plugin-sw-locales.mts';
 
-const jsRoot = path.resolve(__dirname, 'app/javascript');
+const jsRoot = path.resolve(import.meta.dirname, 'app/javascript');
 
 const cssAliasClasses: ReadonlyArray<string> = ['components', 'features'];
 
+// Avoid parsing files which don't reference `propTypes`
+const removePropTypesPreset = defineRolldownBabelPreset({
+  preset: () => ({ plugins: ['transform-react-remove-prop-types'] }),
+  rolldown: {
+    filter: {
+      code: /propTypes/i,
+    },
+  },
+});
+
 export const config: UserConfigFnPromise = async ({ mode, command }) => {
   const isProdBuild = mode === 'production' && command === 'build';
+  const devServerPort = Number(
+    loadEnv(mode, __dirname, 'VITE_').VITE_DEV_SERVER_PORT ?? '3036',
+  );
+
+  if (
+    !Number.isInteger(devServerPort) ||
+    devServerPort < 1 ||
+    devServerPort > 65535
+  ) {
+    throw new Error(
+      'VITE_DEV_SERVER_PORT must be an integer between 1 and 65535',
+    );
+  }
 
   let outDirName = 'packs-dev';
   if (mode === 'test' || mode === 'production') {
@@ -41,7 +65,7 @@ export const config: UserConfigFnPromise = async ({ mode, command }) => {
   return {
     root: jsRoot,
     base: `/${outDirName}/`,
-    envDir: __dirname,
+    envDir: import.meta.dirname,
     resolve: {
       tsconfigPaths: true,
       alias: {
@@ -112,9 +136,10 @@ export const config: UserConfigFnPromise = async ({ mode, command }) => {
         protocol: 'ws',
         // The client can't connect through the main Rails app proxy since it doesn't support
         // WebSockets. It needs to connect directly to Vite's server, that's why we set the port again
-        clientPort: 3036,
+        clientPort: devServerPort,
       },
-      port: 3036,
+      port: devServerPort,
+      strictPort: true,
     },
     build: {
       commonjsOptions: { transformMixedEsModules: true },
@@ -182,7 +207,7 @@ export const config: UserConfigFnPromise = async ({ mode, command }) => {
     plugins: [
       react(),
       babel({
-        plugins: ['transform-react-remove-prop-types'],
+        presets: [removePropTypesPreset],
       }),
       formatjs(),
       MastodonThemes(),

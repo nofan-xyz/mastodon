@@ -7,6 +7,14 @@ describe('textAtCursorMatchesToken', () => {
       [1, '#hashtag'],
     ],
     [
+      ['＠alice hello', 12, ['＠']],
+      [null, null],
+    ],
+    [
+      ['hello @alice', 12, ['@']],
+      [7, '@alice'],
+    ],
+    [
       ['@alice', 6, ['@']],
       [1, '@alice'],
     ],
@@ -36,7 +44,7 @@ describe('textAtCursorMatchesToken', () => {
     ],
     [
       ['@alice reply', 12, ['@']],
-      [1, '@alice reply'],
+      [null, null],
     ],
     [
       ['@alice 这是我输入的回复内容', 17, ['@']],
@@ -60,7 +68,7 @@ describe('textAtCursorMatchesToken', () => {
     ],
     [
       ['@алиса пример', 13, ['@']],
-      [1, '@алиса пример'],
+      [null, null],
     ],
   ] as const)(
     'textAtCursorMatchesToken(%s) is %o',

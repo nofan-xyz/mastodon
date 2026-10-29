@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { List as ImmutableList } from 'immutable';
 
+import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 import api from 'mastodon/api';
 import { useAccount } from 'mastodon/hooks/useAccount';
@@ -15,6 +16,7 @@ import { useAppSelector } from 'mastodon/store';
 import { accountSwitchNavigation } from 'mastodon/utils/account_switch';
 
 import { Avatar } from './avatar';
+import { PopoverMenuCard } from './menu/card';
 
 import './account_switcher.scss';
 
@@ -68,11 +70,35 @@ interface AccountList {
 // Only a change notification is shared between tabs, never login credentials.
 const changeKey = 'mastodon:account-changed';
 
-export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
+export interface AccountSwitcherHeaderProps {
+  profileProps: {
+    to: string;
+    'data-hover-card-account': string | undefined;
+  };
+  toggleProps: Pick<
+    React.ComponentPropsWithRef<'button'>,
+    | 'ref'
+    | 'aria-label'
+    | 'aria-expanded'
+    | 'aria-controls'
+    | 'onClick'
+    | 'onKeyDown'
+    | 'onKeyUp'
+  >;
+}
+
+export const AccountSwitcher: React.FC<{
+  size?: number;
+  header?: React.ComponentType<AccountSwitcherHeaderProps>;
+}> = ({ size = 46, header: Header }) => {
   const intl = useIntl();
   const account = useAccount(me);
   const container = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
+  const [toggleElement, setToggleElement] = useState<HTMLButtonElement | null>(
+    null,
+  );
+  const toggleRef = useMergedRefs(toggle, setToggleElement);
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState<SavedAccount[]>([]);
@@ -85,6 +111,8 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     const attachments = state.compose.get('media_attachments');
     return (
       (typeof text === 'string' && !!text.trim()) ||
+      !!state.compose.get('spoiler_text') ||
+      Number(state.compose.get('pending_media_attachments')) > 0 ||
       (ImmutableList.isList(attachments) && attachments.size > 0) ||
       state.compose.get('poll') != null ||
       state.compose.get('quoted_status_id') != null
@@ -114,7 +142,8 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     const handlePointerDown = (event: PointerEvent) => {
       if (
         container.current &&
-        !container.current.contains(event.target as Node)
+        !container.current.contains(event.target as Node) &&
+        !document.getElementById(menuId)?.contains(event.target as Node)
       ) {
         setOpen(false);
       }
@@ -128,7 +157,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('pointerdown', handlePointerDown);
     };
-  }, []);
+  }, [menuId]);
 
   const changeAccount = useCallback(
     async (target?: string) => {
@@ -208,12 +237,23 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
         setOpen(false);
         toggle.current?.focus();
       }
     },
     [],
   );
+
+  const handleKeyUp = useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+    // The mobile drawer also listens for Escape on keyup. Close this menu only.
+    if (event.key === 'Escape') event.stopPropagation();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   const handleToggle = useCallback(() => {
     setOpen((value) => !value);
@@ -225,40 +265,67 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
     return <AccountChangedNotice />;
   }
 
+  const headerProps: AccountSwitcherHeaderProps = {
+    profileProps: {
+      to: `/@${account.acct}`,
+      'data-hover-card-account': open ? undefined : account.id,
+    },
+    toggleProps: {
+      ref: toggleRef,
+      'aria-label': intl.formatMessage(messages.switch),
+      'aria-expanded': open,
+      'aria-controls': menuId,
+      onClick: handleToggle,
+      onKeyDown: handleKeyDown,
+      onKeyUp: handleKeyUp,
+    },
+  };
+
   return (
     <div
-      className='account-switcher account account--minimal account--without-border'
+      className={
+        Header
+          ? undefined
+          : 'account-switcher account account--minimal account--without-border'
+      }
       ref={container}
     >
-      <div className='account-switcher__header'>
-        <Link
-          className='account__display-name account-switcher__profile focusable'
-          to={`/@${account.acct}`}
-          data-hover-card-account={open ? undefined : account.id}
-        >
-          <Avatar account={account} size={size} />
-          <span className='display-name'>
-            <strong className='display-name__html'>
-              {account.display_name || account.username}
-            </strong>
-            <span className='display-name__account'>@{account.acct}</span>
-          </span>
-        </Link>
-        <button
-          className='account-switcher__toggle'
-          type='button'
-          ref={toggle}
-          aria-label={intl.formatMessage(messages.switch)}
-          aria-expanded={open}
-          aria-controls={menuId}
-          onClick={handleToggle}
-          onKeyDown={handleKeyDown}
-        >
-          <span aria-hidden>▾</span>
-        </button>
-      </div>
-      {open && (
-        <div id={menuId} className='account-switcher__menu' aria-busy={busy}>
+      {Header ? (
+        <Header {...headerProps} />
+      ) : (
+        <div className='account-switcher__header'>
+          <Link
+            className='account__display-name account-switcher__profile focusable'
+            {...headerProps.profileProps}
+          >
+            <Avatar account={account} size={size} />
+            <span className='display-name'>
+              <strong className='display-name__html'>
+                {account.display_name || account.username}
+              </strong>
+              <span className='display-name__account'>@{account.acct}</span>
+            </span>
+          </Link>
+          <button
+            className='account-switcher__toggle'
+            {...headerProps.toggleProps}
+            type='button'
+          >
+            <span aria-hidden>▾</span>
+          </button>
+        </div>
+      )}
+      <PopoverMenuCard
+        isOpen={open}
+        onClose={handleClose}
+        reference={toggleElement}
+        placement='top-end'
+        strategy='fixed'
+        id={menuId}
+        className='account-switcher__menu'
+        aria-busy={busy}
+      >
+        <div className='account-switcher'>
           {loading && (
             <p role='status'>{intl.formatMessage(messages.loading)}</p>
           )}
@@ -271,6 +338,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
                 disabled={busy || saved.id === me}
                 onClick={handleSwitch}
                 onKeyDown={handleKeyDown}
+                onKeyUp={handleKeyUp}
               >
                 <img src={saved.avatar} width={28} height={28} alt='' />
                 <span className='account-switcher__name'>
@@ -297,6 +365,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
                   })}
                   onClick={handleRemove}
                   onKeyDown={handleKeyDown}
+                  onKeyUp={handleKeyUp}
                 >
                   <CloseIcon
                     className='account-switcher__remove-icon'
@@ -311,6 +380,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
             disabled={busy || loading}
             onClick={handleAdd}
             onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
           >
             {intl.formatMessage(messages.add)}
           </button>
@@ -322,7 +392,7 @@ export const AccountSwitcher: React.FC<{ size?: number }> = ({ size = 46 }) => {
             </p>
           )}
         </div>
-      )}
+      </PopoverMenuCard>
     </div>
   );
 };

@@ -120,7 +120,7 @@ const selectPickerData = createAppSelector(
         'recent',
         'custom',
         ...Object.keys(categories)
-          .toSorted()
+          .sort()
           .map((category) => `custom-${category}`),
         ...defaultCategories,
       ] as CategoryName[],

@@ -35,9 +35,14 @@ const emojisSlice = createSlice({
   extraReducers(builder) {
     builder.addAsyncThunk(loadCustomEmojis, {
       fulfilled(state, action) {
-        if (!action.payload?.length) {
+        if (!action.payload) {
           return;
         }
+
+        // The endpoint returns this user's current pack selection, including empty.
+        state.custom = {};
+        state.customCategories = {};
+        state.customLoaded = true;
 
         for (const emoji of action.payload) {
           const { shortcode, category, url, static_url } = emoji;
@@ -52,8 +57,6 @@ const emojisSlice = createSlice({
               state.customCategories[category].push(shortcode);
             }
           }
-
-          state.customLoaded = true;
         }
       },
     });

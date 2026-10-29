@@ -1,0 +1,16 @@
+@use 'mastodon/tokens/border';
+@use 'mastodon/tokens/shape';
+@use 'mastodon/tokens/type';
+
+// Custom palettes replace the official color tokens, but 5.0 components also
+// need the shared layout and typography tokens supplied by the default theme.
+html {
+  @include border.border-widths;
+  @include border.borders;
+  @include shape.space;
+  @include shape.radius;
+  @include type.font-size;
+  @include type.line-height;
+  @include type.letter-spacing;
+  @include type.link-underlines;
+}

@@ -87,11 +87,10 @@
   }
 
   &__menu {
-    position: absolute;
-    z-index: 10;
-    inset-inline: 0;
+    z-index: 300;
+    width: 320px;
     min-width: 220px;
-    max-width: calc(100vw - 32px);
+    max-width: min(320px, calc(100vw - 32px));
     max-height: 60vh;
     overflow-y: auto;
     padding: 4px;

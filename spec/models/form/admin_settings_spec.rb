@@ -3,6 +3,22 @@
 require 'rails_helper'
 
 RSpec.describe Form::AdminSettings do
+  describe '#flavour_and_skin' do
+    it 'shows the merged skin for a stored Space Fanfou site default' do
+      settings = described_class.new(flavour: 'mastodon-ui', skin: 'space_fanfou')
+
+      expect(settings.flavour_and_skin).to eq 'mastodon-ui/fanfou_classic'
+    end
+
+    it 'saves a legacy selection as Fanfou Classic' do
+      settings = described_class.new(flavour_and_skin: 'mastodon-ui/space_fanfou')
+      settings.save
+
+      expect(Setting.flavour).to eq 'mastodon-ui'
+      expect(Setting.skin).to eq 'fanfou_classic'
+    end
+  end
+
   describe 'Validations' do
     describe 'site_contact_username' do
       context 'with no accounts' do

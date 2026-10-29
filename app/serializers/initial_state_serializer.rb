@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class InitialStateSerializer < ActiveModel::Serializer
+  include InstanceHelper
   include RoutingHelper
 
   attributes :meta, :compose, :accounts,
@@ -34,6 +35,8 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:use_pending_items] = object_account_user.setting_use_pending_items
       store[:show_trends]       = Setting.trends && object_account_user.setting_trends
       store[:emoji_style]       = object_account_user.settings['web.emoji_style']
+      store[:display_own_boosts] = object_account_user.setting_display_own_boosts
+      store[:display_own_posts] = object_account_user.setting_display_own_posts
       store[:wrapstodon]        = wrapstodon
       store[:on_this_day]       = on_this_day
     else
@@ -60,6 +63,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:default_sensitive] = object_account_user.setting_default_sensitive
       store[:default_language]  = object_account_user.preferred_posting_language
       store[:default_quote_policy] = object_account_user.setting_default_quote_policy
+      store[:default_spoiler_field] = object_account_user.setting_default_spoiler_field
     end
 
     store[:text] = object.text if object.text
@@ -135,6 +139,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       status_page_url: Setting.status_page_url,
       streaming_api_base_url: Rails.configuration.x.streaming_api_base_url,
       title: instance_presenter.title,
+      custom_app_icon: app_icon_path(120),
       landing_page: Setting.landing_page,
       trends_enabled: Setting.trends,
       version: instance_presenter.version,

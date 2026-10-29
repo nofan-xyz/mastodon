@@ -1,9 +1,16 @@
 # frozen_string_literal: true
 
+require_relative '../../app/lib/shared_web_origins'
+
 WebAuthn.configure do |config|
   # This value needs to match `window.location.origin` evaluated by
   # the User Agent during registration and authentication ceremonies.
   config.allowed_origins = ["#{Rails.configuration.x.use_https ? 'https' : 'http'}://#{Rails.configuration.x.web_domain}"]
+
+  if ENV['NOFAN_SHARED_DATA'] == 'true'
+    config.allowed_origins = SharedWebOrigins.for(Rails.configuration.x.local_domain, ENV.fetch('NOFAN_SHARED_WEB_ORIGINS', ''))
+    config.rp_id = Rails.configuration.x.local_domain
+  end
 
   # Relying Party name for display purposes
   config.rp_name = 'Mastodon'

@@ -79,6 +79,7 @@ describe('expireCachedItems', () => {
 
 describe('handleFetch', () => {
   beforeEach(() => {
+    vi.stubGlobal('self', { location: { origin: 'https://example.com' } });
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });
@@ -86,6 +87,33 @@ describe('handleFetch', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+  });
+
+  test('leaves cross-origin media to the browser instead of the worker CSP', () => {
+    const request = new Request('https://media.example.com/avatar.png');
+    Object.defineProperty(request, 'destination', { value: 'image' });
+    const { event, respondWithMock } = createFetchEvent(request);
+    handleFetch(event);
+    expect(respondWithMock).not.toHaveBeenCalled();
+  });
+
+  test('retries a previously cached error without persisting the new failure', async () => {
+    const cache = new MockCache();
+    const request = createRequest('/missing.png', 'image');
+    cache.store.set(request.url, {
+      request,
+      response: new Response(null, { status: 403 }),
+    });
+    const put = vi.spyOn(cache, 'put');
+    const response = new Response(null, { status: 404 });
+    const fetch = vi.fn().mockResolvedValue(response);
+    vi.stubGlobal('caches', { open: vi.fn().mockResolvedValue(cache) });
+    vi.stubGlobal('fetch', fetch);
+    const { event, respondWith } = createFetchEvent(request);
+    handleFetch(event);
+    await expect(respondWith()).resolves.toBe(response);
+    expect(fetch).toHaveBeenCalledWith(request);
+    expect(put).not.toHaveBeenCalled();
   });
 
   test('serves cached images without hitting the network while the TTL is valid', async () => {

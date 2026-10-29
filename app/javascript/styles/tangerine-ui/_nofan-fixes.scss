@@ -11,3 +11,16 @@
 .app-body .navigation-panel .column-link .icon-history path {
   fill: var(--color-accent);
 }
+
+// Keep nofan's legacy compose toolbar fixes outside the vendored theme files.
+.app-body .compose-form__buttons .icon-button,
+.app-body .compose-form__buttons .icon-button.inverted {
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--color-accent);
+  transition: all 0.2s;
+}
+
+.app-body .compose-form__buttons .icon-button:is(.active, .active:hover) {
+  color: var(--color-accent-fg);
+}

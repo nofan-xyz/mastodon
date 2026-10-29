@@ -27,8 +27,20 @@ module ThemeHelper
 
   def theme_style_tags(flavour_and_skin)
     flavour, skin = flavour_and_skin
+    skin = Themes.instance.canonical_skin(flavour, skin)
 
     vite_stylesheet_tag "skins/#{flavour}/#{skin}", type: :virtual, media: 'all', crossorigin: 'anonymous'
+  end
+
+  def available_theme_colors(theme)
+    Themes.instance.available_theme_colors(theme)
+  end
+
+  def flavour_theme_colors
+    Themes.instance.flavours_and_skins.flat_map(&:last).to_h do |pair|
+      colors = available_theme_colors(pair).index_with { |color| I18n.t("color_theme.#{color}", default: color) }
+      [pair.join('/'), colors]
+    end
   end
 
   def theme_color_tags(color_scheme)
@@ -62,7 +74,9 @@ module ThemeHelper
 
   def current_skin
     skins = Themes.instance.skins_for(current_flavour)
-    [current_user&.setting_skin, Setting.skin, 'default'].find { |skin| skins.include?(skin) }
+    [current_user&.setting_skin, Setting.skin, 'default']
+      .map { |skin| Themes.instance.canonical_skin(current_flavour, skin) }
+      .find { |skin| skins.include?(skin) }
   end
 
   def current_theme
@@ -77,8 +91,25 @@ module ThemeHelper
     current_user&.setting_contrast || 'auto'
   end
 
+  def theme_color(theme)
+    available_colors = available_theme_colors(theme)
+    return if available_colors.empty?
+
+    user_color = current_user&.setting_theme_color
+    return user_color if user_color && available_colors.include?(user_color)
+
+    color = Setting.theme_color
+    return color if color && available_colors.include?(color)
+
+    available_colors.first
+  end
+
   def page_color_scheme
     content_for(:force_color_scheme).presence || color_scheme
+  end
+
+  def page_theme_color(theme)
+    content_for(:force_theme_color).presence || theme_color(theme)
   end
 
   private

@@ -24,7 +24,10 @@ class UserSettings
   setting :default_privacy, default: nil, in: %w(public unlisted private)
   setting :on_this_day_enabled, default: true
   setting :default_quote_policy, default: 'public', in: %w(public followers nobody)
+  setting :default_spoiler_field, default: false
   setting :email_subscriptions, default: false
+  setting :display_own_boosts, default: false
+  setting :display_own_posts, default: true
 
   namespace :wxw_emoji do
     setting :picks, default: nil
@@ -54,6 +57,7 @@ class UserSettings
     setting :emoji_style, default: 'auto', in: %w(auto native twemoji)
     setting :color_scheme, default: 'auto', in: %w(auto light dark)
     setting :contrast, default: 'auto', in: %w(auto high)
+    setting :theme_color, default: 'indigo' # TODO: dynamic inclusion checking?
   end
 
   namespace :notification_emails do
@@ -69,6 +73,7 @@ class UserSettings
     setting :appeal, default: true
     setting :software_updates, default: 'critical', in: %w(none critical patch all)
     setting :end_of_support, default: true
+    setting :moderation_suggestions, default: true
   end
 
   namespace :interactions do
@@ -127,13 +132,13 @@ class UserSettings
   # flavour/skin selector as a `flavour/skin` string. Persisted as the
   # two underlying keys so they stay independently readable.
   def flavour_and_skin
-    "#{self['flavour']}/#{self['skin']}"
+    "#{self['flavour']}/#{Themes.instance.canonical_skin(self['flavour'], self['skin'])}"
   end
 
   def flavour_and_skin=(value)
     flavour, skin = value.to_s.split('/', 2)
     self['flavour'] = flavour.presence
-    self['skin'] = skin.presence
+    self['skin'] = Themes.instance.canonical_skin(flavour, skin.presence)
   end
 
   def as_json
