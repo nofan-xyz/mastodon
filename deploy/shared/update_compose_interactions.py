@@ -33,6 +33,8 @@ def healthy():
   rows=[json.loads(x) for x in subprocess.check_output(['docker','compose','ps','--format','json'],cwd=r,text=True).splitlines() if x]
   return all(any(row['Service']==role and row['Health']=='healthy' for row in rows) for role in roles)
  except Exception:return False
+subprocess.run(['python3', str(Path(__file__).with_name('retain_beta_assets.py')), '--image', old['services']['web-beta']['image']], check=True)
+
 try:
  path.write_text(json.dumps(new,indent=2)+'\n');compose('config','--quiet')
  compose('run','--rm','-T','--no-deps','web-beta','bundle','exec','rails','db:abort_if_pending_migrations')

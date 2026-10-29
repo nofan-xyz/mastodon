@@ -69,6 +69,8 @@ def healthy():
     except Exception:
         return False
 
+subprocess.run(['python3', str(Path(__file__).with_name('retain_beta_assets.py')), '--image', old['services']['web-beta']['image']], check=True)
+
 try:
     path.write_text(json.dumps(new, indent=2) + '\n')
     compose('config', '--quiet')
