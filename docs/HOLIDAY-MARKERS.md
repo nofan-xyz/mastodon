@@ -35,3 +35,20 @@ node bin/generate-holiday-calendar.mjs
 ## 验证
 
 自动测试覆盖全部 11 种标记、2026/2027 年农历日期、冬至的公历日期变化、闰月不重复、北京时间零点边界、跨午夜自动隐藏和切换、后台恢复及卸载清理。使用外地设备时区运行同一组测试，确认与设备所在时区无关。
+
+
+## 2026-10-31 正式站发布
+
+- 源码提交：`581e8f21a5458e3859bd2e53b961c901f849cd16`。
+- 构建：https://github.com/nofan-xyz/mastodon/actions/runs/41178823388 ，AMD64、ARM64 与镜像合并均成功。
+- 镜像：`ghcr.io/nofan-xyz/mastodon@sha256:d5457c3e67e0c97888150175506254f7125f64e6323614b66d9c1eb740eb8937`。
+- 原镜像：`ghcr.io/nofan-xyz/mastodon@sha256:4cfbc36f44f985961dbe210138fddd0420e9743530e43a3b5fd600a1425743c8`。
+- 备份：`/home/mastodon/shared-rollout/20261031-holiday-markers/`。
+- 只替换正式站 `web` 镜像；其他容器 ID 保持不变，没有执行数据库迁移。保留旧版前端文件供未刷新页面使用。
+- 镜像 SOURCE_COMMIT、五个实现文件的 SHA-256 与本地源码一致，前端 manifest 存在。
+- ESLint、Stylelint、TypeScript、格式检查通过，36 项自动测试通过；洛杉矶时区复测通过。
+- 实际组件浏览器测试：310、240、180、120 像素容器无溢出；图标没有 title、链接或焦点入口。
+- 公网 `/about` 实际构建：1440、1024、768、390 像素宽度显示正常，无页面异常；当天显示 🎃。在洛杉矶设备时区下模拟全部 11 个节日与普通日期，及万圣节跨午夜撤下、平安夜跨午夜切换圣诞节，均通过。
+- Web 容器健康，登录页、介绍页、Beta 实例 API 返回 200。使用未登录浏览器验收，未操作真实账号或发布嘟文。
+
+回退时，在 `/home/mastodon` 恢复备份中的 `before-compose.override.yml` 并执行 `docker compose up -d --no-deps web`，再核对健康和公网页面。恢复 `before-release.json` 前应先确认没有此后的其他发布，无需操作数据库。
