@@ -70,12 +70,26 @@
   }
 }
 
-.version {
+.versionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   align-self: flex-start;
   margin-top: 4px;
   max-width: 100%;
-  overflow-wrap: anywhere;
   font-size: 11px;
+}
+
+.version {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.holiday {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .wrapper[data-context='about'] {
@@ -85,7 +99,8 @@
     justify-content: center;
   }
 
-  .version {
+  .versionRow {
     align-self: center;
+    justify-content: center;
   }
 }

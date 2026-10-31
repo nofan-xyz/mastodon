@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { useHolidayEmoji } from 'mastodon/hooks/useHolidayEmoji';
 import {
   domain,
   version,
@@ -17,6 +18,7 @@ export const LinkFooter: React.FC<{
   context?: 'default' | 'multi-column' | 'about';
 }> = ({ context = 'default' }) => {
   const multiColumn = context === 'multi-column';
+  const holidayEmoji = useHolidayEmoji();
   const fullVersion = version ?? '未知版本';
   const shortVersion = fullVersion
     .replace(/\+.*/, '')
@@ -69,16 +71,23 @@ export const LinkFooter: React.FC<{
           </li>
         )}
       </ul>
-      <a
-        className={classes.version}
-        href={sourceUrl}
-        target='_blank'
-        rel='noopener'
-        title={`完整版本：${fullVersion}`}
-        aria-label={`nofan · Mastodon ${shortVersion}，完整版本 ${fullVersion}，查看源码`}
-      >
-        nofan · Mastodon {shortVersion}
-      </a>
+      <div className={classes.versionRow}>
+        <a
+          className={classes.version}
+          href={sourceUrl}
+          target='_blank'
+          rel='noopener'
+          title={`完整版本：${fullVersion}`}
+          aria-label={`nofan · Mastodon ${shortVersion}，完整版本 ${fullVersion}，查看源码`}
+        >
+          nofan · Mastodon {shortVersion}
+        </a>
+        {holidayEmoji && (
+          <span className={classes.holiday} aria-hidden='true'>
+            {holidayEmoji}
+          </span>
+        )}
+      </div>
     </footer>
   );
 };
