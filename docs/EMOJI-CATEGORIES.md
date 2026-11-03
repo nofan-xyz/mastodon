@@ -41,3 +41,20 @@
 ## 回退
 
 应用旧正式站 Web 镜像并重新创建 web 服务；无需操作数据库。每次部署前记录原镜像与 compose override，并保留旧前端资源供未刷新的页面使用。
+
+## 2026-11-03 正式站发布
+
+- 源码：`94b44346e1f6a656eb5bf1ef45c5406c7013fef0`。
+- 构建：https://github.com/nofan-xyz/mastodon/actions/runs/41654252137 ，AMD64、ARM64 与镜像合并成功。
+- 镜像：`ghcr.io/nofan-xyz/mastodon@sha256:acee18c32721693d5917cd37d921c410489c7a87ee5b0b1d516ba1fd36326a0a`。
+- 原镜像：`ghcr.io/nofan-xyz/mastodon@sha256:d5457c3e67e0c97888150175506254f7125f64e6323614b66d9c1eb740eb8937`。
+- 回退备份：`/home/mastodon/shared-rollout/20261103-emoji-categories/`。
+- 正式站 Web 健康，其他容器 ID 未变化，没有执行数据库迁移。
+- 镜像 SOURCE_COMMIT、12 个源码/依赖文件 SHA-256 与发布分支一致，编译后的分类图标和悬停滚动条样式存在；原有节日页脚保持在正式站分支中。
+- 保留旧版 2328 个 packs 文件与 428 个 assets 文件，补齐原静态目录缺少的 246 个旧 packs 文件，兼容升级前已打开的页面。
+- 公网 `/about` 在 1440、768、390px 视口无横向溢出或页面异常，版本及源码链接指向本次提交；登录页和介绍页返回 200。
+- 公网自定义表情 API 返回 1806 个表情、32 个分类，分类排序值完整、互不重复并按管理端预设顺序返回。
+- Beta 容器未更新，内部健康检查和从源站访问公网实例 API 均返回 200；验收客户端首次请求 Beta 超时后，已从源站核实服务正常。
+- 自动验证共 14 项前端测试和 6 项 Rails 请求测试通过；13 套主题、滚轮、触屏滑动、键盘及搜索切换检查通过。用户已在本地登录预览确认；公网使用未登录浏览器验收，未操作真实账号或发布嘟文。
+
+回退时先确认没有后续发布，再将备份中的 `before-compose.override.yml` 恢复到 `/home/mastodon/docker-compose.override.yml`，在 `/home/mastodon` 执行 `docker compose up -d --no-deps web` 并检查健康和公网页面。核对后按需恢复 `before-release.json`，无需操作数据库。
