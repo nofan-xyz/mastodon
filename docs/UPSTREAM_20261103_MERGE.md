@@ -22,7 +22,7 @@ Node 按 `.nvmrc` 使用 26.13.0，Ruby 使用 4.0.9，Bundler 4.0.23。Yarn imm
 
 - TypeScript 检查通过；41 个前端测试文件、4270 项测试全部通过。
 - 完整生产前端构建通过，包括本站主题和新表情模块；构建中的动态/静态导入及插件计时提示不影响成功结果。
-- 变更文件 ESLint 22 个、Stylelint 19 个、RuboCop 16 个全部通过；合并 diff 检查通过。
+- 变更路径 ESLint 命令检查 22 个，其中 legacy JSX `app/javascript/mastodon/features/ui/index.jsx` 被上游配置忽略，其合并内容已人工核对并通过生产编译；Stylelint 19 个、RuboCop 16 个通过，合并 diff 检查通过。
 - 本地专用数据库 `mastodon_beta_upstream_20261103_test` 和 Redis 6397 隔离运行登录会话、用户、HTTP 签名、ActivityPub 活动、文本解析、链接预览及对象完整性证明测试，共 303 项全部通过。
 - 初次后端验证因原测试 Redis 6385 未运行而失败，改用本任务独立 Redis；随后系统 OpenSSL 3.0.2 不支持 ML-DSA-44，导致上游刚启用的 3 项签名测试失败。仅在测试进程设置 `LD_LIBRARY_PATH=/home/linuxbrew/.linuxbrew/opt/openssl@3/lib`，使用本机现有 OpenSSL 3.6.1 重跑全部 303 项后零失败。没有修改上游测试、跳过这些测试或改变系统默认库。
 - 任务专用 Redis 完成后停止。没有连接正式数据库进行写入测试，没有运行部署脚本。
