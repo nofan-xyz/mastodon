@@ -1,0 +1,182 @@
+diff --git a/dist/components/anchors.js b/dist/components/anchors.js
+index 85c7d6819e402977ac936335f83156b912bcb38d..c235fcbd7261cdd46a2676325499bc46d77eae87 100644
+--- a/dist/components/anchors.js
++++ b/dist/components/anchors.js
+@@ -56,6 +56,21 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           onAnchorClick = _this$props.onAnchorClick;
+       onAnchorClick(categories[index], index);
+     }
++  }, {
++    key: "componentDidUpdate",
++    value: function componentDidUpdate() {
++      var nav = this.nav;
++      if (!nav) return;
++      var selected = nav.querySelector('.emoji-mart-anchor-selected');
++      if (!selected) return;
++      var navRect = nav.getBoundingClientRect();
++      var selectedRect = selected.getBoundingClientRect();
++      if (selectedRect.left < navRect.left) {
++        nav.scrollLeft += selectedRect.left - navRect.left;
++      } else if (selectedRect.right > navRect.right) {
++        nav.scrollLeft += selectedRect.right - navRect.right;
++      }
++    }
+   }, {
+     key: "render",
+     value: function render() {
+@@ -69,6 +84,7 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           selected = this.state.selected;
+       return /*#__PURE__*/_react["default"].createElement("nav", {
+         className: "emoji-mart-anchors",
++        ref: function ref(node) { _this2.nav = node; },
+         "aria-label": i18n.categorieslabel
+       }, categories.map(function (category, i) {
+         var id = category.id,
+@@ -80,11 +96,16 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           return null;
+         }
+ 
+-        var iconId = id.startsWith('custom-') ? 'custom' : id;
++        var isCustom = id === 'custom' || id.startsWith('custom-');
++        var iconId = isCustom ? 'custom' : id;
++        var label = isCustom && id !== 'custom' ? name : i18n.categories[iconId];
++        var representative = isCustom && category.emojis && (category.emojis.find(function (emoji) { return emoji.featured; }) || category.emojis[0]);
+         return /*#__PURE__*/_react["default"].createElement("button", {
+           key: id,
+-          "aria-label": i18n.categories[iconId],
+-          title: i18n.categories[iconId],
++          "aria-label": label,
++          title: label,
++          "aria-pressed": isSelected,
++          "data-category": id,
+           "data-index": i,
+           type: 'button',
+           onClick: _this2.handleClick,
+@@ -94,7 +115,13 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           }
+         }, /*#__PURE__*/_react["default"].createElement("div", {
+           className: "emoji-mart-anchor-icon"
+-        }, icons.categories[iconId]()), /*#__PURE__*/_react["default"].createElement("span", {
++        }, representative && representative.imageUrl ? /*#__PURE__*/_react.default.createElement("img", {
++          src: representative.staticImageUrl || representative.imageUrl,
++          alt: '',
++          width: 32,
++          height: 32,
++          draggable: false
++        }) : icons.categories[iconId]()), /*#__PURE__*/_react["default"].createElement("span", {
+           className: "emoji-mart-anchor-bar",
+           style: {
+             backgroundColor: color
+diff --git a/dist/components/picker/nimble-picker.js b/dist/components/picker/nimble-picker.js
+index 395f8f2e09f8b1a5d87f287d2f12d0b65a8afe24..d92b28b57626a57b7462ebf24788ef50ad443ced 100644
+--- a/dist/components/picker/nimble-picker.js
++++ b/dist/components/picker/nimble-picker.js
+@@ -130,16 +130,14 @@ var NimblePicker = /*#__PURE__*/function (_React$PureComponent) {
+ 
+     if (props.custom.length > 0) {
+       var customCategories = {};
+-      var customCategoriesCreated = 0;
+       props.custom.forEach(function (emoji) {
+         if (!customCategories[emoji.customCategory]) {
+           customCategories[emoji.customCategory] = {
+             id: emoji.customCategory ? "custom-".concat(emoji.customCategory) : 'custom',
+             name: emoji.customCategory || 'Custom',
+             emojis: [],
+-            anchor: customCategoriesCreated === 0
++            anchor: true
+           };
+-          customCategoriesCreated++;
+         }
+ 
+         var category = customCategories[emoji.customCategory];
+diff --git a/dist-es/components/anchors.js b/dist-es/components/anchors.js
+index 1f41c5c6ed9f461cf6c6ab0c9c85e09df54b3388..d98c3235a8e7ee39da323af48f5ff5266f091f0d 100644
+--- a/dist-es/components/anchors.js
++++ b/dist-es/components/anchors.js
+@@ -42,6 +42,21 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           onAnchorClick = _this$props.onAnchorClick;
+       onAnchorClick(categories[index], index);
+     }
++  }, {
++    key: "componentDidUpdate",
++    value: function componentDidUpdate() {
++      var nav = this.nav;
++      if (!nav) return;
++      var selected = nav.querySelector('.emoji-mart-anchor-selected');
++      if (!selected) return;
++      var navRect = nav.getBoundingClientRect();
++      var selectedRect = selected.getBoundingClientRect();
++      if (selectedRect.left < navRect.left) {
++        nav.scrollLeft += selectedRect.left - navRect.left;
++      } else if (selectedRect.right > navRect.right) {
++        nav.scrollLeft += selectedRect.right - navRect.right;
++      }
++    }
+   }, {
+     key: "render",
+     value: function render() {
+@@ -55,6 +70,7 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           selected = this.state.selected;
+       return /*#__PURE__*/React.createElement("nav", {
+         className: "emoji-mart-anchors",
++        ref: function ref(node) { _this2.nav = node; },
+         "aria-label": i18n.categorieslabel
+       }, categories.map(function (category, i) {
+         var id = category.id,
+@@ -66,11 +82,16 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           return null;
+         }
+ 
+-        var iconId = id.startsWith('custom-') ? 'custom' : id;
++        var isCustom = id === 'custom' || id.startsWith('custom-');
++        var iconId = isCustom ? 'custom' : id;
++        var label = isCustom && id !== 'custom' ? name : i18n.categories[iconId];
++        var representative = isCustom && category.emojis && (category.emojis.find(function (emoji) { return emoji.featured; }) || category.emojis[0]);
+         return /*#__PURE__*/React.createElement("button", {
+           key: id,
+-          "aria-label": i18n.categories[iconId],
+-          title: i18n.categories[iconId],
++          "aria-label": label,
++          title: label,
++          "aria-pressed": isSelected,
++          "data-category": id,
+           "data-index": i,
+           type: 'button',
+           onClick: _this2.handleClick,
+@@ -80,7 +101,13 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
+           }
+         }, /*#__PURE__*/React.createElement("div", {
+           className: "emoji-mart-anchor-icon"
+-        }, icons.categories[iconId]()), /*#__PURE__*/React.createElement("span", {
++        }, representative && representative.imageUrl ? /*#__PURE__*/React.createElement("img", {
++          src: representative.staticImageUrl || representative.imageUrl,
++          alt: '',
++          width: 32,
++          height: 32,
++          draggable: false
++        }) : icons.categories[iconId]()), /*#__PURE__*/React.createElement("span", {
+           className: "emoji-mart-anchor-bar",
+           style: {
+             backgroundColor: color
+diff --git a/dist-es/components/picker/nimble-picker.js b/dist-es/components/picker/nimble-picker.js
+index f6115f819a8e3bb250509a3c62785992ca035d50..d8db1217e54790e52d0133ec90e606e056bdb994 100644
+--- a/dist-es/components/picker/nimble-picker.js
++++ b/dist-es/components/picker/nimble-picker.js
+@@ -97,16 +97,14 @@ var NimblePicker = /*#__PURE__*/function (_React$PureComponent) {
+ 
+     if (props.custom.length > 0) {
+       var customCategories = {};
+-      var customCategoriesCreated = 0;
+       props.custom.forEach(function (emoji) {
+         if (!customCategories[emoji.customCategory]) {
+           customCategories[emoji.customCategory] = {
+             id: emoji.customCategory ? "custom-".concat(emoji.customCategory) : 'custom',
+             name: emoji.customCategory || 'Custom',
+             emojis: [],
+-            anchor: customCategoriesCreated === 0
++            anchor: true
+           };
+-          customCategoriesCreated++;
+         }
+ 
+         var category = customCategories[emoji.customCategory];

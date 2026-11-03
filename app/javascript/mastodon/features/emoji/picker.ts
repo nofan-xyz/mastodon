@@ -79,9 +79,13 @@ const defaultCategories = [
   'flags',
 ] as CategoryName[];
 
-const selectPickerData = createAppSelector(
-  [(state) => state.emojis.custom, (state) => state.emojis.customCategories],
-  (emojis, categories) => {
+export const selectPickerData = createAppSelector(
+  [
+    (state) => state.emojis.custom,
+    (state) => state.emojis.customCategories,
+    (state) => state.emojis.customCategoryOrder,
+  ],
+  (emojis, categories, categoryOrder) => {
     // Create a map of shortcode to category name.
     const categoryMap = new Map<string, string>();
     for (const category in categories) {
@@ -107,6 +111,8 @@ const selectPickerData = createAppSelector(
         custom: true,
         short_names: [shortcode],
         imageUrl: autoPlayGif ? emoji.url : emoji.static_url,
+        staticImageUrl: emoji.static_url,
+        featured: emoji.featured,
         customCategory: categoryMap.get(shortcode),
       } as CustomEmoji);
     }
@@ -120,7 +126,16 @@ const selectPickerData = createAppSelector(
         'recent',
         'custom',
         ...Object.keys(categories)
-          .sort()
+          .sort((a, b) => {
+            const orderA = categoryOrder[a];
+            const orderB = categoryOrder[b];
+            if (orderA !== undefined && orderB !== undefined) {
+              return orderA - orderB;
+            }
+            if (orderA !== undefined) return -1;
+            if (orderB !== undefined) return 1;
+            return a < b ? -1 : a > b ? 1 : 0;
+          })
           .map((category) => `custom-${category}`),
         ...defaultCategories,
       ] as CategoryName[],

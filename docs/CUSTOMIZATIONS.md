@@ -81,3 +81,7 @@
 - 工作流还有 nightly、PR、安全构建和 fork 条件定制，合并时需要逐个保留正确仓库目标。
 - 相关文件：`.github/workflows/`、`Dockerfile`、`lib/mastodon/version.rb`、`.husky/pre-commit`、`.gitignore`。
 - 发布验收：测试/构建、tag 与源码一致、镜像来源一致、服务健康、公开版本/API、资源文件，另加本版本数据库迁移及回滚演练。
+
+### Beta 表情包分类栏易用性
+
+- 同步正式站已确认的分类封面图标、个人选择和顺序、横向滑动及悬停细滚动条，并统一设置页专用样式的主题入口。保留 Beta 现有选择器容器、图层和表情加载缓存修复；见 `docs/EMOJI-CATEGORIES.md`。

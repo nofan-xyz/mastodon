@@ -3,6 +3,9 @@
 // here win over upstream component styles of equal specificity while
 // flavour stylesheets (loaded after application) may still refine them.
 
+// Pack settings and search styles are shared by every theme.
+@use 'mastodon/wxw_custom_emojis';
+
 // Emoji picker: render uploaded custom emoji at a fixed 33×33 so their
 // artwork stays legible next to unicode emoji (the wider buttons also
 // wrap the custom category to ~6 per row), and magnify on hover for a

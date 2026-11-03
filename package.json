@@ -72,7 +72,7 @@
     "debug": "4.4.3",
     "delegated-events": "1.1.2",
     "detect-passive-events": "2.0.3",
-    "emoji-mart": "npm:emoji-mart-lazyload@latest",
+    "emoji-mart": "patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch",
     "emojibase": "16.0.0",
     "emojibase-data": "16.0.3",
     "emojibase-regex": "16.0.0",

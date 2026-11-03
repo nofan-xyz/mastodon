@@ -8,8 +8,12 @@ import { toSupportedLocale } from '@/mastodon/features/emoji/locale';
 import { createAsyncThunk } from '@/mastodon/store/typed_functions';
 
 interface EmojisState {
-  custom: Record<string, Pick<ApiCustomEmojiJSON, 'url' | 'static_url'>>;
+  custom: Record<
+    string,
+    Pick<ApiCustomEmojiJSON, 'url' | 'static_url' | 'featured'>
+  >;
   customCategories: Record<string, string[]>; // { name: shortcodes[] }
+  customCategoryOrder: Record<string, number>;
   customLoaded: boolean;
   localesLoaded: Locale[];
 }
@@ -17,6 +21,7 @@ interface EmojisState {
 const initialState: EmojisState = {
   custom: {},
   customCategories: {},
+  customCategoryOrder: {},
   customLoaded: false,
   localesLoaded: [],
 };
@@ -39,19 +44,31 @@ const emojisSlice = createSlice({
           return;
         }
 
-        // The endpoint returns this user's current pack selection, including empty.
+        // Replace the previous selection, including when all packs were hidden.
         state.custom = {};
         state.customCategories = {};
+        state.customCategoryOrder = {};
         state.customLoaded = true;
 
         for (const emoji of action.payload) {
-          const { shortcode, category, url, static_url } = emoji;
+          const {
+            shortcode,
+            category,
+            category_order,
+            url,
+            static_url,
+            featured,
+          } = emoji;
           state.custom[shortcode] = {
             url,
             static_url,
+            featured,
           };
 
           if (category) {
+            if (category_order !== undefined) {
+              state.customCategoryOrder[category] = category_order;
+            }
             state.customCategories[category] ??= [];
             if (!state.customCategories[category].includes(shortcode)) {
               state.customCategories[category].push(shortcode);
