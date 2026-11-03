@@ -28,8 +28,43 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
   padding: 0 6px;
   line-height: 0;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &:hover {
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--color-text-secondary) 25%,
+        transparent
+      )
+      transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(
+        in srgb,
+        var(--color-text-secondary) 25%,
+        transparent
+      );
+    }
+  }
 }
 
 .emoji-mart-anchor {
