@@ -85,12 +85,13 @@ RSpec.describe UserSettings do
 
   describe '#update' do
     before do
-      subject.update(always_send_emails: true, default_language: 'fr', default_privacy: nil)
+      subject.update(always_send_emails: true, default_language: 'fr', default_privacy: nil, display_own_boosts: true)
     end
 
     it 'updates values' do
       expect(subject[:always_send_emails]).to be true
       expect(subject[:default_language]).to eq 'fr'
+      expect(subject[:display_own_boosts]).to be true
     end
 
     it 'does not set values that are nil' do
@@ -113,9 +114,22 @@ RSpec.describe UserSettings do
 
       expect(subject.flavour_and_skin).to eq 'bird-ui/mastodon-bird-ui-auto'
     end
+
+    it 'selects Fanfou Classic for a stored Space Fanfou preference' do
+      subject['flavour'] = 'mastodon-ui'
+      subject['skin'] = 'space_fanfou'
+
+      expect(subject.flavour_and_skin).to eq 'mastodon-ui/fanfou_classic'
+    end
   end
 
   describe '#flavour_and_skin=' do
+    it 'saves an old Space Fanfou form submission under the merged skin' do
+      subject.flavour_and_skin = 'mastodon-ui/space_fanfou'
+
+      expect(subject['skin']).to eq 'fanfou_classic'
+    end
+
     it 'splits the pair onto the flavour and skin keys' do
       subject.flavour_and_skin = 'bird-ui/mastodon-bird-ui-auto'
 

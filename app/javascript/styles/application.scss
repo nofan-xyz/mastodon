@@ -3,7 +3,7 @@
 @use 'fonts/roboto';
 @use 'fonts/roboto-mono';
 @use 'fonts/inter';
-@use 'fonts/syne';
+@use 'fonts/cal-sans-ui';
 
 @use 'mastodon/reset';
 @use 'mastodon/tokens';
@@ -21,7 +21,6 @@
 @use 'mastodon/about';
 @use 'mastodon/tables';
 @use 'mastodon/admin';
-@use 'mastodon/wxw_custom_emojis';
 @use 'mastodon/dashboard';
 @use 'mastodon/rtl';
 @use 'mastodon/rich_text';

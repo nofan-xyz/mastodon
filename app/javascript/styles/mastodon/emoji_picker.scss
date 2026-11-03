@@ -24,16 +24,55 @@
 
 .emoji-mart-anchors {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
   padding: 0 6px;
   line-height: 0;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &:hover {
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--color-text-secondary) 25%,
+        transparent
+      )
+      transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(
+        in srgb,
+        var(--color-text-secondary) 25%,
+        transparent
+      );
+    }
+  }
 }
 
 .emoji-mart-anchor {
   position: relative;
-  flex: 1;
+  flex: 0 0 44px;
   text-align: center;
-  padding: 12px 4px;
+  padding: 8px 4px;
+  min-height: 48px;
   overflow: hidden;
   transition: color 0.1s ease-out;
   cursor: pointer;
@@ -47,6 +86,23 @@
       var(--color-text-primary),
       var(--color-text-secondary)
     );
+  }
+}
+
+.emoji-mart-anchor:focus-visible {
+  outline: var(--outline-focus-default);
+  outline-offset: -3px;
+}
+
+.emoji-mart-anchor-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+
+  img {
+    display: block;
+    object-fit: contain;
   }
 }
 
@@ -184,7 +240,7 @@
   span {
     display: block;
     width: 100%;
-    font-weight: 500;
+    font-weight: bold;
     padding: 5px 6px;
   }
 }

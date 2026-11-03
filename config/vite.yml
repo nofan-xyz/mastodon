@@ -7,7 +7,7 @@ shared:
 
 development:
   host: 'localhost'
-  port: 3036
+  port: <%= Integer(ENV.fetch('VITE_DEV_SERVER_PORT', '3036'), 10) %>
   https: false
   base_path: '/packs-dev/'
   manifest_path: 'public/packs-dev/.vite/manifest.json'

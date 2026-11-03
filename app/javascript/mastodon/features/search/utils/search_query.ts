@@ -453,3 +453,46 @@ export const clearSearchFilters = (query: string) =>
         !isManagedContentClause(token),
     ),
   );
+
+// 5.0 requires positive text for a public search. Library/self queries can
+// still consist entirely of the filters exposed by SearchFilterBar.
+export const searchNeedsKeywords = (
+  query: string,
+  ownAcct?: string,
+  localDomain?: string,
+) => {
+  const tokens = parseSearchQuery(query);
+  if (!tokens.length) return false;
+  const scope = tokens.filter(({ prefix }) => prefix === 'in').at(-1);
+  if (scope?.value === 'library') return false;
+  if (
+    tokens.some(
+      ({ prefix, operator, value }) =>
+        prefix === 'from' &&
+        operator !== '-' &&
+        (value === 'me' ||
+          (ownAcct &&
+            [ownAcct, `${ownAcct}@${localDomain}`].some(
+              (acct) =>
+                value?.replace(/^@/, '').toLowerCase() === acct.toLowerCase(),
+            ))),
+    )
+  )
+    return false;
+  const prefixes = new Set([
+    'has',
+    'is',
+    'language',
+    'from',
+    'before',
+    'after',
+    'during',
+    'in',
+  ]);
+  return !tokens.some(
+    ({ prefix, operator, raw }) =>
+      operator !== '-' &&
+      (!prefix || !prefixes.has(prefix)) &&
+      raw.replace(/^\+/, '').replaceAll('"', '').trim().length > 0,
+  );
+};

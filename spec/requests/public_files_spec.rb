@@ -15,7 +15,7 @@ RSpec.describe 'Public files' do
         .to have_http_status(200)
 
       expect(response.headers['Cache-Control'])
-        .to eq "public, max-age=#{Mastodon::Middleware::PublicFileServer::SERVICE_WORKER_TTL}, must-revalidate"
+        .to eq 'no-store'
 
       expect(response.headers['X-Content-Type-Options'])
         .to eq 'nosniff'

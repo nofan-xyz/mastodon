@@ -9,7 +9,7 @@ declare const self: ServiceWorkerGlobalScope;
 // Cause a new version of a registered Service Worker to replace an existing one
 // that is already installed, and replace the currently active worker on open pages.
 self.addEventListener('install', (event) => {
-  event.waitUntil(cacheRoot());
+  event.waitUntil(Promise.all([cacheRoot(), self.skipWaiting()]));
 });
 
 self.addEventListener('activate', (event) => {

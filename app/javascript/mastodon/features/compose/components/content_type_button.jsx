@@ -26,7 +26,7 @@ const messages = defineMessages({
 
 export const ContentTypeButton = () => {
   const intl = useIntl();
-  const contentType = useAppSelector((state) => state.getIn(['compose', 'content_type']));
+  const contentType = useAppSelector((state) => state.compose.get('content_type'));
   const dispatch = useAppDispatch();
 
   const handleChange = useCallback((value) => {

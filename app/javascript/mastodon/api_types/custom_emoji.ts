@@ -4,6 +4,7 @@ export interface ApiCustomEmojiJSON {
   static_url: string;
   url: string;
   category?: string;
+  category_order?: number;
   featured?: boolean;
   visible_in_picker: boolean;
 }
