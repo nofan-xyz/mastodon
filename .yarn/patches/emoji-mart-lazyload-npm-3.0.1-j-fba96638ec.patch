@@ -1,5 +1,5 @@
 diff --git a/dist/components/anchors.js b/dist/components/anchors.js
-index 85c7d6819e402977ac936335f83156b912bcb38d..937d9c04559704cc30b3d02fe9bcf0f506ffae10 100644
+index 85c7d6819e402977ac936335f83156b912bcb38d..c235fcbd7261cdd46a2676325499bc46d77eae87 100644
 --- a/dist/components/anchors.js
 +++ b/dist/components/anchors.js
 @@ -56,6 +56,21 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
@@ -40,7 +40,7 @@ index 85c7d6819e402977ac936335f83156b912bcb38d..937d9c04559704cc30b3d02fe9bcf0f5
 +        var isCustom = id === 'custom' || id.startsWith('custom-');
 +        var iconId = isCustom ? 'custom' : id;
 +        var label = isCustom && id !== 'custom' ? name : i18n.categories[iconId];
-+        var representative = isCustom && category.emojis && category.emojis[0];
++        var representative = isCustom && category.emojis && (category.emojis.find(function (emoji) { return emoji.featured; }) || category.emojis[0]);
          return /*#__PURE__*/_react["default"].createElement("button", {
            key: id,
 -          "aria-label": i18n.categories[iconId],
@@ -90,7 +90,7 @@ index 395f8f2e09f8b1a5d87f287d2f12d0b65a8afe24..d92b28b57626a57b7462ebf24788ef50
  
          var category = customCategories[emoji.customCategory];
 diff --git a/dist-es/components/anchors.js b/dist-es/components/anchors.js
-index 1f41c5c6ed9f461cf6c6ab0c9c85e09df54b3388..9a5447136e78900ae0eb208e3794cb3415acd039 100644
+index 1f41c5c6ed9f461cf6c6ab0c9c85e09df54b3388..d98c3235a8e7ee39da323af48f5ff5266f091f0d 100644
 --- a/dist-es/components/anchors.js
 +++ b/dist-es/components/anchors.js
 @@ -42,6 +42,21 @@ var Anchors = /*#__PURE__*/function (_React$PureComponent) {
@@ -131,7 +131,7 @@ index 1f41c5c6ed9f461cf6c6ab0c9c85e09df54b3388..9a5447136e78900ae0eb208e3794cb34
 +        var isCustom = id === 'custom' || id.startsWith('custom-');
 +        var iconId = isCustom ? 'custom' : id;
 +        var label = isCustom && id !== 'custom' ? name : i18n.categories[iconId];
-+        var representative = isCustom && category.emojis && category.emojis[0];
++        var representative = isCustom && category.emojis && (category.emojis.find(function (emoji) { return emoji.featured; }) || category.emojis[0]);
          return /*#__PURE__*/React.createElement("button", {
            key: id,
 -          "aria-label": i18n.categories[iconId],

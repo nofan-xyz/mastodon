@@ -7129,14 +7129,14 @@ __metadata:
 
 "emoji-mart@patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch::locator=%40mastodon%2Fmastodon%40workspace%3A.":
   version: 3.0.1-j
-  resolution: "emoji-mart@patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch::version=3.0.1-j&hash=b0885d&locator=%40mastodon%2Fmastodon%40workspace%3A."
+  resolution: "emoji-mart@patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch::version=3.0.1-j&hash=17320b&locator=%40mastodon%2Fmastodon%40workspace%3A."
   dependencies:
     "@babel/runtime": "npm:^7.0.0"
     intersection-observer: "npm:^0.12.0"
     prop-types: "npm:^15.6.0"
   peerDependencies:
     react: ^0.14.0 || ^15.0.0-0 || ^16.0.0 || ^17.0.0
-  checksum: 10c0/7525b51a7698636d2c9b3c7d18a5b114c8528de792159d1cf920decbfe7096374ed58e5e7206be045ab468e13547d44ea77c6c59b627d1cb9fec3dc4f3e1ef5e
+  checksum: 10c0/3e645a797bea42df47d19bcfc2da86f9ae79608764f84284fefc122e948da10f62409a664febfffdb5e3ab30365472de00728285e9d93e4782be97f6b081f65c
   languageName: node
   linkType: hard
 
