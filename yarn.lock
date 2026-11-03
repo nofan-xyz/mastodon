@@ -2867,7 +2867,7 @@ __metadata:
     debug: "npm:4.4.3"
     delegated-events: "npm:1.1.2"
     detect-passive-events: "npm:2.0.3"
-    emoji-mart: "npm:emoji-mart-lazyload@latest"
+    emoji-mart: "patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch"
     emojibase: "npm:16.0.0"
     emojibase-data: "npm:16.0.3"
     emojibase-regex: "npm:16.0.0"
@@ -2897,6 +2897,7 @@ __metadata:
     lande: "npm:1.0.10"
     lint-staged: "npm:17.0.5"
     lodash: "npm:4.18.1"
+    lunar-typescript: "npm:1.8.6"
     marky: "npm:1.3.0"
     msw: "npm:2.12.14"
     msw-storybook-addon: "npm:2.0.6"
@@ -7113,7 +7114,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-mart@npm:emoji-mart-lazyload@latest":
+"emoji-mart-lazyload@npm:3.0.1-j":
   version: 3.0.1-j
   resolution: "emoji-mart-lazyload@npm:3.0.1-j"
   dependencies:
@@ -7123,6 +7124,19 @@ __metadata:
   peerDependencies:
     react: ^0.14.0 || ^15.0.0-0 || ^16.0.0 || ^17.0.0
   checksum: 10c0/be673a03292d6a79db38fa0f5ad525a82a642ee5211b8ff32630dfce70988627bb9724695c60f11d635a5631a539beabbddd1185f0986f06890f4266e9cedee2
+  languageName: node
+  linkType: hard
+
+"emoji-mart@patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch::locator=%40mastodon%2Fmastodon%40workspace%3A.":
+  version: 3.0.1-j
+  resolution: "emoji-mart@patch:emoji-mart-lazyload@npm%3A3.0.1-j#./.yarn/patches/emoji-mart-lazyload-npm-3.0.1-j-fba96638ec.patch::version=3.0.1-j&hash=17320b&locator=%40mastodon%2Fmastodon%40workspace%3A."
+  dependencies:
+    "@babel/runtime": "npm:^7.0.0"
+    intersection-observer: "npm:^0.12.0"
+    prop-types: "npm:^15.6.0"
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0-0 || ^16.0.0 || ^17.0.0
+  checksum: 10c0/3e645a797bea42df47d19bcfc2da86f9ae79608764f84284fefc122e948da10f62409a664febfffdb5e3ab30365472de00728285e9d93e4782be97f6b081f65c
   languageName: node
   linkType: hard
 
@@ -9784,6 +9798,13 @@ __metadata:
   dependencies:
     yallist: "npm:^3.0.2"
   checksum: 10c0/89b2ef2ef45f543011e38737b8a8622a2f8998cddf0e5437174ef8f1f70a8b9d14a918ab3e232cb3ba343b7abddffa667f0b59075b2b80e6b4d63c3de6127482
+  languageName: node
+  linkType: hard
+
+"lunar-typescript@npm:1.8.6":
+  version: 1.8.6
+  resolution: "lunar-typescript@npm:1.8.6"
+  checksum: 10c0/8b464b1b2edf74de821ac8777331d26132f749a41a4613327fd2cf8136c8716038ba162d86e34cd7f74f4f1cc9077b3548fe0a2b48e0faee441edf8eb9b93f16
   languageName: node
   linkType: hard
 

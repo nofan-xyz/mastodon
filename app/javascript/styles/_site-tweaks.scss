@@ -1,7 +1,10 @@
 // Site-wide tweaks that apply to every flavour and skin. Imported from
-// application.scss, which every skin's entrypoint loads, so the rules
-// here win over upstream component styles of equal specificity while
-// flavour stylesheets (loaded after application) may still refine them.
+// each base theme (including standalone Fanfou/Graphite themes), so the
+// rules here follow their common component styles. Flavour stylesheets
+// loaded afterward may still refine them.
+
+// Pack preferences, search and admin pages need these styles in every theme.
+@use 'mastodon/wxw_custom_emojis';
 
 // Emoji picker: render uploaded custom emoji at a fixed 33×33 so their
 // artwork stays legible next to unicode emoji (the wider buttons also
