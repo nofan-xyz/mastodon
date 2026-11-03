@@ -24,16 +24,20 @@
 
 .emoji-mart-anchors {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   padding: 0 6px;
   line-height: 0;
 }
 
 .emoji-mart-anchor {
   position: relative;
-  flex: 1;
+  flex: 0 0 44px;
   text-align: center;
-  padding: 12px 4px;
+  padding: 8px 4px;
+  min-height: 48px;
   overflow: hidden;
   transition: color 0.1s ease-out;
   cursor: pointer;
@@ -47,6 +51,23 @@
       var(--color-text-primary),
       var(--color-text-secondary)
     );
+  }
+}
+
+.emoji-mart-anchor:focus-visible {
+  outline: var(--outline-focus-default);
+  outline-offset: -3px;
+}
+
+.emoji-mart-anchor-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+
+  img {
+    display: block;
+    object-fit: contain;
   }
 }
 

@@ -107,6 +107,7 @@ const selectPickerData = createAppSelector(
         custom: true,
         short_names: [shortcode],
         imageUrl: autoPlayGif ? emoji.url : emoji.static_url,
+        staticImageUrl: emoji.static_url,
         customCategory: categoryMap.get(shortcode),
       } as CustomEmoji);
     }
