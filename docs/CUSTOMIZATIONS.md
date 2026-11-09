@@ -34,8 +34,8 @@
 
 - 表情选择器：全部自定义分组使用代表表情静态图标、真实分类名称提示和横向滚动导航；保留常用、搜索和标准 Emoji。实现及验收见 `docs/EMOJI-CATEGORIES.md`。
 
-
 - 嘟文字数上限 500 → 5000（`app/validators/status_length_validator.rb` 的 `MAX_CHARS`，实例 API 同步上报 `max_characters`）。
+- 新建投票最多 12 项，单选、多选一致；每项仍最多 50 字。后端由 `PollOptionsValidator` 校验，实例 API 向前端提供限制。2026-11-09 已修改源码并通过边界测试，尚未部署；后续需与 Beta/共享消费者同步发布，并刷新实例配置缓存。
 - 自定义主题三套（`config/themes.yml`）：
   - `fanfou_classic`（饭否经典）：绿色侧栏、浅色渐变背景。
   - `space_fanfou`（太空饭否）：磨砂玻璃侧栏、圆角面板。
