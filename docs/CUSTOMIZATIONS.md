@@ -22,7 +22,8 @@
 ## 发帖、富文本与内容展示
 
 - 字数上限 5000，实例 API、前端计数和后端验证必须一致：`app/validators/status_length_validator.rb`。
-- 新建投票最多 12 项，单选、多选一致；每项仍最多 50 字。后端由 `PollOptionsValidator` 校验，实例 API 向前端提供限制。2026-11-09 已修改源码并通过边界测试，尚未部署；后续需与正式 4.7 Web/共享消费者同步发布，并刷新实例配置缓存。
+- 新建投票最多 12 项，单选、多选一致；每项仍最多 50 字。后端由 `PollOptionsValidator` 校验，实例 API 向前端提供限制。2026-11-09 已修改源码并通过边界检查；2026-11-11 已与正式站同步发布，公网实例 API 回读为 12 项、每项 50 字。
+- 表情选择器快速分类栏支持桌面端按住鼠标左右拖动；点击标签仍切换分类，触屏端保留原生横向滑动。实现与发布记录见 docs/EMOJI-CATEGORIES.md。
 - 支持 `text/plain`、`text/markdown`、`text/html`；格式选择按钮和用户默认格式设置；编辑、修订历史、定时发布及联邦内容保留相应格式。
 - Markdown 使用 Redcarpet，HTML 经白名单清洗；允许的标签也在前端 HTML 配置中同步。
 - 代码：`app/lib/advanced_text_formatter.rb`、`app/lib/html_aware_formatter.rb`、`lib/sanitize_ext/sanitize_config.rb`、`app/javascript/config/html-tags.json`、`app/javascript/mastodon/features/compose/components/content_type_button.jsx`、compose actions/reducer、status/source serializers 和 post/update services。
