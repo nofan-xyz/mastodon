@@ -1,0 +1,40 @@
+name: Build nofan beta images
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/upgrade-mastodon-5]
+    paths: [.github/workflows/build-beta.yml]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: nofan-beta-images
+  cancel-in-progress: false
+
+jobs:
+  rails:
+    uses: ./.github/workflows/build-container-image.yml
+    with:
+      file_to_build: Dockerfile
+      push_to_images: ghcr.io/nofan-xyz/mastodon
+      version_metadata: beta-${{ github.sha }}
+      flavor: latest=false
+      tags: |
+        type=raw,value=beta-${{ github.sha }}
+        type=raw,value=beta-5.0
+    secrets: inherit
+
+  streaming:
+    uses: ./.github/workflows/build-container-image.yml
+    with:
+      file_to_build: streaming/Dockerfile
+      push_to_images: ghcr.io/nofan-xyz/mastodon-streaming
+      version_metadata: beta-${{ github.sha }}
+      flavor: latest=false
+      tags: |
+        type=raw,value=beta-${{ github.sha }}
+        type=raw,value=beta-5.0
+    secrets: inherit

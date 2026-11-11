@@ -6,7 +6,7 @@ class Api::V1::WxwCustomEmojisController < Api::BaseController
   def index
     return unless stale?(etag: emoji_etag, public: false, template: false)
 
-    render json: emojis, each_serializer: REST::WxwCustomEmojiSerializer, category_names: category_names
+    render json: emojis, each_serializer: REST::WxwCustomEmojiSerializer, category_names: category_names, category_orders: category_orders
   end
 
   private
@@ -50,10 +50,16 @@ class Api::V1::WxwCustomEmojisController < Api::BaseController
       width = [picker_packs.size, 1].max.to_s.length
       picker_packs.each_with_index.to_h do |pack, index|
         name = anonymous? ? pack.name : pack.name_for(I18n.locale)
-        # Picker category order is lexical.
+        # Numbering is a display preference; category_order carries the saved order.
         name = format('%0*d. ', width, index + 1) + name if numbered?
         [pack.custom_emoji_category_id, name]
       end
+    end
+  end
+
+  def category_orders
+    @category_orders ||= picker_packs.each_with_index.to_h do |pack, index|
+      [pack.custom_emoji_category_id, index]
     end
   end
 
@@ -63,6 +69,7 @@ class Api::V1::WxwCustomEmojisController < Api::BaseController
 
   def emoji_etag
     [
+      :category_navigation_v1,
       anonymous? ? nil : I18n.locale,
       anonymous?,
       ::Wxw::EmojiPack.publish_version,

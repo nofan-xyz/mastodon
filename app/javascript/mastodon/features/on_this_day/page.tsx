@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, FC } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -7,12 +7,12 @@ import { useHistory } from 'react-router';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import { focusCompose } from '@/mastodon/actions/compose';
 import { Button } from '@/mastodon/components/button';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { Icon } from '@/mastodon/components/icon';
-import { StatusQuoteManager } from '@/mastodon/components/status_quoted';
+import { Status } from '@/mastodon/components/status';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import {
   fetchOnThisDayData,
   fetchOnThisDayState,
@@ -23,6 +23,7 @@ import HistoryIcon from '@/material-icons/400-24px/history.svg?react';
 import styles from './page.module.scss';
 
 const skeletonRows = [0, 1, 2];
+const pendingMessageDelay = 10_000;
 
 export const OnThisDayPage: FC = () => {
   const intl = useIntl();
@@ -62,6 +63,21 @@ export const OnThisDayPage: FC = () => {
   const isLoading =
     !data && !error && state !== 'empty' && state !== 'disabled';
 
+  // Polls must not restart the grace period or leave an endless skeleton when
+  // generation is delayed. Keep polling, but distinguish waiting from no memories.
+  const pendingDate = isLoading && state === 'pending' ? date : undefined;
+  const [delayedPendingDate, setDelayedPendingDate] = useState<string>();
+  useEffect(() => {
+    if (!pendingDate) return;
+    const timer = window.setTimeout(() => {
+      setDelayedPendingDate(pendingDate);
+    }, pendingMessageDelay);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [pendingDate]);
+  const showPending = !!pendingDate && delayedPendingDate === pendingDate;
+
   const showError = error && !data;
 
   const showDisabled = state === 'disabled' && !data && !error;
@@ -83,7 +99,7 @@ export const OnThisDayPage: FC = () => {
 
   const handleWrite = useCallback(() => {
     history.push('/home');
-    dispatch(focusCompose());
+    dispatch(openNewComposer({}));
   }, [dispatch, history]);
 
   const pageTitle = intl.formatMessage({
@@ -93,14 +109,38 @@ export const OnThisDayPage: FC = () => {
 
   return (
     <Column>
-      <ColumnHeader
-        icon='history'
-        iconComponent={HistoryIcon}
-        title={pageTitle}
-        multiColumn={false}
-      />
+      <ColumnHeader title={pageTitle} withBackButton='auto' />
 
-      {isLoading ? (
+      {showPending ? (
+        <div className={styles.wrapper}>
+          <Helmet>
+            <title>{pageTitle}</title>
+          </Helmet>
+          <div className={styles.emptyState} role='status'>
+            <Icon
+              id='history'
+              icon={HistoryIcon}
+              className={styles.emptyIcon}
+            />
+            <h1>{pageTitle}</h1>
+            <p className={styles.emptyMessage}>
+              <FormattedMessage
+                id='on_this_day.page.pending'
+                defaultMessage="Your memories are still being prepared. They'll appear automatically when ready. You can also try again in a moment."
+              />
+            </p>
+            <div className={styles.emptyAction}>
+              <Button
+                text={intl.formatMessage({
+                  id: 'on_this_day.page.retry',
+                  defaultMessage: 'Retry',
+                })}
+                onClick={handleRetry}
+              />
+            </div>
+          </div>
+        </div>
+      ) : isLoading ? (
         <div className={styles.wrapper} role='status' aria-label='Loading'>
           <div className={styles.skeletonHeader} />
           <div className={styles.skeletonSummary} />
@@ -239,11 +279,7 @@ export const OnThisDayPage: FC = () => {
                 <h2 className={styles.yearDivider}>{year}</h2>
                 <div className={styles.statusList}>
                   {data?.years[year]?.map((statusId) => (
-                    <StatusQuoteManager
-                      key={statusId}
-                      id={statusId}
-                      showActions
-                    />
+                    <Status key={statusId} id={statusId} showActions />
                   ))}
                 </div>
               </section>

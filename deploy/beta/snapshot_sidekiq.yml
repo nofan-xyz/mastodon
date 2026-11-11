@@ -1,0 +1,6 @@
+---
+:concurrency: 3
+:queues:
+  - default
+:scheduler:
+  :enabled: false

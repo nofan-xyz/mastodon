@@ -68,6 +68,9 @@ export async function importCustomEmojiData() {
     return;
   }
 
+  const emojis = (await response.json()) as CustomEmojiData[];
+  await putCustomEmojiData({ emojis, clear: true });
+
   const etag = response.headers.get('ETag');
   if (etag) {
     log('Custom emoji data fetched successfully, storing etag %s', etag);
@@ -76,8 +79,6 @@ export async function importCustomEmojiData() {
     log('No etag found in response for custom emoji data');
   }
 
-  const emojis = (await response.json()) as CustomEmojiData[];
-  await putCustomEmojiData({ emojis, clear: true });
   return emojis;
 }
 

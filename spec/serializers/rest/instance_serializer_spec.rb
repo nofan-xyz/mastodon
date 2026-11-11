@@ -13,6 +13,13 @@ RSpec.describe REST::InstanceSerializer do
   end
 
   describe 'configuration' do
+    it 'advertises twelve poll options and fifty characters per option' do
+      expect(serialization['configuration']['polls']).to include(
+        'max_options' => 12,
+        'max_characters_per_option' => 50
+      )
+    end
+
     it 'returns the VAPID public key' do
       expect(serialization['configuration']['vapid']).to eq({
         'public_key' => Rails.configuration.x.vapid.public_key,

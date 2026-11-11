@@ -1,0 +1,16 @@
+// Map the new 5.0 surfaces to each legacy skin's existing semantic palette.
+// Loaded only by custom skins; the official default keeps its native palette.
+:root:root {
+  --color-bg-desktop: var(
+    --color-bg,
+    var(--color-bg-secondary-base, var(--color-bg-primary))
+  );
+  --color-bg-highlight: color-mix(
+    in srgb,
+    var(--color-text-brand) 8%,
+    transparent
+  );
+  --color-border-strong: var(--color-text-primary);
+  --color-border-input: var(--color-text-secondary);
+  --color-text-inverted: var(--color-bg-primary);
+}

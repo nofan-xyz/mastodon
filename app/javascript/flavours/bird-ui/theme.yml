@@ -1,5 +1,4 @@
-# The bird-ui flavour layers the Mastodon Bird UI stylesheets over the
-# stock frontend. The Bird UI look is pure CSS (see skins/bird-ui/), so
-# pack_directory points at the shared entrypoint tree, exactly like
-# mastodon-ui, and no app code is duplicated.
+# X UI keeps the existing bird-ui identifier to preserve saved preferences.
+# Shared application code is reused; the dedicated navigation and style layer
+# apply only when this flavour is selected.
 pack_directory: app/javascript/entrypoints
