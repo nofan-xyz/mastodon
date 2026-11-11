@@ -26,6 +26,7 @@
   display: flex;
   justify-content: flex-start;
   overflow-x: auto;
+  cursor: grab;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -64,6 +65,19 @@
         transparent
       );
     }
+  }
+}
+
+.emoji-mart-picker-wrapper {
+  display: contents;
+}
+
+.emoji-mart-anchors--dragging {
+  cursor: grabbing;
+  user-select: none;
+
+  .emoji-mart-anchor {
+    cursor: grabbing;
   }
 }
 
