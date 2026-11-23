@@ -18,7 +18,7 @@ import type { EmojiData, EmojiSkin } from 'emoji-mart';
 
 import { emojiUse } from '@/mastodon/actions/emojis';
 import { changeSetting } from '@/mastodon/actions/settings';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { IconButton } from '@/mastodon/components/button';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
 import {
   PER_LINE,
@@ -66,18 +66,27 @@ export const EmojiPickerButton: React.FC<{
   onPick: OnEmojiPick;
   disabled?: boolean;
   placement?: Placement;
-}> = ({ onPick, disabled, placement = 'top-start' }) => {
+  className?: string;
+  size?: React.ComponentProps<typeof IconButton>['size'];
+}> = ({
+  onPick,
+  disabled,
+  placement = 'top-start',
+  className,
+  size = 'sm',
+}) => {
   const [open, { onToggle, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
 
   return (
     <>
       <IconButton
-        size='sm'
+        size={size}
         icon={SmileyIcon}
         ref={setTarget}
         onClick={onToggle}
         aria-expanded={open}
+        className={className}
       >
         <FormattedMessage
           id='emoji_button.label'
@@ -236,10 +245,10 @@ export const EmojiDropdown: React.FC<
           emojiTooltip
         />
 
-        <div className='emoji-picker-dropdown__modifiers'>
+        <div className={classes.modifiers}>
           <Emoji emoji='fist' size={22} skin={skinTone} onClick={onTrue} />
           <div
-            className='emoji-picker-dropdown__modifiers__menu'
+            className={classes.modifiersMenu}
             hidden={!open}
             ref={modifierRef}
           >

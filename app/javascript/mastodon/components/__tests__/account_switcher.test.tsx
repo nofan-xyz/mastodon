@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 
-import { NavigationAccountCardAndMenu } from '@/mastodon/features/navigation_panel/redesign/account_card_and_menu';
-import { XNavigationAccount } from '@/mastodon/features/navigation_panel/redesign/x_navigation';
+import { NavigationAccountCardAndMenu } from '@/mastodon/features/navigation_panel/account_card_and_menu';
+import { XNavigationAccount } from '@/mastodon/features/navigation_panel/x_navigation';
 import {
   render,
   screen,

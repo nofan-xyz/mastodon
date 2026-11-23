@@ -6,8 +6,6 @@ import { length } from 'stringz';
 
 import {
   changeCompose,
-  changeComposeSpoilerness,
-  changeComposeSpoilerText,
   clearComposeSuggestions,
   COMPOSE_DIRECT,
   COMPOSE_FOCUS,
@@ -57,10 +55,7 @@ type DisplayState = 'hidden' | 'showing' | 'minimized';
 
 export type ComposeType = 'post' | 'message' | 'reply' | 'replyPrivate';
 
-export type ComposerPublishError =
-  | 'empty'
-  | 'too-long'
-  | 'missing-content-warning';
+export type ComposerPublishError = 'empty' | 'too-long';
 
 interface ComposerState {
   displayState: DisplayState;
@@ -86,6 +81,9 @@ const composerSlice = createSlice({
     minimizeComposerToggle(state) {
       state.displayState =
         state.displayState === 'showing' ? 'minimized' : 'showing';
+    },
+    minimizeComposer(state) {
+      state.displayState = 'minimized';
     },
     hideComposer(state) {
       state.displayState = 'hidden';
@@ -157,6 +155,7 @@ const composerSlice = createSlice({
 export const composer = composerSlice.reducer;
 
 export const {
+  minimizeComposer,
   requestFocus: requestComposerFocus,
   clearPendingFocus: clearComposerFocusRequest,
   clearErrors: clearComposerErrors,
@@ -305,6 +304,21 @@ export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
   }
 });
 
+/**
+ * Closes the composer if it's empty, otherwise minimises it
+ */
+export const closeOrMinimizeComposer = createAppThunk(
+  (_arg, { getState, dispatch }) => {
+    const isChanged = selectComposerIsChanged(getState());
+
+    if (isChanged) {
+      dispatch(minimizeComposer());
+    } else {
+      dispatch(closeComposer());
+    }
+  },
+);
+
 export const selectIsMinimized = createAppSelector(
   [(state) => state.composer.displayState],
   (displayState) => displayState === 'minimized',
@@ -312,7 +326,7 @@ export const selectIsMinimized = createAppSelector(
 
 export const submitComposer = createAppThunk(
   (
-    { redirectOnSuccess }: { redirectOnSuccess?: boolean },
+    arg: undefined | { redirectOnSuccess?: boolean; force?: boolean } = {},
     { getState, dispatch },
   ) => {
     const textareaValue = getComposerTextarea()?.value;
@@ -323,29 +337,18 @@ export const submitComposer = createAppThunk(
       dispatch(changeCompose(textareaValue));
     }
 
-    const { compose, composer, meta, statuses, server, settings } = getState();
+    const { compose, meta, statuses, server, settings } = getState();
 
-    let text = compose.get('text') as string;
+    const text =
+      (compose.get('text') as string) + (compose.get('spoiler_text') as string);
 
     const attachments = compose.get('media_attachments');
-    const spoilerText = compose.get('spoiler_text') as string;
-    if (
-      (!text.trim() || text === composer.initialText) &&
-      isList(attachments) &&
-      attachments.isEmpty()
-    ) {
+    if (!text.trim() && isList(attachments) && attachments.isEmpty()) {
       dispatch(composerSlice.actions.addError('empty'));
-    }
-
-    if (!!compose.get('spoiler') && !spoilerText.trim()) {
-      dispatch(composerSlice.actions.addError('missing-content-warning'));
     }
 
     const maxChars =
       server.server.item?.configuration.statuses.max_characters ?? 500;
-    if (compose.get('spoiler') && typeof spoilerText === 'string') {
-      text += spoilerText;
-    }
     const textLength = length(countableText(text));
     if (textLength > maxChars) {
       dispatch(composerSlice.actions.addError('too-long'));
@@ -377,10 +380,13 @@ export const submitComposer = createAppThunk(
       statuses.getIn([quotedStatusId, 'account']) !== me &&
       !settings.getIn(['dismissed_banners', PRIVATE_QUOTE_MODAL_ID]);
 
+    const { force, redirectOnSuccess } = arg;
+
     if (
       !!meta.get('missing_alt_text_modal') &&
       missingAltText &&
-      privacy !== 'direct'
+      privacy !== 'direct' &&
+      !force
     ) {
       dispatch(
         openModal({
@@ -388,7 +394,7 @@ export const submitComposer = createAppThunk(
           modalProps: {},
         }),
       );
-    } else if (quoteToPrivate) {
+    } else if (quoteToPrivate && !force) {
       dispatch(
         openModal({
           modalType: 'CONFIRM_PRIVATE_QUOTE_NOTIFY',
@@ -405,18 +411,6 @@ export const submitComposer = createAppThunk(
           dispatch(resetComposer());
         }),
       );
-    }
-  },
-);
-
-export const toggleContentWarning = createAppThunk(
-  (_arg, { dispatch, getState }) => {
-    dispatch(changeComposeSpoilerText(''));
-    dispatch(changeComposeSpoilerness());
-    dispatch(clearComposerErrors(['missing-content-warning']));
-
-    if (!getState().compose.get('spoiler')) {
-      dispatch(requestComposerFocus());
     }
   },
 );

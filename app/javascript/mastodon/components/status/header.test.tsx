@@ -6,7 +6,7 @@ import { reducerWithInitialState } from '@/mastodon/reducers';
 import { accountFactoryState } from '@/testing/factories';
 import { cleanup, render, screen } from '@/testing/rendering';
 
-import { StatusRedesignHeader } from './header';
+import { StatusHeader as StatusRedesignHeader } from './header';
 
 const mode = vi.hoisted(() => ({ xUi: false }));
 vi.mock('@/mastodon/initial_state', async (importOriginal) => ({

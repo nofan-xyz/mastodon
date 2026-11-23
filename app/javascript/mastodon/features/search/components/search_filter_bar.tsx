@@ -380,12 +380,12 @@ const SearchDateRangeForm: React.FC<{
       <div className='search-filter-bar__date-range-actions'>
         <Button
           className='search-filter-bar__date-range-clear'
-          secondary
+          variant='tonal'
           onClick={onClear}
         >
           {intl.formatMessage(messages.dateClear)}
         </Button>
-        <Button secondary onClick={onCancel}>
+        <Button variant='tonal' onClick={onCancel}>
           {intl.formatMessage(messages.dateCancel)}
         </Button>
         <Button type='submit' disabled={!isValid}>
@@ -469,7 +469,7 @@ const SearchAuthorPicker: React.FC<{
       />
 
       <div className='search-filter-bar__author-picker-actions'>
-        <Button secondary onClick={onCancel}>
+        <Button variant='tonal' onClick={onCancel}>
           {intl.formatMessage(messages.authorCancel)}
         </Button>
       </div>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { act, useCallback, useState } from 'react';
 
 import { cleanup, fireEvent, render, screen } from '@/testing/rendering';
 
@@ -76,9 +76,13 @@ afterEach(() => {
   }
 });
 
-it('keeps the mobile sheet open when its trigger is clicked and omits desktop width props', () => {
+it('keeps the mobile sheet open when its trigger is clicked and omits desktop width props', async () => {
   const consoleError = vi.spyOn(console, 'error');
   render(<Fixture />);
+  fireEvent.click(screen.getByRole('button', { name: 'Switch account' }));
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
   fireEvent.click(screen.getByRole('button', { name: 'Switch account' }));
   const dialog = screen.getByRole('dialog');
   expect(dialog.hasAttribute('minWidth')).toBe(false);
@@ -97,9 +101,12 @@ it('closes React state on native Escape cancellation even while account buttons 
   expect(screen.getByRole('dialog')).toBeTruthy();
 });
 
-it('dismisses the sheet when clicking outside both the sheet and its trigger', () => {
+it('dismisses the sheet when clicking outside both the sheet and its trigger', async () => {
   render(<Fixture />);
   fireEvent.click(screen.getByRole('button', { name: 'Switch account' }));
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
   fireEvent.click(screen.getByRole('button', { name: 'Outside' }));
   expect(screen.queryByRole('dialog')).toBeNull();
 });

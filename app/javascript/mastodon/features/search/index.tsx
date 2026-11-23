@@ -10,7 +10,7 @@ import {
 } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
-import { Button } from '@/mastodon/components/button/redesign';
+import { Button } from '@/mastodon/components/button';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { Search } from '@/mastodon/components/search';
@@ -315,7 +315,12 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
   const extraStickyHeaderContent = (
     <>
       <div className='explore__search-header'>
-        <Search singleColumn initialValue={trimmedValue} key={trimmedValue} />
+        <Search
+          singleColumn
+          initialValue={trimmedValue}
+          initialType={mappedType !== 'all' ? mappedType : undefined}
+          key={trimmedValue}
+        />
       </div>
 
       <div className='account__section-headline'>

@@ -130,13 +130,12 @@ export const OnThisDayPage: FC = () => {
               />
             </p>
             <div className={styles.emptyAction}>
-              <Button
-                text={intl.formatMessage({
+              <Button onClick={handleRetry}>
+                {intl.formatMessage({
                   id: 'on_this_day.page.retry',
                   defaultMessage: 'Retry',
                 })}
-                onClick={handleRetry}
-              />
+              </Button>
             </div>
           </div>
         </div>
@@ -176,13 +175,12 @@ export const OnThisDayPage: FC = () => {
               />
             </p>
             <div className={styles.emptyAction}>
-              <Button
-                text={intl.formatMessage({
+              <Button onClick={handleRetry}>
+                {intl.formatMessage({
                   id: 'on_this_day.page.retry',
                   defaultMessage: 'Retry',
                 })}
-                onClick={handleRetry}
-              />
+              </Button>
             </div>
           </div>
         </div>
@@ -210,13 +208,12 @@ export const OnThisDayPage: FC = () => {
               />
             </p>
             <div className={styles.emptyAction}>
-              <Button
-                text={intl.formatMessage({
+              <Button onClick={handleEnable}>
+                {intl.formatMessage({
                   id: 'on_this_day.page.enable',
                   defaultMessage: 'Enable in preferences',
                 })}
-                onClick={handleEnable}
-              />
+              </Button>
             </div>
           </div>
         </div>
@@ -260,13 +257,12 @@ export const OnThisDayPage: FC = () => {
                 />
               </p>
               <div className={styles.emptyAction}>
-                <Button
-                  text={intl.formatMessage({
+                <Button onClick={handleWrite}>
+                  {intl.formatMessage({
                     id: 'on_this_day.page.write',
                     defaultMessage: 'Post something',
                   })}
-                  onClick={handleWrite}
-                />
+                </Button>
               </div>
             </div>
           ) : (

@@ -162,14 +162,19 @@ const EmojiFieldWrapper: FC<
 
   return (
     <FormFieldWrapper
-      className={classes.fieldWrapper}
       describedById={counterId}
+      className={classes.fieldWrapper}
       {...otherProps}
     >
       {(inputProps) => (
         <>
           {children({ ...inputProps, onChange: handleChange })}
-          <EmojiPickerButton onPick={handlePickEmoji} disabled={disabled} />
+          <EmojiPickerButton
+            size='xs'
+            onPick={handlePickEmoji}
+            disabled={disabled}
+            className={classes.emojiButton}
+          />
           {counterMax && (
             <CharacterCounter
               currentString={value ?? ''}

@@ -25,19 +25,17 @@ import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 import { accountSwitchNavigation } from 'mastodon/utils/account_switch';
 import { OnThisDayController } from '@/mastodon/features/on_this_day/controller';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
 
-import { uploadCompose, resetCompose } from '../../actions/compose';
+import { uploadCompose } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
 import { fetchServer, fetchServerTranslationLanguages } from '../../actions/server';
 import { expandHomeTimeline } from '../../actions/timelines';
 import { initialState, forceSingleColumn, me, owner, singleUserMode, trendsEnabled, landingPage, localLiveFeedAccess, disableHoverCards, domain } from '../../initial_state';
 
-import { openNewComposer, toggleContentWarning } from '@/mastodon/reducers/slices/composer';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 
 import { BundleColumnError } from './components/bundle_column_error';
-import { NavigationBar } from './components/navigation_bar';
 import { UploadArea } from './components/upload_area';
 import { HashtagMenuController } from './components/hashtag_menu_controller';
 import { ColumnsArea } from './components/columns_area';
@@ -95,7 +93,7 @@ import { CustomHomepage } from 'mastodon/features/custom_homepage';
 
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
 // Without this it ends up in ~8 very commonly used bundles.
-import '../../components/status/legacy/status';
+import '../../components/status';
 import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 
@@ -167,9 +165,7 @@ class SwitchingColumnsArea extends PureComponent {
     const { signedIn } = this.props.identity;
     const pathName = this.props.location.pathname;
 
-    const defaultHomepage = (singleColumn || isRedesignEnabled())
-      ? '/home'
-      : '/deck/getting-started';
+    const defaultHomepage = '/home';
 
     let rootRedirect;
     if (signedIn) {
@@ -210,10 +206,7 @@ class SwitchingColumnsArea extends PureComponent {
             {(forceSingleColumn || transientSingleColumn) && pathName.startsWith('/deck/') ? <Redirect from={pathName} to={{...this.props.location, pathname: pathName.slice(5)}} /> : null}
             {/* Redirect old bookmarks (without /deck) with home-like routes to the advanced interface */}
             {!singleColumn && pathName === '/home' ? <Redirect from='/home' to={redirectWithoutFocusing(defaultHomepage)} exact /> : null}
-            {(pathName === '/getting-started' || isRedesignEnabled())
-              ? <Redirect from='/getting-started' to={redirectWithoutFocusing(defaultHomepage)} exact />
-              : null
-            }
+            <Redirect from='/getting-started' to={redirectWithoutFocusing(defaultHomepage)} exact />
 
             <WrappedRoute path='/keyboard-shortcuts' component={KeyboardShortcuts} content={children} />
             <WrappedRoute path='/about' component={About} content={children} />
@@ -484,23 +477,10 @@ class UI extends PureComponent {
   handleHotkeyNew = e => {
     e.preventDefault();
 
-    if (isRedesignEnabled()) {
-      this.props.dispatch(openNewComposer());
-      return;
-    }
-
-    const element = this.node.querySelector('.autosuggest-textarea__textarea');
-
-    if (element) {
-      element.focus();
-    }
+    this.props.dispatch(openNewComposer());
   };
 
   handleHotkeyNewMessage = (e) => {
-    if (!isRedesignEnabled()) {
-      return;
-    }
-
     e.preventDefault();
     this.props.dispatch(openNewComposer({ type: 'message' }));
   }
@@ -510,7 +490,7 @@ class UI extends PureComponent {
 
     const searchField = this.node.querySelector('[data-main-search="true"]');
 
-    if (searchField.checkVisibility()) {
+    if (searchField?.checkVisibility()) {
       searchField.focus();
     } else {
       this.props.history.push('/search', { focusTarget: FOCUS_TARGET.SEARCH });
@@ -518,17 +498,7 @@ class UI extends PureComponent {
   };
 
   handleHotkeyForceNew = e => {
-    if (isRedesignEnabled()) {
-      this.props.dispatch(openNewComposer({ force: true }));
-      return;
-    }
-    this.handleHotkeyNew(e);
-    this.props.dispatch(resetCompose());
-  };
-
-  handleHotkeyToggleComposeSpoilers = e => {
-    e.preventDefault();
-    this.props.dispatch(toggleContentWarning());
+    this.props.dispatch(openNewComposer({ force: true }));
   };
 
   handleHotkeyFocusColumn = e => {
@@ -647,7 +617,6 @@ class UI extends PureComponent {
       search: this.handleHotkeySearch,
       forceNew: this.handleHotkeyForceNew,
       newMessage: this.handleHotkeyNewMessage,
-      toggleComposeSpoilers: this.handleHotkeyToggleComposeSpoilers,
       focusColumn: this.handleHotkeyFocusColumn,
       focusLoadMore: this.handleHotkeyLoadMore,
       moveDown: this.handleMoveDown,
@@ -687,7 +656,6 @@ class UI extends PureComponent {
             {children}
           </SwitchingColumnsArea>
 
-          {!minimalShell && !isRedesignEnabled() && <NavigationBar />}
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
           {this.props.identity.signedIn && <OnThisDayController />}

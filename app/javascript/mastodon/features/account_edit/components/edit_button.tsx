@@ -1,8 +1,8 @@
 import type { FC, MouseEventHandler } from 'react';
 
-import { PencilIcon, TrashIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
 
-import { Button, IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button';
 
 export interface EditButtonProps {
   onClick: MouseEventHandler;
@@ -35,7 +35,12 @@ export const EditIconButton: FC<{
   title: string;
   disabled?: boolean;
 }> = ({ title, onClick, disabled }) => (
-  <IconButton icon={PencilIcon} onClick={onClick} disabled={disabled} size='sm'>
+  <IconButton
+    icon={PencilSimpleIcon}
+    onClick={onClick}
+    disabled={disabled}
+    size='sm'
+  >
     {title}
   </IconButton>
 );

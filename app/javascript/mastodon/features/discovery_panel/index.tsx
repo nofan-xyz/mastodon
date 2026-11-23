@@ -2,12 +2,12 @@ import { useRouteMatch } from 'react-router';
 
 import { Search } from '@/mastodon/components/search';
 import { Trends } from '@/mastodon/features/navigation_panel/components/trends';
+import { FooterLinks } from '@/mastodon/features/navigation_panel/footer_links';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from '@/mastodon/identity_context';
 import { isXUi } from '@/mastodon/initial_state';
 import { includeMultiColumnPaths } from '@/mastodon/utils/react_router';
 
-import { FooterLinks } from './footer_links';
 import classes from './styles.module.scss';
 
 /**
@@ -48,7 +48,7 @@ export const DiscoveryPanel: React.FC = () => {
       {isXUi && signedIn && !isNarrow && <Trends />}
 
       <footer className={classes.footer}>
-        <FooterLinks context='search' />
+        <FooterLinks />
       </footer>
     </div>
   );

@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import { useThrottledCallback } from 'use-debounce';
 
+import { isKeyComposing } from '@/mastodon/utils/events';
+
 import { normalizeKey } from '../hotkeys/utils';
 import { getAllMenuItems } from '../menu';
 
@@ -104,13 +106,7 @@ export function useAutosuggestMenu({
   const onSourceKeyDown: React.KeyboardEventHandler<AutosuggestSourceElements> =
     useCallback(
       (event) => {
-        // Check if this composing: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing
-        // and https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event#keydown_events_with_ime
-        if (
-          event.nativeEvent.isComposing ||
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          event.nativeEvent.keyCode === 229
-        ) {
+        if (isKeyComposing(event)) {
           return;
         }
 
@@ -227,6 +223,7 @@ export function useAutosuggestFloatingMenu({
       }
 
       // Set top to scroll offset so the mirror matches the current line location.
+      // offsetTop accounts for content above the source, like the reply preview.
       const lineOffset =
         mirrorElement.scrollHeight - mirrorElement.clientHeight;
       const parent = mirrorElement.parentElement;

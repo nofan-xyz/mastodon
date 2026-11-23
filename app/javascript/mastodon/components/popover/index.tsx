@@ -31,7 +31,7 @@ export interface PopoverProps {
    * Callback triggered when the popover needs to be closed
    * (e.g. because the Esc key was pressed).
    */
-  onClose: (e: Event) => void;
+  onClose: (e?: Event) => void;
   /**
    * Pass an element that the popover should be attached to.
    * Must come from `useState`, not `useRef`.
@@ -187,7 +187,7 @@ export const Popover: React.FC<PopoverProps> = ({
     (e) => {
       onClose(e);
     },
-    isOpen && closeOnClickOutside,
+    { enabled: isOpen && closeOnClickOutside },
   );
 
   // Close when pressing Escape

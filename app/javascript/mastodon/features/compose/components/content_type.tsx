@@ -5,7 +5,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import { TextAaIcon } from '@phosphor-icons/react';
 
 import { changeComposeContentType } from '@/mastodon/actions/compose';
-import { Button } from '@/mastodon/components/button/redesign';
+import { Button } from '@/mastodon/components/button';
 import {
   Menu,
   MenuItemRadio,
