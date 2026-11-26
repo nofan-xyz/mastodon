@@ -13,6 +13,13 @@ RSpec.describe REST::InstanceSerializer do
   end
 
   describe 'configuration' do
+    it 'advertises twelve poll options and fifty characters per option' do
+      expect(serialization['configuration']['polls']).to include(
+        'max_options' => 12,
+        'max_characters_per_option' => 50
+      )
+    end
+
     it 'returns the VAPID public key' do
       expect(serialization['configuration']['vapid']).to eq({
         'public_key' => Rails.configuration.x.vapid.public_key,
@@ -24,6 +31,19 @@ RSpec.describe REST::InstanceSerializer do
         .to include(
           configuration: include(
             accounts: include(max_pinned_statuses: StatusPinValidator::PIN_LIMIT)
+          )
+        )
+    end
+
+    it 'returns the default collection limits' do
+      expect(serialization.deep_symbolize_keys)
+        .to include(
+          configuration: include(
+            collections: {
+              max_items: Collection::MAX_ITEMS,
+              max_name_length: Collection::NAME_LENGTH_LOCAL_LIMIT,
+              max_description_length: Collection::DESCRIPTION_LENGTH_LOCAL_LIMIT,
+            }
           )
         )
     end

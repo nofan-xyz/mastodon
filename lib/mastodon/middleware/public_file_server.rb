@@ -7,7 +7,6 @@ module Mastodon
     class PublicFileServer
       CACHE_TTL = 28.days.to_i
       SERVICE_WORKER_PATH = '/sw.js'
-      SERVICE_WORKER_TTL = 7.days.to_i
 
       def initialize(app)
         @app = app
@@ -26,7 +25,7 @@ module Mastodon
         request = Rack::Request.new env
         headers['cache-control'] = begin
           if request.path.start_with?(SERVICE_WORKER_PATH)
-            "public, max-age=#{SERVICE_WORKER_TTL}, must-revalidate"
+            'no-store'
           elsif request.path.start_with?(paperclip_root_url)
             "public, max-age=#{CACHE_TTL}, immutable"
           else

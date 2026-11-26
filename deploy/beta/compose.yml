@@ -1,0 +1,89 @@
+name: nofan-beta
+
+services:
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mastodon
+      POSTGRES_DB: mastodon_beta
+      POSTGRES_PASSWORD: ${BETA_DB_PASSWORD:?Set beta database password}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U mastodon -d mastodon_beta']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    volumes:
+      - ./redis:/data
+    networks: [internal]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: ${MASTODON_IMAGE:?Set immutable beta Rails image}
+    restart: unless-stopped
+    env_file: .env.production
+    command: bundle exec puma -C config/puma.rb
+    ports: ['127.0.0.1:3105:3000']
+    volumes:
+      - ./public/system:/opt/mastodon/public/system
+    networks: [internal, external]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:3000/health || exit 1']
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 90s
+
+  sidekiq:
+    image: ${MASTODON_IMAGE:?Set immutable beta Rails image}
+    restart: unless-stopped
+    env_file: .env.production
+    command: bundle exec sidekiq -c 5
+    volumes:
+      - ./public/system:/opt/mastodon/public/system
+    networks: [internal, external]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  streaming:
+    image: ${STREAMING_IMAGE:?Set immutable beta streaming image}
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+      PORT: '4000'
+    ports: ['127.0.0.1:4105:4000']
+    networks: [internal, external]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          CMD-SHELL,
+          'curl -fsS http://localhost:4000/api/v1/streaming/health || exit 1',
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+
+networks:
+  internal:
+    internal: true
+  external: {}

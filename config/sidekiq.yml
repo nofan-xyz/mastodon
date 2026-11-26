@@ -76,6 +76,15 @@
       interval: 1 hour
       class: Scheduler::CollectionItemCleanupScheduler
       queue: scheduler
+    moderation_list_synchronization_scheduler:
+      every: ['6h', first_in: '<%= Random.rand(5..60) %> minutes']
+      class: Scheduler::ModerationListSynchronizationScheduler
+      queue: scheduler
+    pending_accounts_notification_scheduler:
+      every: '1h'
+      class: Scheduler::PendingAccountsNotificationScheduler
+      queue: scheduler
+
     on_this_day_precompute_scheduler:
       cron: '0 23 * * * Asia/Shanghai'
       class: Scheduler::OnThisDayScheduler
@@ -85,7 +94,7 @@
       cron: '5 0 * * * Asia/Shanghai'
       class: Scheduler::OnThisDayScheduler
       queue: scheduler
-    repair_remote_collections_scheduler:
-      every: ['24h', first_in: '1s']
-      class: Scheduler::RepairRemoteCollectionsScheduler
+    server_checks_scheduler:
+      every: '15 minutes'
+      class: Scheduler::ServerChecksScheduler
       queue: scheduler

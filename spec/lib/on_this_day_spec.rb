@@ -7,9 +7,9 @@ RSpec.describe OnThisDay do
 
   # Fabricate a status at noon (CST) on this month/day of a past year,
   # safely inside that day's CST range and before the current time.
-  def status_on_this_day(years_ago, **kwargs)
+  def status_on_this_day(years_ago, **)
     past = described_class.today_cst.advance(years: -years_ago)
-    Fabricate(:status, account: account, created_at: described_class.cst_time_zone.local(past.year, past.month, past.day, 12), **kwargs)
+    Fabricate(:status, account: account, created_at: described_class.cst_time_zone.local(past.year, past.month, past.day, 12), **)
   end
 
   describe '.today_cst' do

@@ -50,7 +50,7 @@ export const OnThisDayAnnouncement: React.FC<OnThisDayAnnouncementProps> = ({
         />
       </Button>
     )}
-    <Button onClick={onDismiss} plain className={styles.closeButton}>
+    <Button onClick={onDismiss} variant='ghost' className={styles.closeButton}>
       <FormattedMessage
         id='on_this_day.announcement.action_dismiss'
         defaultMessage='Dismiss'

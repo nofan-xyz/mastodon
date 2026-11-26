@@ -3,7 +3,10 @@ import { Record as ImmutableRecord, isList } from 'immutable';
 
 import type { ApiCustomEmojiJSON } from 'mastodon/api_types/custom_emoji';
 
-export type CustomEmojiShape = Required<ApiCustomEmojiJSON>; // no changes from server shape
+export type CustomEmojiShape = Required<
+  Omit<ApiCustomEmojiJSON, 'category_order'>
+> &
+  Pick<ApiCustomEmojiJSON, 'category_order'>;
 export type CustomEmoji = RecordOf<CustomEmojiShape>;
 
 export const CustomEmojiFactory = ImmutableRecord<CustomEmojiShape>({

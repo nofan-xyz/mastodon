@@ -48,4 +48,24 @@ RSpec.describe StatusesSearchService do
       end
     end
   end
+
+  context 'with migrated nofan search filters', :search do
+    let(:account) { Fabricate(:user).account }
+    let!(:matching_status) { Fabricate(:status, account: account, text: '今日回忆：一次旅行', visibility: :private, created_at: Time.utc(2024, 10, 20, 4)) }
+    let!(:other_status) { Fabricate(:status, account: account, text: '今日天气很好', visibility: :private, created_at: Time.utc(2024, 10, 22, 4)) }
+
+    before { Chewy.client.indices.refresh(index: StatusesIndex.index_name) }
+
+    it 'keeps Chinese phrase matching for the current account' do
+      results = described_class.new.call('今日回忆 from:me', account, limit: 10)
+
+      expect(results).to include(matching_status)
+      expect(results).to_not include(other_status)
+    end
+
+    it 'allows personal date-only filters without a keyword' do
+      expect(described_class.new.call('from:me after:2024-10-19 before:2024-10-21', account, limit: 10))
+        .to contain_exactly(matching_status)
+    end
+  end
 end

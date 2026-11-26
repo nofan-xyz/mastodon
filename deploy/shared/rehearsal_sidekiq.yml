@@ -1,0 +1,10 @@
+---
+:concurrency: 2
+:queues:
+  - default
+  - ingress
+  - pull
+  - push
+  - mailers
+:scheduler:
+  :enabled: false

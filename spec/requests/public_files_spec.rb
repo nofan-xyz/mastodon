@@ -6,7 +6,7 @@ RSpec.describe 'Public files' do
   include RoutingHelper
 
   context 'when requesting service worker file' do
-    before { stub_const 'Mastodon::Middleware::PublicFileServer::SERVICE_WORKER_PATH', '/robots.txt' }
+    before { stub_const 'Mastodon::Middleware::PublicFileServer::SERVICE_WORKER_PATH', '/sw.js' }
 
     it 'returns the file with the expected headers' do
       get Mastodon::Middleware::PublicFileServer::SERVICE_WORKER_PATH
@@ -15,7 +15,7 @@ RSpec.describe 'Public files' do
         .to have_http_status(200)
 
       expect(response.headers['Cache-Control'])
-        .to eq "public, max-age=#{Mastodon::Middleware::PublicFileServer::SERVICE_WORKER_TTL}, must-revalidate"
+        .to eq 'no-store'
 
       expect(response.headers['X-Content-Type-Options'])
         .to eq 'nosniff'

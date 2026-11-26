@@ -6,11 +6,12 @@ import { Globals } from '@react-spring/web';
 import * as perf from '@/mastodon/utils/performance';
 import { setupBrowserNotifications } from 'mastodon/actions/notifications';
 import Mastodon from 'mastodon/containers/mastodon';
-import { me, reduceMotion } from 'mastodon/initial_state';
+import { me, reduceMotion, version } from 'mastodon/initial_state';
 import ready from 'mastodon/ready';
 import { store } from 'mastodon/store';
 
 import { isDevelopment, isProduction } from './utils/environment';
+import { prepareServiceWorker } from './utils/service_worker';
 
 function main() {
   perf.start('main()');
@@ -30,6 +31,21 @@ function main() {
       });
     }
 
+    if (
+      me &&
+      'serviceWorker' in navigator &&
+      (isDevelopment() || isProduction()) // Disallow testing environment
+    ) {
+      let swPath = `/sw.js?version=${encodeURIComponent(version ?? 'unknown')}`;
+      if (isDevelopment()) {
+        const { default: swDevUrl } =
+          await import('@/mastodon/service_worker/sw?url');
+        swPath = swDevUrl;
+      }
+
+      await prepareServiceWorker(swPath);
+    }
+
     const { initializeEmoji } = await import('./features/emoji/index');
     await initializeEmoji();
 
@@ -44,28 +60,14 @@ function main() {
     if (
       me &&
       'serviceWorker' in navigator &&
-      (isDevelopment() || isProduction()) // Disallow testing environment
+      isProduction() &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
     ) {
-      let swPath = '/sw.js';
-      if (isDevelopment()) {
-        const { default: swDevUrl } =
-          await import('@/mastodon/service_worker/sw?url');
-        swPath = swDevUrl;
-      }
+      const registerPushNotifications =
+        await import('mastodon/actions/push_notifications');
 
-      await navigator.serviceWorker.register(swPath, {
-        scope: '/',
-        type: 'module',
-      });
-
-      if (isProduction()) {
-        if ('Notification' in window && Notification.permission === 'granted') {
-          const registerPushNotifications =
-            await import('mastodon/actions/push_notifications');
-
-          store.dispatch(registerPushNotifications.register());
-        }
-      }
+      store.dispatch(registerPushNotifications.register());
     }
 
     perf.stop('main()');

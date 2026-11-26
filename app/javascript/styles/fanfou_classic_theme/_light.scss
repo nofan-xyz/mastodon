@@ -32,12 +32,12 @@
   /* BACKGROUND TOKENS */
 
   // Neutrals — teal-tinted to harmonise with Fanfou's #acdae5 page background
+  --color-bg: #b1dae1;
   --color-bg-primary: var(--color-white);
+  --color-bg-navigation: var(--color-space-green-100);
   --overlay-strength-secondary: 5%;
   --color-bg-secondary: var(--color-space-teal-50);
-  --color-bg-tertiary: var(
-    --color-space-teal-100
-  ); // legacy — subtle teal tint like Fanfou sidebar
+  --color-bg-tertiary: var(--color-space-teal-100); // legacy — subtle teal tint like Fanfou sidebar
 
   // Utility
   --color-bg-inverted: var(--color-space-night-950);
@@ -75,7 +75,7 @@
 
   /* BORDER TOKENS */
 
-  --color-border-primary: var(--color-space-teal-200);
+  --color-border-primary: var(--color-grey-200);
   --color-border-brand: var(--color-text-brand);
   --color-border-brand-soft: var(--color-space-blue-200);
   --color-border-error: var(--color-red-700);

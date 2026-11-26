@@ -1,7 +1,11 @@
 import type { ApiAnnualReportState } from './api/annual_report';
 import type { ApiAccountJSON } from './api_types/accounts';
 
-type InitialStateLanguage = [code: string, name: string, localName: string];
+export type InitialStateLanguage = [
+  code: string,
+  name: string,
+  localName: string,
+];
 
 interface InitialStateMeta {
   access_token: string;
@@ -41,6 +45,7 @@ interface InitialStateMeta {
   local_topic_feed_access: 'public' | 'authenticated';
   remote_topic_feed_access: 'public' | 'authenticated' | 'disabled';
   title: string;
+  custom_app_icon: string | null;
   show_trends: boolean;
   landing_page: 'about' | 'trends' | 'local_feed';
   use_blurhash: boolean;
@@ -49,6 +54,7 @@ interface InitialStateMeta {
   sso_redirect: string;
   status_page_url: string;
   terms_of_service_enabled: boolean;
+  show_stats_in_feed: boolean;
   emoji_style?: string;
   wrapstodon?: InitialStateWrapstodon | null;
   on_this_day?: InitialStateOnThisDay | null;
@@ -91,6 +97,9 @@ export interface InitialState {
   role?: IntialStateRole;
   features: string[];
 }
+
+// Flavour IDs remain stable when their display names change.
+export const isXUi = document.documentElement.dataset.flavour === 'bird-ui';
 
 const element = document.getElementById('initial-state');
 export const initialState: InitialState | undefined = element?.textContent
@@ -148,6 +157,7 @@ export const remoteLiveFeedAccess = getMeta('remote_live_feed_access');
 export const localTopicFeedAccess = getMeta('local_topic_feed_access');
 export const remoteTopicFeedAccess = getMeta('remote_topic_feed_access');
 export const title = getMeta('title');
+export const customAppIcon = getMeta('custom_app_icon');
 export const landingPage = getMeta('landing_page');
 export const useBlurhash = getMeta('use_blurhash');
 export const usePendingItems = getMeta('use_pending_items');
@@ -158,6 +168,7 @@ export const sso_redirect = getMeta('sso_redirect');
 export const termsOfServiceEnabled = getMeta('terms_of_service_enabled');
 export const wrapstodon = getMeta('wrapstodon');
 export const onThisDay = getMeta('on_this_day');
+export const showStatsInFeed = getMeta('show_stats_in_feed');
 
 const displayNames =
   // Intl.DisplayNames can be undefined in old browsers

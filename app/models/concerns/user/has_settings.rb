@@ -51,6 +51,14 @@ module User::HasSettings
     settings['web.delete_modal']
   end
 
+  def setting_display_own_boosts
+    settings['display_own_boosts']
+  end
+
+  def setting_display_own_posts
+    settings['display_own_posts']
+  end
+
   def setting_reduce_motion
     settings['web.reduce_motion']
   end
@@ -73,6 +81,10 @@ module User::HasSettings
 
   def setting_skin
     settings['skin']
+  end
+
+  def setting_theme_color
+    settings['web.theme_color']
   end
 
   def setting_color_scheme
