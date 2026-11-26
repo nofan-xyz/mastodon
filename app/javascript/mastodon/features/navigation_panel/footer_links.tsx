@@ -22,6 +22,10 @@ export const FooterLinks: React.FC<{
         target: '_blank',
       }
     : undefined;
+  const fullVersion = version ?? '未知版本';
+  const shortVersion = fullVersion
+    .replace(/\+.*/, '')
+    .replace(/^(\d+\.\d+\.\d+)\.0(?=-|$)/, '$1');
 
   return (
     <div className={classes.root}>
@@ -93,7 +97,9 @@ export const FooterLinks: React.FC<{
       </section>
 
       <section>
-        <h2 className={classes.heading}>{`Mastodon v${version}`}</h2>
+        <h2 className={classes.heading} title={`完整版本：${fullVersion}`}>
+          {`Mastodon v${shortVersion}`}
+        </h2>
         <ul className={classes.list}>
           <li>
             <a href={source_url} rel='noopener' target='_blank'>
